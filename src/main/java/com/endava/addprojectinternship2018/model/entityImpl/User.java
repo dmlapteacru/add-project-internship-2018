@@ -1,7 +1,6 @@
-package com.endava.addprojectinternship2018.model.interfacesImpl;
+package com.endava.addprojectinternship2018.model.entityImpl;
 
 import com.endava.addprojectinternship2018.model.enums.Role;
-import com.endava.addprojectinternship2018.model.interfaces.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,10 +10,10 @@ import javax.persistence.*;
 @Table(name = "USER")
 @Data
 @NoArgsConstructor
-public class UserImpl implements User {
+public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO) // what is the difference from SEQUENCE ???
     private int id;
 
     @Column(name = "username", unique = true)
@@ -26,7 +25,7 @@ public class UserImpl implements User {
     @Column(name = "role")
     private Role role;
 
-    public UserImpl(String username, String password, Role role) {
+    public User(String username, String password, Role role) {
         this.username = username;
         this.password = password;
         this.role = role;
