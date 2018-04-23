@@ -1,6 +1,6 @@
-package com.endava.addprojectinternship2018.model.entityImpl;
+package com.endava.addprojectinternship2018.model;
 
-import com.endava.addprojectinternship2018.model.enums.Role;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,19 +10,21 @@ import javax.persistence.*;
 @Table(name = "USERS")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) // what is the difference from SEQUENCE ???
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
 
-    @Column(name = "username", unique = true)
+    @Column(unique = true)
     private String username;
 
-    @Column(name = "password")
+    @Column
     private String password;
 
-    @Column(name = "role")
+    @Column
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     public User(String username, String password, Role role) {
@@ -31,5 +33,4 @@ public class User {
         this.role = role;
     }
 
-    //
 }
