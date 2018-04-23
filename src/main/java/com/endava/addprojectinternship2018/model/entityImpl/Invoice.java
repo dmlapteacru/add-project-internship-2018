@@ -1,5 +1,6 @@
 package com.endava.addprojectinternship2018.model.entityImpl;
 
+import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.enums.Status;
 import com.endava.addprojectinternship2018.model.entityIntf.ContractIntf;
 import lombok.Data;
@@ -21,7 +22,7 @@ public class Invoice {
     // String field with some additional contract nr. ???
 
     @Column(name = "contract")
-    private ContractIntf contract;
+    private Contract contract;
 
     @Column(name = "sum")
     private double sum;
@@ -37,6 +38,6 @@ public class Invoice {
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private InvoiceStatus status;
 
 }

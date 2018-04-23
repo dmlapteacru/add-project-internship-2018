@@ -32,7 +32,7 @@ public class Company implements CompanyIntf {
     private long accountNumber;
 
     @ManyToMany
-    private Set<ServiceIntf> services;
+    private Set<Service> serviceSet;
 
     @ManyToMany
     private Set<Contract> contractSet;
@@ -42,14 +42,14 @@ public class Company implements CompanyIntf {
 
     public Company(User user, String name
             , String email, long accountNumber
-            , Set<ServiceIntf> services, Set<Contract> contractSet
+            , Set<Service> serviceSet, Set<Contract> contractSet
             , Set<Invoice> invoiceSet) {
 
         this.user = user;
         this.name = name;
         this.email = email;
         this.accountNumber = accountNumber;
-        this.services = services;
+        this.serviceSet = serviceSet;
         this.contractSet = contractSet;
         this.invoiceSet = invoiceSet;
 
