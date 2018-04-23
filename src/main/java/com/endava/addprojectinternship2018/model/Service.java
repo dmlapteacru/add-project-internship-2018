@@ -1,32 +1,37 @@
-package com.endava.addprojectinternship2018.model.entityImpl;
+package com.endava.addprojectinternship2018.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
-@Table(name = "service")
+@Table(name = "SERVICE")
 @Data
 @NoArgsConstructor
 public class Service {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
 
-    @Column(name = "name", unique = true)
+    @Column(unique = true)
     private String name;
 
-    @Column(name = "price")
+    @Column
     private double price;
 
-    @Column(name = "description")
+    @Column
     private String description;
+
+    @ManyToMany(mappedBy = "services")
+    private List<Company> companies;
 
     public Service(String name, double price, String description) {
         this.name = name;
         this.price = price;
         this.description = description;
     }
+
 }
