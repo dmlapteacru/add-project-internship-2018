@@ -1,6 +1,5 @@
 package com.endava.addprojectinternship2018.model;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,13 +14,13 @@ import javax.persistence.*;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) // what is the difference from SEQUENCE ???
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @Column(name = "username", unique = true)
+    @Column(unique = true)
     private String username;
 
-    @Column(name = "password")
+    @Column
     private String password;
 
     @Column
