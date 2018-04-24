@@ -27,9 +27,13 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public User(String username, String password, Role role) {
+    @Column
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus;
+
+    public User(String username, String password, UserStatus userStatus) {
         this.username = username;
         this.password = password;
-        this.role = role;
+        this.userStatus = userStatus;
     }
 }
