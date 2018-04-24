@@ -1,4 +1,4 @@
-insert into users values (6, '$2a$10$IE4XZPWC.BfLtTIqD5rZ0ewiF8YKIKVKIldHOhNgsASdKn7fu4o.G', 'ADMIN', 'ACTIVE', 'admin');
+-- insert into users values (6, '$2a$10$IE4XZPWC.BfLtTIqD5rZ0ewiF8YKIKVKIldHOhNgsASdKn7fu4o.G', 'ADMIN', 'ACTIVE', 'admin');
 -- insert into users values (2, '123456', 'CUSTOMER', 'ACTIVE', 'petea');
 -- insert into users values (3, '123456', 'COMPANY', 'INCTIVE', 'orange');
 -- insert into users values (4, '123456', 'Customer', 'ACTIVE', 'vova');

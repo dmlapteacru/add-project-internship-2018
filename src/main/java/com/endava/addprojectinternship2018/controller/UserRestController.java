@@ -17,6 +17,6 @@ public class UserRestController {
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public List<User> all(){
-        return userService.findAllUsers();
+        return userService.getAllUsers();
     }
 }

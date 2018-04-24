@@ -7,12 +7,16 @@ import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.model.dto.CompanyRegistrationDto;
 import com.endava.addprojectinternship2018.model.dto.CustomerRegistrationDto;
 import com.endava.addprojectinternship2018.model.dto.UserRegistrationDto;
+import com.endava.addprojectinternship2018.model.dto.UserWithProfileDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.endava.addprojectinternship2018.model.UserStatus.ACTIVE;
+import static com.endava.addprojectinternship2018.model.UserStatus.INACTIVE;
 
 @Service
 public class UserService {
@@ -27,11 +31,11 @@ public class UserService {
     private CompanyDao companyDao;
 
 
-    public Optional<User> findUserByUsername(String username){
+    public Optional<User> getUserByUsername(String username){
         return userDao.findUserByUsername(username);
     }
 
-    public List<User> findAllUsers(){
+    public List<User> getAllUsers(){
         return userDao.findAll();
     }
 
@@ -39,7 +43,7 @@ public class UserService {
 
         User user = new User(userDto.getUsername(),
                 passwordEncoder.encode(userDto.getPassword()),
-                UserStatus.INACTIVE);
+                INACTIVE);
         user.setRole(Role.COMPANY);
         userDao.save(user);
 
@@ -57,6 +61,17 @@ public class UserService {
             customer.setUser(user);
             customerDao.save(customer);
         }
+    }
 
+    public void changeUserStatus(String username){
+        User user = userDao.findUserByUsername(username).get();
+        if (user.getUserStatus() == ACTIVE){
+            user.setUserStatus(INACTIVE);
+        } else user.setUserStatus(ACTIVE);
+        userDao.save(user);
+    }
+
+    public List<UserWithProfileDto> getAllUsersWithProfile() {
+       return userDao.findAllUsersWithProfile();
     }
 }
