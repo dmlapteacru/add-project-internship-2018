@@ -7,24 +7,24 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "SERVICE")
+@Table(name = "PRICE")
 @Data
 @NoArgsConstructor
-public class Service {
+public class Price {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @Column(unique = true)
-    private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "service_id")
+    private Service service;
 
     @Column
-    private String description;
+    private double price;
 
-    public Service(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
+    @ManyToMany(mappedBy = "prices")
+    private List<Company> companies;
+
 
 }

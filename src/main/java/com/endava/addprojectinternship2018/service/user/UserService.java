@@ -40,7 +40,7 @@ public class UserService {
     public void saveUser(UserRegistrationDto userDto) {
 
         User user = new User(userDto.getUsername(),
-                userDto.getPassword(),
+                passwordEncoder.encode(userDto.getPassword()),
                 UserStatus.INACTIVE);
         user.setRole(Role.COMPANY);
         userDao.save(user);

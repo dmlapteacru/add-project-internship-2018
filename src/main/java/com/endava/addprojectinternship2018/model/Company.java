@@ -16,7 +16,7 @@ import java.util.Set;
 public class Company {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     @Column(unique = true)
@@ -34,11 +34,11 @@ public class Company {
 
     @ManyToMany
     @JoinTable(
-            name = "company_services",
+            name = "company_prices",
             joinColumns = {@JoinColumn(name = "company_id")},
-            inverseJoinColumns = {@JoinColumn(name = "service_id")}
-    )
-    private List<Service> services;
+            inverseJoinColumns = {@JoinColumn(name = "price_id")}
+            )
+    private List<Price> prices;
 
     @OneToMany(mappedBy = "company")
     private List<Contract> contracts;

@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class Contract {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     @Column
@@ -35,8 +35,8 @@ public class Contract {
     private Company company;
 
     @OneToOne
-    @JoinColumn(name = "service_id")
-    private Service service;
+    @JoinColumn(name = "price_id")
+    private Price price;
 
     public Contract(LocalDate issueDate, LocalDate expireDate, double sum) {
         this.issueDate = issueDate;
