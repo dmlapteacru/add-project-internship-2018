@@ -45,6 +45,10 @@ public class UserRegistrationController {
             return "registration/company";
         }
 
+        if (!userService.isUsernameUnique(user.getUsername())) {
+            result.rejectValue("username", "username.error", "Username is not unique");
+        }
+
         userService.saveUser(user);
         return "redirect:/registration?success";
     }

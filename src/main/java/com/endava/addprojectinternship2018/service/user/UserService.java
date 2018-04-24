@@ -39,6 +39,10 @@ public class UserService {
         return userDao.findAll();
     }
 
+    public boolean isUsernameUnique(String username) {
+        return !findUserByUsername(username).isPresent();
+    }
+
     public void saveUser(UserRegistrationDto userDto) {
 
         User user = new User(userDto.getUsername(),
