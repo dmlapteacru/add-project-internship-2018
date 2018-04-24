@@ -15,5 +15,4 @@ public interface CompanyDao extends JpaRepository<Company, Integer> {
      Optional<Company> findByName(String name);
      Optional<Company> findByEmail(String email);
 
-
 }

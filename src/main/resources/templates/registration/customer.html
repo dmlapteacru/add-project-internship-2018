@@ -23,7 +23,7 @@
 
             <h1>Registration</h1>
 
-            <form th:action="@{/registration}" th:object="${user}" method="post">
+            <form th:action="@{/registration/customer}" th:object="${user}" method="post">
 
                 <p class="error-message"
                    th:if="${#fields.hasGlobalErrors()}"
