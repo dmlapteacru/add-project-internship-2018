@@ -15,9 +15,9 @@ public class InvoiceService {
     @Autowired
     private InvoiceDao invoiceDao;
 
-    public Invoice getInvoiceById(int id){
-        return invoiceDao.findById(id);
-    }
+//    public Invoice getInvoiceById(int id){
+//        return invoiceDao.findById(id);
+//    }
 
     private List<Invoice> getAllInvoices(){
         return invoiceDao.findAll();
