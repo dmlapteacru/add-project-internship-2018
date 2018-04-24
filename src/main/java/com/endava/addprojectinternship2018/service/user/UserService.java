@@ -26,8 +26,6 @@ public class UserService {
     @Autowired
     private CompanyDao companyDao;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
 
     public Optional<User> findUserByUsername(String username){
         return userDao.findUserByUsername(username);
