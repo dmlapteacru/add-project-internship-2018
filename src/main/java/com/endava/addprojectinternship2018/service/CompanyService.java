@@ -20,15 +20,15 @@ public class CompanyService {
         return companyDao.findAll();
     }
 
-    public Optional<Company> getCompanyById(int id) {
+    public Company getCompanyById(int id) {
         return companyDao.findById(id);
     }
 
-    public Optional<Company> getCompanyByEmail(String email){
+    public Company getCompanyByEmail(String email){
         return companyDao.findByEmail(email);
     }
 
-    public Optional<Company> getCompanyByName(String name){
+    public Company getCompanyByName(String name){
         return companyDao.findByName(name);
     }
 

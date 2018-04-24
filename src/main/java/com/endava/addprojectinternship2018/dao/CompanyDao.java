@@ -11,9 +11,9 @@ import java.util.Optional;
 public interface CompanyDao extends JpaRepository<Company, Integer> {
 
      List<Company> findAll();
-     Optional<Company> findById(int id);
-     Optional<Company> findByName(String name);
-     Optional<Company> findByEmail(String email);
+     Company findById(int id);
+     Company findByName(String name);
+     Company findByEmail(String email);
 
 
 }

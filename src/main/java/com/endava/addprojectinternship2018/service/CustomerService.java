@@ -21,15 +21,15 @@ public class CustomerService  {
         return customerDao.findAll();
     }
 
-    public Optional<Customer> getCustomerById(String id){
+    public Customer getCustomerById(int id){
         return customerDao.findById(id);
     }
 
-    public Optional<Customer> getCustomerByName(String f_name, String l_name){
+    public Customer getCustomerByName(String f_name, String l_name){
         return customerDao.findByFirstNameAndLastName(f_name, l_name);
     }
 
-    public Optional<Customer> getCustomerByBankAccount(String b_account){
+    public Customer getCustomerByBankAccount(String b_account){
         return customerDao.findByBankAccount(b_account);
     }
 }

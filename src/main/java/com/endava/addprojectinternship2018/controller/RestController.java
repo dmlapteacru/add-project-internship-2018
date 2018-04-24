@@ -1,8 +1,12 @@
 package com.endava.addprojectinternship2018.controller;
 
+import com.endava.addprojectinternship2018.dao.InvoiceDao;
 import com.endava.addprojectinternship2018.model.Company;
+import com.endava.addprojectinternship2018.model.Contract;
 import com.endava.addprojectinternship2018.model.Customer;
+import com.endava.addprojectinternship2018.model.Invoice;
 import com.endava.addprojectinternship2018.service.CompanyService;
+import com.endava.addprojectinternship2018.service.ContractService;
 import com.endava.addprojectinternship2018.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,30 +25,56 @@ public class RestController {
     @Autowired
     private CustomerService customerService;
 
-    @GetMapping("/rest/getAllCompanies")
+    @Autowired
+    private ContractService contractService;
+
+    @Autowired
+    private InvoiceDao invoiceDao;
+
+    // REST Companies
+
+    @GetMapping("/rest/company/getAll")
     public List<Company> getAllCompanies(){
         return companyService.getAllCompanies();
     }
 
-    @GetMapping("/rest/getCompanyByName/{name}")
-    public Optional<Company> getCompanyByUsername(@PathVariable String name){
-        return companyService.getCompanyByEmail(name);
+    @GetMapping("/rest/company/getByName/{name}")
+    public Company getCompanyByUsername(@PathVariable String name){
+        return companyService.getCompanyByName(name);
     }
 
-    @GetMapping("/rest/getCompanyByName/{id}")
-    public Optional<Company> getCompanyById(@PathVariable String id){
-        return companyService.getCompanyByEmail(id);
+    @GetMapping("/rest/company/getById/{id}")
+    public Company getCompanyById(@PathVariable Integer id){
+        return companyService.getCompanyById(id);
     }
 
-    @GetMapping("/rest/getCompanyByName/{email}")
-    public Optional<Company> getCompanyByEmail(@PathVariable String email){
+    @GetMapping("/rest/company/getByEmail/{email}")
+    public Company getCompanyByEmail(@PathVariable String email){
         return companyService.getCompanyByEmail(email);
     }
 
-    @GetMapping("rest/customerById/{id}")
-    public Optional<Customer> getCustomerById(@PathVariable String id){
+
+    //  -----     REST Customer
+    @GetMapping("rest/customer/ById/{id}")
+    public Customer getCustomerById(@PathVariable int id){
         return customerService.getCustomerById(id);
     }
+
+
+    // -----      REST Contracts
+    @GetMapping("rest/contracts/byCustomerName/{customername}")
+    public List<Contract> getContractsByCustomer(String customername){
+        return contractService.getContractsByCompanyName(customername);
+    }
+
+    // -----      REST Invoices
+
+    @GetMapping("rest/invoice/getAll")
+    public List<Invoice> getAllInvoices(){
+        return invoiceDao.findAll();
+    }
+
+
 
 
 
