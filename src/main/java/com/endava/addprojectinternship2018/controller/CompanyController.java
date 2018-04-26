@@ -37,9 +37,11 @@ public class CompanyController {
     public String showCompanyContracts(Model model, Authentication authentication){
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
+//        int userId = auth.get;
 
-        Optional<Company> company =  companyService.getCompanyByUsername(username);
+        //todo  to verify additionally
+
+//        Optional<Company> company =  companyService.getCompanyByUserId();
 //        if (!company.isPresent()){
 //            model.addAttribute("error", "you have some errors");
 //            return "company/error";

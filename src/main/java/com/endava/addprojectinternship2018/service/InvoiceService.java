@@ -20,23 +20,23 @@ public class InvoiceService {
 //        return invoiceDao.findById(id);
 //    }
 
-    private List<Invoice> getAllInvoices(){
+    public List<Invoice> getAllInvoices(){
         return invoiceDao.findAll();
     }
 
-    private List<Invoice> getAllInvoiceByContractId(int id){
+    public List<Invoice> getAllInvoiceByContractId(int id){
         return invoiceDao.findByContractId(id);
     }
 
-    private List<Invoice> getAllInvoicesByStatus(InvoiceStatus status){
+    public List<Invoice> getAllInvoicesByStatus(InvoiceStatus status){
         return invoiceDao.findAllByStatus(status);
     }
 
-    private List<Invoice> getAllInvoicesByIssueDate(LocalDate localDate){
+    public List<Invoice> getAllInvoicesByIssueDate(LocalDate localDate){
         return invoiceDao.findAllByIssueDate(localDate);
     }
 
-    private List<Invoice> getAllInvoicesByDueDate(LocalDate localDate){
+    public List<Invoice> getAllInvoicesByDueDate(LocalDate localDate){
         return invoiceDao.findAllByDueDate(localDate);
     }
 
