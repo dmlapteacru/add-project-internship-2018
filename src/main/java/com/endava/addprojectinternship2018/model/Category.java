@@ -4,27 +4,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
-@Table(name = "SERVICE")
+@Table(name = "CATEGORY")
 @Data
 @NoArgsConstructor
-public class Service {
+public class Category {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(unique = true)
     private String name;
 
-    @Column
-    private String description;
-
-    public Service(String name, String description) {
+    public Category(String name) {
         this.name = name;
-        this.description = description;
     }
 
 }

@@ -11,8 +11,15 @@ import java.util.Optional;
 public interface CustomerDao extends JpaRepository <Customer, Integer> {
 
     List<Customer> findAll();
-    Optional <Customer> findById(String id);
-    Optional<Customer> findByFirstNameAndLastName(String f_name, String L_name);
-    Optional<Customer> findByBankAccount(String bank_acc);
+
+    Optional <Customer> findById(int id);
+
+    Optional<Customer> findByFirstNameAndLastName(String firstName, String lastName);
+
+    Optional<Customer> findByBankAccount(String bankAccount);
+
+    Optional<Customer> findByEmail(String email);
+
+    Optional<Customer> findByUserId(int id);
 
 }

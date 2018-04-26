@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "USERS")
@@ -14,19 +15,23 @@ import javax.persistence.*;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @NotNull
     @Column(unique = true)
     private String username;
 
+    @NotNull
     @Column
     private String password;
 
+    @NotNull
     @Column
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @NotNull
     @Column
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;

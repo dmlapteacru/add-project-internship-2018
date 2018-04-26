@@ -3,19 +3,24 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Customer main page</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/default.css"  />
+    <title>Customer Page</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 
 <body>
-<div class="main_wrapper">
-    <h1>Welcome</h1>
+<div class="container">
 
-    <a href="/customer/contracts"> Contracts</a>
-    <br>
-    <a href="/customer/invoices"> Contracts</a>
-    <br>
+    <h1 th:text="'Welcome, '+${customer.getFullName()}"></h1>
+
+    <ul class="nav nav-pills nav-stacked">
+        <li class="active"><a href="#">Home</a></li>
+        <li><a th:href="@{/customer/contracts}"> Contracts </a></li>
+        <li><a th:href="@{/customer/invoices}"> Invoices </a></li>
+    </ul>
 
 </div>
 </body>

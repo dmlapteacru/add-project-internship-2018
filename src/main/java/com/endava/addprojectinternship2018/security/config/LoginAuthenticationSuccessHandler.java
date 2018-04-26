@@ -17,7 +17,6 @@ public class LoginAuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
     private static final String DEFAULT_URL_COMPANY = "/company";
     private static final String DEFAULT_URL_CUSTOMER = "/customer";
 
-
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,

@@ -30,26 +30,27 @@ public class UserService {
     @Autowired
     private CompanyDao companyDao;
 
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     public Optional<User> getUserByUsername(String username){
         return userDao.findUserByUsername(username);
+    }
+
+    public Optional<User> findUserById(int id) {
+        return userDao.findById(id);
     }
 
     public List<User> getAllUsers(){
         return userDao.findAll();
     }
 
-    public boolean isUsernameUnique(String username) {
-        return !findUserByUsername(username).isPresent();
-    }
 
     public void saveUser(UserRegistrationDto userDto) {
 
         User user = new User(userDto.getUsername(),
                 passwordEncoder.encode(userDto.getPassword()),
-                INACTIVE);
-        user.setRole(Role.COMPANY);
-        userDao.save(user);
+                UserStatus.INACTIVE);
 
         if (userDto instanceof CompanyRegistrationDto) {
             CompanyRegistrationDto companyRegistrationDto = (CompanyRegistrationDto) userDto;
@@ -57,12 +58,16 @@ public class UserService {
             company.setName(companyRegistrationDto.getName());
             company.setEmail(companyRegistrationDto.getEmail());
             company.setUser(user);
+            user.setRole(Role.COMPANY);
+            userDao.save(user);
             companyDao.save(company);
         } else {
             CustomerRegistrationDto customerRegistrationDto = (CustomerRegistrationDto) userDto;
             Customer customer = new Customer(customerRegistrationDto.getFirstName(),
                     customerRegistrationDto.getLastName(), customerRegistrationDto.getEmail());
             customer.setUser(user);
+            user.setRole(Role.CUSTOMER);
+            userDao.save(user);
             customerDao.save(customer);
         }
     }

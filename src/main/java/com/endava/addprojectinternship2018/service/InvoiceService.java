@@ -2,14 +2,14 @@ package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
 import com.endava.addprojectinternship2018.model.Invoice;
+import com.endava.addprojectinternship2018.model.InvoiceStatus;
+import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
-// ??
 public class InvoiceService {
 
     @Autowired
@@ -24,10 +24,10 @@ public class InvoiceService {
     }
 
     private List<Invoice> getAllInvoiceByContract(int id){
-        return invoiceDao.findAllByContractId(id);
+        return invoiceDao.findByContractId(id);
     }
 
-    private List<Invoice> getAllInvoicesByStatus(String status){
+    private List<Invoice> getAllInvoicesByStatus(InvoiceStatus status){
         return invoiceDao.findAllByStatus(status);
     }
 
@@ -39,5 +39,8 @@ public class InvoiceService {
         return invoiceDao.findAllByDueDate(localDate);
     }
 
+    public List<Invoice> getInvoicesByCustomerId(int id) {
+        return invoiceDao.findAllByContractCustomerId(id);
+    }
 
 }
