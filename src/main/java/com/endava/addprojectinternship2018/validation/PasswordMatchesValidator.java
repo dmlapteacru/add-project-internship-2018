@@ -1,7 +1,5 @@
 package com.endava.addprojectinternship2018.validation;
 
-import com.endava.addprojectinternship2018.model.dto.CompanyRegistrationDto;
-import com.endava.addprojectinternship2018.model.dto.CustomerRegistrationDto;
 import com.endava.addprojectinternship2018.model.dto.UserRegistrationDto;
 
 import javax.validation.ConstraintValidator;

@@ -42,7 +42,7 @@ public class RestController {
     }
 
     @GetMapping("rest/customerById/{id}")
-    public Optional<Customer> getCustomerById(@PathVariable String id){
+    public Optional<Customer> getCustomerById(@PathVariable int id){
         return customerService.getCustomerById(id);
     }
 

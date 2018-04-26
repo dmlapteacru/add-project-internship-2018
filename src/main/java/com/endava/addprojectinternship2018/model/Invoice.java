@@ -16,7 +16,7 @@ import java.security.PrivateKey;
 public class Invoice {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column

@@ -2,6 +2,7 @@ package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.CompanyDao;
 import com.endava.addprojectinternship2018.model.Company;
+import com.endava.addprojectinternship2018.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,7 @@ public class CompanyService {
     @Autowired
     private CompanyDao companyDao;
 
-    public List<Company> getAllCompanies(){
+    public List<Company> getAllCompanies() {
         return companyDao.findAll();
     }
 
@@ -24,13 +25,15 @@ public class CompanyService {
         return companyDao.findById(id);
     }
 
-    public Optional<Company> getCompanyByEmail(String email){
+    public Optional<Company> getCompanyByEmail(String email) {
         return companyDao.findByEmail(email);
     }
 
-    public Optional<Company> getCompanyByName(String name){
+    public Optional<Company> getCompanyByName(String name) {
         return companyDao.findByName(name);
     }
 
-
+    public Optional<Company> getCompanyByUserId(int id) {
+        return companyDao.findByUserId(id);
+    }
 }

@@ -12,24 +12,33 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class CustomerService  {
+public class CustomerService {
 
     @Autowired
-    CustomerDao customerDao;
+    private CustomerDao customerDao;
 
-    public List<Customer> getAllCustomers(){
+    public List<Customer> getAllCustomers() {
         return customerDao.findAll();
     }
 
-    public Optional<Customer> getCustomerById(String id){
+    public Optional<Customer> getCustomerById(int id) {
         return customerDao.findById(id);
     }
 
-    public Optional<Customer> getCustomerByName(String f_name, String l_name){
-        return customerDao.findByFirstNameAndLastName(f_name, l_name);
+    public Optional<Customer> getCustomerByFullName(String firstName, String lastName) {
+        return customerDao.findByFirstNameAndLastName(firstName, lastName);
     }
 
-    public Optional<Customer> getCustomerByBankAccount(String b_account){
-        return customerDao.findByBankAccount(b_account);
+    public Optional<Customer> getCustomerByEmail(String email) {
+        return customerDao.findByEmail(email);
     }
+
+    public Optional<Customer> getCustomerByBankAccount(String bankAccount) {
+        return customerDao.findByBankAccount(bankAccount);
+    }
+
+    public Optional<Customer> getCustomerByUserId(int id) {
+        return customerDao.findByUserId(id);
+    }
+
 }

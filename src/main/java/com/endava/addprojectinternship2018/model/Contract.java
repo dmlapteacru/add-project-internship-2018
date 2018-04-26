@@ -6,7 +6,6 @@ import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 
-
 @Entity
 @Table(name = "CONTRACT")
 @Data
@@ -14,7 +13,7 @@ import javax.persistence.*;
 public class Contract {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column
@@ -35,8 +34,8 @@ public class Contract {
     private Company company;
 
     @OneToOne
-    @JoinColumn(name = "price_id")
-    private Price price;
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     public Contract(LocalDate issueDate, LocalDate expireDate, double sum) {
         this.issueDate = issueDate;
