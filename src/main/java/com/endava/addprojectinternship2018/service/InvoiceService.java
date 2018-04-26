@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+// ??
 public class InvoiceService {
 
     @Autowired
@@ -23,7 +24,7 @@ public class InvoiceService {
         return invoiceDao.findAll();
     }
 
-    private List<Invoice> getAllInvoiceByContract(int id){
+    private List<Invoice> getAllInvoiceByContractId(int id){
         return invoiceDao.findByContractId(id);
     }
 

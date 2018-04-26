@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/3.3.7/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
+
+    <title>Contracts</title>
+</head>
+
+<body>
+    <h3>Here must be contracts</h3>
+
+    <table border="1">
+        <tr>
+            <th>Id</th>
+            <th>Sum</th>
+            <th>Issue Date</th>
+            <th>Expire Date</th>
+        </tr>
+        <tr th:each="var : ${contracts}">
+            <td th:text="${var.getId()} ? ${var.getId()} : 'null value !'"></td>
+            <td th:text="${var.getSum()} ? ${var.getSum()} : 'null value !'"></td>
+            <td th:text="${var.getIssueDate()} ? ${var.getIssueDate()} : 'null value !'"></td>
+            <td th:text="${var.getExpireDate()} ? ${var.getExpireDate()} : 'null value !'"> </td>
+        </tr>
+    </table>
+<div>Some text in div section</div>
+</body>
+</html>

@@ -14,8 +14,12 @@ public class ContractService {
     @Autowired
     private ContractDao contractDao;
 
-    public List<Contract> getContractsByCompanyName(String companyName) {
+    public List<Contract> getContractsByCompanyName(String companyName){
         return contractDao.findByCompanyName(companyName);
+    }
+
+    public List<Contract> getAllContracts(){
+        return contractDao.findAll();
     }
 
     public List<Contract> getContractsByCustomerId(int id) {
