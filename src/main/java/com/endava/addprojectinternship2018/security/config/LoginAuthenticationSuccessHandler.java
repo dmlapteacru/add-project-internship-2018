@@ -5,7 +5,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -34,17 +33,14 @@ public class LoginAuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
     }
 
 
-    public String authenticatedRedirectDefaultPage(Authentication authentication){
+    public String authenticatedRedirectDefaultPage(Authentication authentication) {
             Set<String> setOfAuthorities = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
             if (setOfAuthorities.contains("ADMIN")){
-                return "admin";
+                return "/admin";
             } else
             if (setOfAuthorities.contains("COMPANY")){
-                return "company";
+                return "/company";
             } else
-                if (setOfAuthorities.contains("CUSTOMER"))
-                    return "customer";
-
-            return "login";
+                    return "/customer";
     }
 }

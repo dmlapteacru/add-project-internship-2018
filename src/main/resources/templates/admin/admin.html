@@ -1,0 +1,43 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Getting Started: Serving Web Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/contacts.css" />
+
+</head>
+<body>
+    <form th:action="@{/logout}" method="post" class="logout_btn">
+
+        <input class="btn btn-danger" type="submit" value="Logout"/>
+        <div class="time-date">
+            <p th:text="${#dates.format(#dates.createNow(), 'HH:mm , dd MMMMMMMMM yyyy')}"></p>
+        </div>
+    </form>
+    <div>
+        <table class="table">
+            <th>Role</th>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th></th>
+            <th></th>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.role}"></td>
+                <td th:text="${user.name}"></td>
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.email}"></td>
+                <td th:text="${user.userStatus}"></td>
+                <td th:switch="${user.userStatus}">
+                    <a th:case="${user.userStatus.INACTIVE}"
+                       th:href="@{admin/status?(username=${user.username})}" class="btn">ACTIVATE</a>
+                    <a th:case="${user.userStatus.ACTIVE}"
+                       th:href="@{admin/status?(username=${user.username})}" class="btn">DEACTIVATE</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

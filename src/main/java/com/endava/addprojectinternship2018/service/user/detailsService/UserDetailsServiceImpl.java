@@ -1,6 +1,7 @@
 package com.endava.addprojectinternship2018.service.user.detailsService;
 
 import com.endava.addprojectinternship2018.model.User;
+import com.endava.addprojectinternship2018.model.UserStatus;
 import com.endava.addprojectinternship2018.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,11 +22,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if (!userService.findUserByUsername(username).isPresent()){
+        if (!userService.getUserByUsername(username).isPresent()){
             throw new UsernameNotFoundException("No such user");
         }
-
-        User user = userService.findUserByUsername(username).get();
+        if (userService.getUserByUsername(username).get().getUserStatus() != UserStatus.ACTIVE){
+            throw new UsernameNotFoundException("user is inactive");
+        }
+        User user = userService.getUserByUsername(username).get();
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         grantedAuthorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
 

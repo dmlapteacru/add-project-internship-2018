@@ -1,6 +1,5 @@
 package com.endava.addprojectinternship2018.security.config;
 
-import com.endava.addprojectinternship2018.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -52,11 +51,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.authorizeRequests()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/admin").access("hasAuthority('ADMIN')")
+                .antMatchers("/login", "/registration", "/").permitAll()
+                .antMatchers("/admin/**").access("hasAuthority('ADMIN')")
+                .antMatchers("/customer/**").access("hasAuthority('CUSTOMER')")
+                .antMatchers("/company/**").access("hasAuthority('COMPANY')")
+                .antMatchers("/invoices/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
+                .antMatchers("/service/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
+                .antMatchers("/bank/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
+                .anyRequest().authenticated()
                 .and().formLogin().loginPage("/login")
                 .successHandler(loginAuthenticationSuccessHandler)
-                .failureUrl("/error")
+                .failureUrl("/login?error=true")
                 .usernameParameter("username").passwordParameter("password")
                 .and().csrf().disable();
     }
