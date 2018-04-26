@@ -1,6 +1,8 @@
-body {
-
-    margin:0 auto;
+body, html {
+    margin: 0 auto;
+    height: 100%;
+    margin: 0;
+    font-family: Arial;
 }
 .wrap {
     height: 80%;
@@ -56,3 +58,4 @@ body {
     margin-bottom: 15px;
     color: rgba(255,255,255,0.4);
 }
+

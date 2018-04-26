@@ -4,8 +4,8 @@
     <title>Getting Started: Serving Web Content</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/contacts.css" />
-
+    <link rel="stylesheet" type="text/css" href="/css/tabs.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body>
     <form th:action="@{/logout}" method="post" class="logout_btn">
@@ -15,9 +15,42 @@
             <p th:text="${#dates.format(#dates.createNow(), 'HH:mm , dd MMMMMMMMM yyyy')}"></p>
         </div>
     </form>
-    <div>
+
+    <button style="background-color: #234232" class="tablink" onclick="openPage('Users', this)">Users</button>
+    <button class="tablink" onclick="openPage('Services', this)">Services</button>
+
+    <div id="Users" class="tabcontent">
         <table class="table">
             <th>Role</th>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th></th>
+            <th></th>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.role}"></td>
+                <td th:text="${user.name}"></td>
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.email}"></td>
+                <td th:text="${user.userStatus}"></td>
+                <td th:switch="${user.userStatus}">
+                    <a th:case="${user.userStatus.INACTIVE}"
+                       th:href="@{admin/status?(username=${user.username})}" class="btn">ACTIVATE</a>
+                    <a th:case="${user.userStatus.ACTIVE}"
+                       th:href="@{admin/status?(username=${user.username})}" class="btn">DEACTIVATE</a>
+                </td>
+                <td id="passChange">
+                    <span class="input" th:value="${user.username}"></span>
+                    <button class="changePassBtn" th:value="${user.username}">change pass</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="Services" class="tabcontent">
+        <table class="table">
+            <th>Service</th>
             <th>Name</th>
             <th>Username</th>
             <th>Email</th>
@@ -39,5 +72,32 @@
             </tr>
         </table>
     </div>
+
+    <script>
+        function openPage(pageName,elmnt) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablink");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].style.backgroundColor = "";
+            }
+            document.getElementById(pageName).style.display = "block";
+            elmnt.style.backgroundColor = "#234232";
+        }
+        // // Get the element with id="defaultOpen" and click on it
+        // document.getElementById("defaultOpen").click();
+
+        $(".changePassBtn").click(function () {
+            var value = $(this).attr("value");
+            $(".input[value=" + value + "]").each(function () {
+               $(this).html("<input type='text'/>");
+            });
+            $(this).attr("id", "op");
+        });
+    </script>
+
 </body>
 </html>

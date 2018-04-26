@@ -55,7 +55,7 @@ public class UserRegistrationController {
             return "registration/company";
         }
 
-        if (userService.findUserByUsername(user.getUsername()).isPresent()) {
+        if (userService.getUserByUsername(user.getUsername()).isPresent()) {
             result.rejectValue("username", "username.error", "Username is not unique");
             return "registration/company";
         }
@@ -77,7 +77,7 @@ public class UserRegistrationController {
             return "registration/customer";
         }
 
-        if (userService.findUserByUsername(user.getUsername()).isPresent()) {
+        if (userService.getUserByUsername(user.getUsername()).isPresent()) {
             result.rejectValue("username", "username.error", "Username is not unique");
             return "registration/customer";
         }

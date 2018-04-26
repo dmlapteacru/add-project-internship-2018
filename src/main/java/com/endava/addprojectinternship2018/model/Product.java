@@ -19,7 +19,7 @@ public class Product {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_category_id")
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @Column

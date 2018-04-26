@@ -10,6 +10,7 @@ import com.endava.addprojectinternship2018.service.InvoiceService;
 import com.endava.addprojectinternship2018.service.user.UserService;
 import com.endava.addprojectinternship2018.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -39,10 +40,9 @@ public class CustomerController {
 
     @GetMapping(value = "")
     public String getHomePage(Model model) {
-        if (UserUtil.getCurrentCustomer() == null) {
-            return "error";
-        }
-        model.addAttribute("customer", UserUtil.getCurrentCustomer());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String name = authentication.getName();
+        model.addAttribute("customer", name);
         return "customer/homePage";
     }
 
@@ -78,7 +78,7 @@ public class CustomerController {
 
     private Customer getCurrentCustomer() {
         Customer result = null;
-        Optional<User> userOptional = userService.findUserByUsername(getPrincipal());
+        Optional<User> userOptional = userService.getUserByUsername(getPrincipal());
         if (userOptional.isPresent()) {
             Optional<Customer> customerOptional = customerService.getCustomerByUserId(userOptional.get().getId());
             if (customerOptional.isPresent()) {

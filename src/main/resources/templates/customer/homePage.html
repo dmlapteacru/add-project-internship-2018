@@ -14,13 +14,13 @@
 <body>
 <div class="container">
 
-    <h1 th:text="'Welcome, '+${customer.getFullName()}"></h1>
+    <h1 th:text="'Welcome, '+${customer}"></h1>
 
-    <ul class="nav nav-pills nav-stacked">
-        <li class="active"><a href="#">Home</a></li>
-        <li><a th:href="@{/customer/contracts}"> Contracts </a></li>
-        <li><a th:href="@{/customer/invoices}"> Invoices </a></li>
-    </ul>
+    <!--<ul class="nav nav-pills nav-stacked">-->
+        <!--<li class="active"><a href="#">Home</a></li>-->
+        <!--<li><a th:href="@{/customer/contracts}"> Contracts </a></li>-->
+        <!--<li><a th:href="@{/customer/invoices}"> Invoices </a></li>-->
+    <!--</ul>-->
 
 </div>
 </body>

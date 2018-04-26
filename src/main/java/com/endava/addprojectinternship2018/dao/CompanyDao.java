@@ -21,4 +21,5 @@ public interface CompanyDao extends JpaRepository<Company, Integer> {
 
     Optional<Company> findByUserId(int id);
 
+
 }

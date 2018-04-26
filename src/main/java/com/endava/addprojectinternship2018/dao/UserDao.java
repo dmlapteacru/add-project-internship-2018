@@ -16,7 +16,7 @@ public interface UserDao extends JpaRepository<User, Integer> {
     Optional<User> findUserByUsername(String username);
 
     @Query("select new com.endava.addprojectinternship2018.model.dto.UserWithProfileDto(a.role," +
-            "case when co.id is not null then co.name when cu.id is not null then cu.firstName else null end," +
+            "case when co.id is not null then co.name when cu.id is not null then concat(concat(cu.firstName, ' ') , cu.lastName) else null end," +
             "a.username, " +
             "case when co.id is not null then co.email when cu.id is not null then cu.email else null end, a.userStatus)" +
             "from User a " +

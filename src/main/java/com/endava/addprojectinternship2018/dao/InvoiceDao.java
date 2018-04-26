@@ -1,11 +1,13 @@
 package com.endava.addprojectinternship2018.dao;
 
+import com.endava.addprojectinternship2018.model.Company;
 import com.endava.addprojectinternship2018.model.Invoice;
 import com.endava.addprojectinternship2018.model.InvoiceStatus;
 import org.joda.time.LocalDate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
 
 @Repository
