@@ -10,32 +10,33 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+// ??
 public class InvoiceService {
 
     @Autowired
     private InvoiceDao invoiceDao;
 
-    public Invoice getInvoiceById(int id){
-        return invoiceDao.findById(id);
-    }
+//    public Invoice getInvoiceById(int id){
+//        return invoiceDao.findById(id);
+//    }
 
-    private List<Invoice> getAllInvoices(){
+    public List<Invoice> getAllInvoices(){
         return invoiceDao.findAll();
     }
 
-    private List<Invoice> getAllInvoiceByContract(int id){
+    public List<Invoice> getAllInvoiceByContractId(int id){
         return invoiceDao.findByContractId(id);
     }
 
-    private List<Invoice> getAllInvoicesByStatus(InvoiceStatus status){
+    public List<Invoice> getAllInvoicesByStatus(InvoiceStatus status){
         return invoiceDao.findAllByStatus(status);
     }
 
-    private List<Invoice> getAllInvoicesByIssueDate(LocalDate localDate){
+    public List<Invoice> getAllInvoicesByIssueDate(LocalDate localDate){
         return invoiceDao.findAllByIssueDate(localDate);
     }
 
-    private List<Invoice> getAllInvoicesByDueDate(LocalDate localDate){
+    public List<Invoice> getAllInvoicesByDueDate(LocalDate localDate){
         return invoiceDao.findAllByDueDate(localDate);
     }
 

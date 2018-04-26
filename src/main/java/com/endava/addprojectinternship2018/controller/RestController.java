@@ -26,25 +26,37 @@ public class RestController {
         return companyService.getAllCompanies();
     }
 
-    @GetMapping("/rest/getCompanyByName/{name}")
-    public Optional<Company> getCompanyByUsername(@PathVariable String name){
-        return companyService.getCompanyByEmail(name);
+
+//  -----   REST Company
+    @GetMapping("/rest/getCompanyByEmail/{name}")
+    public Company getCompanyByEmail(@PathVariable String name){
+        return companyService.getCompanyByEmail(name).get();
     }
 
-    @GetMapping("/rest/getCompanyByName/{id}")
-    public Optional<Company> getCompanyById(@PathVariable String id){
-        return companyService.getCompanyByEmail(id);
+    @GetMapping("/rest/getCompanyById/{id}")
+    public Company getCompanyById(@PathVariable int id){
+        return companyService.getCompanyById(id).get();
     }
 
-    @GetMapping("/rest/getCompanyByName/{email}")
-    public Optional<Company> getCompanyByEmail(@PathVariable String email){
-        return companyService.getCompanyByEmail(email);
+    @GetMapping("/rest/getCompanyByName/{companyName}")
+    public Company getCompanyByUsername(@PathVariable String companyName){
+        return companyService.getCompanyByName(companyName).get();
     }
 
-    @GetMapping("rest/customerById/{id}")
-    public Optional<Customer> getCustomerById(@PathVariable int id){
-        return customerService.getCustomerById(id);
-    }
+//  -------------------------------------------
+
+//
+
+//
+//    @GetMapping("rest/customerById/{id}")
+//    public Customer getCustomerById(@PathVariable int id){
+//        return customerService.getCustomerById(id);
+//    }
+
+//    @GetMapping("rest/customerByName/{name}")
+//    public Optional<Customer> getCustomerByNameSurname(String name){
+//        return customerService.getCustomerByName(name);
+//    }
 
 
 

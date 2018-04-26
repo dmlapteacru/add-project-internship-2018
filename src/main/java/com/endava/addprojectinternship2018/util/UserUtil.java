@@ -49,7 +49,7 @@ public class UserUtil {
 
     public static User getCurrentUser() {
         User result = null;
-        Optional<User> userOptional = userService.findUserByUsername(getPrincipal());
+        Optional<User> userOptional = userService.getUserByUsername(getPrincipal());
         if (userOptional.isPresent()) {
             result = userOptional.get();
         }

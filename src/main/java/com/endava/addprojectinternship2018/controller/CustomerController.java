@@ -78,7 +78,7 @@ public class CustomerController {
 
     private Customer getCurrentCustomer() {
         Customer result = null;
-        Optional<User> userOptional = userService.findUserByUsername(getPrincipal());
+        Optional<User> userOptional = userService.getUserByUsername(getPrincipal());
         if (userOptional.isPresent()) {
             Optional<Customer> customerOptional = customerService.getCustomerByUserId(userOptional.get().getId());
             if (customerOptional.isPresent()) {
