@@ -1,12 +1,13 @@
 package com.endava.addprojectinternship2018.model;
 
+import com.endava.addprojectinternship2018.model.Enums.InvoiceStatus;
+import com.endava.addprojectinternship2018.util.LocalDateTimeConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.joda.time.LocalDate;
 
 import javax.persistence.*;
-import java.security.PrivateKey;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "INVOICE")
@@ -23,10 +24,12 @@ public class Invoice {
     private double sum;
 
     @Column
-    private LocalDate issueDate;
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime issueDate;
 
     @Column
-    private LocalDate dueDate;
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime dueDate;
 
     @Column
     @Enumerated(EnumType.STRING)
@@ -36,7 +39,7 @@ public class Invoice {
     @JoinColumn(name = "contract_id")
     private Contract contract;
 
-    public Invoice(double sum, LocalDate issueDate, LocalDate dueDate) {
+    public Invoice(double sum, LocalDateTime issueDate, LocalDateTime dueDate) {
         this.sum = sum;
         this.issueDate = issueDate;
         this.dueDate = dueDate;

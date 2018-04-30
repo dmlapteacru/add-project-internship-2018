@@ -1,7 +1,7 @@
 package com.endava.addprojectinternship2018.model.dto;
 
-import com.endava.addprojectinternship2018.model.Role;
-import com.endava.addprojectinternship2018.model.UserStatus;
+import com.endava.addprojectinternship2018.model.Enums.Role;
+import com.endava.addprojectinternship2018.model.Enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

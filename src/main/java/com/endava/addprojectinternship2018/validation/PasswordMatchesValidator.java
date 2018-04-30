@@ -1,6 +1,6 @@
 package com.endava.addprojectinternship2018.validation;
 
-import com.endava.addprojectinternship2018.model.dto.UserRegistrationDto;
+import com.endava.addprojectinternship2018.model.dto.UserDto;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -15,7 +15,7 @@ public class PasswordMatchesValidator implements ConstraintValidator<PasswordMat
     public boolean isValid(Object obj, ConstraintValidatorContext context) {
         context.disableDefaultConstraintViolation();
 
-        UserRegistrationDto user = (UserRegistrationDto) obj;
+        UserDto user = (UserDto) obj;
 
         boolean regExpMatches = user.getPassword().matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$");
         if (!regExpMatches) {

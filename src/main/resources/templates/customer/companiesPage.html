@@ -15,16 +15,24 @@
 <div th:replace="fragments/header :: header">
 
 </div>
-<div class="container">
+<h2>List all of companies in system:</h2>
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>E-mail</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="company : ${companies}">
+        <td th:text="${company.getName()}">company name</td>
+        <td th:text="${company.getEmail()}">company email</td>
+        <td><a th:href="@{/contract/editContract(contractId=0,companyId=${company.getId()})}" class="btn btn-info" role="button">Create new contract</a></td>
+    </tr>
+    </tbody>
+</table>
 
-    <h2 th:text="'Welcome, '+${customer.getFullName()}"></h2>
-    <div class="list-group">
-        <a th:href="@{/customer/companies}" class="list-group-item"> Companies </a>
-        <a th:href="@{/customer/contracts}" class="list-group-item"> Contracts </a>
-        <a th:href="@{/customer/invoices}" class="list-group-item"> Invoices </a>
-        <a th:href="@{/customer/bank}" class="list-group-item"> Bank operations </a>
-    </div>
 </div>
-<div th:replace="fragments/footer :: footer">&copy; 2018 The Static Templates</div>
 </body>
 </html>

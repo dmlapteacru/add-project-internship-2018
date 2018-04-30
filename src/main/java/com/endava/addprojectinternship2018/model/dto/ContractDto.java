@@ -2,33 +2,64 @@ package com.endava.addprojectinternship2018.model.dto;
 
 import com.endava.addprojectinternship2018.model.Company;
 import com.endava.addprojectinternship2018.model.Customer;
+import com.endava.addprojectinternship2018.model.Enums.ContractStatus;
 import com.endava.addprojectinternship2018.model.Product;
+import com.endava.addprojectinternship2018.util.LocalDateTimeConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.joda.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Convert;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.NotEmpty;
-
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ContractDto {
 
-    @NotEmpty
-    private LocalDate issueDate;
+    private int contractId;
 
     @NotEmpty
-    private LocalDate expireDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime issueDate;
+
+    @NotEmpty
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime expireDate;
 
     @NotEmpty
     private double sum;
 
-    private Company company;
-    private Customer customer;
+    @NotEmpty
+    @Enumerated(EnumType.STRING)
+    private ContractStatus status;
+
+    private List<Company> companies;
 
     @NotEmpty
-    private Product product;
+    private Company selectedCompany;
 
+    private List<Customer> customers;
+
+    @NotEmpty
+    private Customer selectedCustomer;
+
+    private List<Product> products;
+
+    @NotEmpty
+    private Product selectedProduct;
+
+    public ContractDto(@NotEmpty LocalDateTime issueDate, @NotEmpty LocalDateTime expireDate,
+                       @NotEmpty double sum) {
+        this.issueDate = issueDate;
+        this.expireDate = expireDate;
+        this.sum = sum;
+    }
 }

@@ -70,7 +70,7 @@ public class CompanyController {
 
     @GetMapping(value = "invoices")
     public String showInvoicesByContractId(Model model){
-        model.addAttribute("invoices", invoiceService.getAllInvoiceByContractId(1));
+//        model.addAttribute("invoices", invoiceService.getAllInvoiceByContractId(1));
         return "company/invoicesByContractPage";
     }
 
