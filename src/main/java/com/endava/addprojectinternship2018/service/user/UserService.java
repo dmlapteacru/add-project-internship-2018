@@ -1,12 +1,8 @@
 package com.endava.addprojectinternship2018.service.user;
 
-import com.endava.addprojectinternship2018.dao.CompanyDao;
-import com.endava.addprojectinternship2018.dao.CustomerDao;
 import com.endava.addprojectinternship2018.dao.UserDao;
 import com.endava.addprojectinternship2018.model.*;
-import com.endava.addprojectinternship2018.model.dto.CompanyRegistrationDto;
-import com.endava.addprojectinternship2018.model.dto.CustomerRegistrationDto;
-import com.endava.addprojectinternship2018.model.dto.UserRegistrationDto;
+import com.endava.addprojectinternship2018.model.dto.UserDto;
 import com.endava.addprojectinternship2018.model.dto.UserWithProfileDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,8 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.List;
 import java.util.Optional;
 
-import static com.endava.addprojectinternship2018.model.UserStatus.ACTIVE;
-import static com.endava.addprojectinternship2018.model.UserStatus.INACTIVE;
+import static com.endava.addprojectinternship2018.model.Enums.UserStatus.ACTIVE;
+import static com.endava.addprojectinternship2018.model.Enums.UserStatus.INACTIVE;
 
 @Service
 public class UserService {
@@ -25,62 +21,54 @@ public class UserService {
     private UserDao userDao;
 
     @Autowired
-    private CustomerDao customerDao;
-
-    @Autowired
-    private CompanyDao companyDao;
-
-    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    public Optional<User> getUserByUsername(String username){
+    public Optional<User> getUserByUsername(String username) {
         return userDao.findUserByUsername(username);
     }
 
-    public Optional<User> findUserById(int id) {
+    public Optional<User> getUserById(int id) {
         return userDao.findById(id);
     }
 
-    public List<User> getAllUsers(){
+    public List<User> getAllUsers() {
         return userDao.findAll();
     }
 
-
-    public void saveUser(UserRegistrationDto userDto) {
-
-        User user = new User(userDto.getUsername(),
-                passwordEncoder.encode(userDto.getPassword()),
-                UserStatus.INACTIVE);
-
-        if (userDto instanceof CompanyRegistrationDto) {
-            CompanyRegistrationDto companyRegistrationDto = (CompanyRegistrationDto) userDto;
-            Company company = new Company();
-            company.setName(companyRegistrationDto.getName());
-            company.setEmail(companyRegistrationDto.getEmail());
-            company.setUser(user);
-            user.setRole(Role.COMPANY);
-            userDao.save(user);
-            companyDao.save(company);
-        } else {
-            CustomerRegistrationDto customerRegistrationDto = (CustomerRegistrationDto) userDto;
-            Customer customer = new Customer(customerRegistrationDto.getFirstName(),
-                    customerRegistrationDto.getLastName(), customerRegistrationDto.getEmail());
-            customer.setUser(user);
-            user.setRole(Role.CUSTOMER);
-            userDao.save(user);
-            customerDao.save(customer);
-        }
+    public User saveUser(UserDto userDto) {
+        return userDao.save(convertUserDtoToUser(userDto));
     }
 
-    public void changeUserStatus(String username){
+    public User convertUserDtoToUser(UserDto userDto) {
+        User user = userDao.findById(userDto.getUserId())
+                .orElseGet(User :: new);
+        user.setUsername(userDto.getUsername());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setUserStatus(INACTIVE);
+        user.setRole(userDto.getRole());
+        user.setUserStatus(userDto.getStatus());
+        return user;
+    }
+
+    public UserDto convertUserToUserDto(User user) {
+        UserDto userDto = new UserDto();
+        userDto.setUserId(user.getId());
+        userDto.setUsername(user.getUsername());
+        userDto.setRole(user.getRole());
+        userDto.setStatus(user.getUserStatus());
+        return userDto;
+    }
+
+    public void changeUserStatus(String username) {
         User user = userDao.findUserByUsername(username).get();
-        if (user.getUserStatus() == ACTIVE){
+        if (user.getUserStatus() == ACTIVE) {
             user.setUserStatus(INACTIVE);
         } else user.setUserStatus(ACTIVE);
         userDao.save(user);
     }
 
     public List<UserWithProfileDto> getAllUsersWithProfile() {
-       return userDao.findAllUsersWithProfile();
+        return userDao.findAllUsersWithProfile();
     }
+
 }

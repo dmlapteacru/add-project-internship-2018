@@ -9,54 +9,43 @@ import com.endava.addprojectinternship2018.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+@Component
 public class UserUtil {
 
     @Autowired
-    private static CustomerService customerService;
+    private CustomerService customerService;
 
     @Autowired
-    private static UserService userService;
+    private UserService userService;
 
     @Autowired
-    private static CompanyService companyService;
+    private CompanyService companyService;
 
-    public static Customer getCurrentCustomer() {
+    public Customer getCurrentCustomer() {
         Customer result = null;
-        User currentUser = getCurrentUser();
-        if (currentUser != null) {
-            Optional<Customer> customerOptional = customerService.getCustomerByUserId(currentUser.getId());
-            if (customerOptional.isPresent()) {
-                result = customerOptional.get();
-            }
+        Optional<Customer> customerOptional = customerService.getCustomerByUserId(getCurrentUser().getId());
+        if (customerOptional.isPresent()) {
+            result = customerOptional.get();
         }
         return result;
     }
 
-    public static Company getCurrentCompany() {
+    public Company getCurrentCompany() {
         Company result = null;
-        User currentUser = getCurrentUser();
-        if (currentUser != null) {
-            Optional<Company> companyOptional = companyService.getCompanyByUserId(currentUser.getId());
-            if (companyOptional.isPresent()) {
-                result = companyOptional.get();
-            }
+        Optional<Company> companyOptional = companyService.getCompanyByUserId(getCurrentUser().getId());
+        if (companyOptional.isPresent()) {
+            result = companyOptional.get();
         }
         return result;
     }
 
-    public static User getCurrentUser() {
-        User result = null;
-        Optional<User> userOptional = userService.getUserByUsername(getPrincipal());
-        if (userOptional.isPresent()) {
-            result = userOptional.get();
-        }
-        return result;
-    }
-
-    private static String getPrincipal() {
+    public User getCurrentUser() {
         String userName;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
@@ -64,7 +53,11 @@ public class UserUtil {
         } else {
             userName = principal.toString();
         }
-        return userName;
+        Optional<User> userOptional = userService.getUserByUsername(userName);
+        if (!userOptional.isPresent()) {
+            throw new UsernameNotFoundException("No user with username: " + userName);
+        }
+        return userOptional.get();
     }
 
 }

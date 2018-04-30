@@ -1,21 +1,23 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.model.Customer;
-import com.endava.addprojectinternship2018.model.Role;
-import com.endava.addprojectinternship2018.model.User;
+import com.endava.addprojectinternship2018.model.Contract;
+import com.endava.addprojectinternship2018.model.Enums.ContractStatus;
+import com.endava.addprojectinternship2018.model.Enums.Role;
 import com.endava.addprojectinternship2018.model.dto.ContractDto;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.ContractService;
-import com.endava.addprojectinternship2018.service.CustomerService;
+import com.endava.addprojectinternship2018.service.ProductService;
+import com.endava.addprojectinternship2018.service.user.UserService;
 import com.endava.addprojectinternship2018.util.UserUtil;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping(value = "contract")
@@ -28,24 +30,40 @@ public class ContractController {
     private CompanyService companyService;
 
     @Autowired
-    private CustomerService customerService;
+    private UserUtil userUtil;
 
-    @GetMapping(value = "createNew")
-    public String showNewContract(Model model) {
-        if (UserUtil.getCurrentUser().getRole() == Role.CUSTOMER) {
-            model.addAttribute("owner", UserUtil.getCurrentCustomer());
-            model.addAttribute("listOfAllCompanies", companyService.getAllCompanies());
-        } else {
-            model.addAttribute("owner", UserUtil.getCurrentCompany());
-            model.addAttribute("listOfAllCustomers", customerService.getAllCustomers());
+    @Autowired
+    private ProductService productService;
+
+    @GetMapping(value = "createContract")
+    public String printContract(@RequestParam(name = "companyId") int companyId,
+                                Model model) {
+        Role role = userUtil.getCurrentUser().getRole();
+        ContractDto contractDto = new ContractDto();
+        if (role == Role.CUSTOMER) {
+            contractDto.setSelectedCustomer(userUtil.getCurrentCustomer());
+            if (companyId != 0) {
+                contractDto.setSelectedCompany(companyService.getCompanyById(companyId).get());
+            }
+            contractDto.setStatus(ContractStatus.SIGNED_BY_CUSTOMER);
+        } else if (role == Role.COMPANY) {
+            contractDto.setSelectedCompany(userUtil.getCurrentCompany());
+            contractDto.setStatus(ContractStatus.SIGNED_BY_COMPANY);
         }
-        return "contract/newContractPage";
+        contractDto.setIssueDate(LocalDateTime.now());
+        LocalDateTime endOfCurrentYear = LocalDateTime.of(LocalDate.now().getYear(), 12, 31, 12, 00);
+        contractDto.setExpireDate(endOfCurrentYear);
+        model.addAttribute("contractDto", contractDto);
+        model.addAttribute("update", false);
+        return "contract/contractPage";
     }
 
-    @PostMapping
+    @PostMapping(value = "updateContract")
     public String createNewContract(@ModelAttribute ContractDto contractDto,
                                     BindingResult result, Model model) {
-        contractService.createNewContract(contractDto);
-        return "";
+        model.addAttribute("contractDto", contractDto);
+        contractService.saveContract(contractDto);
+        return "redirect:/customer/contracts";
     }
+
 }

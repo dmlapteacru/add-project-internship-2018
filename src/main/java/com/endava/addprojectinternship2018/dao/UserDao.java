@@ -1,6 +1,5 @@
 package com.endava.addprojectinternship2018.dao;
 
-import com.endava.addprojectinternship2018.model.Company;
 import com.endava.addprojectinternship2018.model.User;
 import com.endava.addprojectinternship2018.model.dto.UserWithProfileDto;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -3,7 +3,7 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Customer Page</title>
+    <title>Customer contracts list</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -12,8 +12,11 @@
 </head>
 
 <body>
+<div th:replace="fragments/header :: header">
+
+</div>
 <h2 th:text="${customer.getFullName()}+', list of contracts'"></h2>
-<a th:href="@{/contract/createNew}" class="btn btn-info" role="button">Create new contract</a>
+<a th:href="@{/contract/createContract(companyId=0)}" class="btn btn-info" role="button">Create new contract</a>
 <table class="table table-hover">
     <thead>
     <tr>
@@ -22,17 +25,23 @@
         <th>Expire date</th>
         <th>Sum</th>
         <th>Service</th>
+        <th>Status</th>
         <th></th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each="contract : ${customerContracts}">
-        <td th:text="${contract.getCompany().getName()}">company name</td>
-        <td th:text="${contract.getIssueDate().toString(DateTimeFormatt.forPattern('MM/dd/yyyy'))}">issue date</td>
-        <td th:text="${contract.getExpireDate().toString(DateTimeFormatt.forPattern('MM/dd/yyyy'))}">expire date</td>
-        <td th:text="${contract.getSum()}">sum</td>
-        <td th:text="${contract.getService().getName()}">service name</td>
-        <td><a th:href="@{/customer/editContract}"> Edit </a></td>
+    <tr th:each="contractDto : ${customerContracts}">
+        <td th:text="${contractDto.selectedCompany.name}">company name</td>
+        <td th:text="${#temporals.format(contractDto.getIssueDate(),'dd MMM yyyy')}">issue date</td>
+        <td th:text="${#temporals.format(contractDto.getExpireDate(),'dd MMM yyyy')}">expire date</td>
+        <td th:text="${contractDto.sum}">sum</td>
+        <td th:text="${contractDto.selectedProduct.name}">service name</td>
+        <td th:text="${contractDto.status}"></td>
+        <td>
+            <form th:object="${contractDto}" th:action="@{/contract/updateContract}" th:method="post">
+                <button type="submit" class="btn btn-info">Edit</button>
+            </form>
+        </td>
     </tr>
     </tbody>
 </table>
