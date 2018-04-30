@@ -9,21 +9,23 @@ import com.endava.addprojectinternship2018.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+@Component
 public class UserUtil {
 
     @Autowired
-    private static CustomerService customerService;
+    private  CustomerService customerService;
 
     @Autowired
-    private static UserService userService;
+    private  UserService userService;
 
     @Autowired
-    private static CompanyService companyService;
+    private  CompanyService companyService;
 
-    public static Customer getCurrentCustomer() {
+    public  Customer getCurrentCustomer() {
         Customer result = null;
         User currentUser = getCurrentUser();
         if (currentUser != null) {
@@ -35,7 +37,7 @@ public class UserUtil {
         return result;
     }
 
-    public static Company getCurrentCompany() {
+    public Company getCurrentCompany() {
         Company result = null;
         User currentUser = getCurrentUser();
         if (currentUser != null) {
@@ -47,7 +49,7 @@ public class UserUtil {
         return result;
     }
 
-    public static User getCurrentUser() {
+    public User getCurrentUser() {
         User result = null;
         Optional<User> userOptional = userService.getUserByUsername(getPrincipal());
         if (userOptional.isPresent()) {
@@ -56,9 +58,11 @@ public class UserUtil {
         return result;
     }
 
-    private static String getPrincipal() {
+    private String getPrincipal() {
         String userName;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String principal_1 = SecurityContextHolder.getContext().getAuthentication().getName();
+
         if (principal instanceof UserDetails) {
             userName = ((UserDetails) principal).getUsername();
         } else {

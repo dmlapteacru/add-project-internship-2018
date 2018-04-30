@@ -20,7 +20,7 @@
         <form class="login_form" th:action="@{/login}" th:object="${loginForm_}" method="POST">
             <h3 class="form-signin-heading heading"  th:text="Welcome"></h3>
             <br/>
-            <input type="text" name="email" th:field="*{username}" th:placeholder="Email"
+            <input type="text" name="email" th:field="*{username}" th:placeholder="Username"
                     class="form-control" />
             <br/>
             <input type="password" th:field="*{password}" th:placeholder="Password"

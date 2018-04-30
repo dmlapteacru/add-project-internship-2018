@@ -26,6 +26,9 @@ import java.util.Optional;
 public class CustomerController {
 
     @Autowired
+    private UserUtil userUtil;
+
+    @Autowired
     private CustomerService customerService;
 
     @Autowired
@@ -39,10 +42,10 @@ public class CustomerController {
 
     @GetMapping(value = "")
     public String getHomePage(Model model) {
-        if (UserUtil.getCurrentCustomer() == null) {
-            return "error";
+        if (userUtil.getCurrentCustomer() == null) {
+            return "company/error";
         }
-        model.addAttribute("customer", UserUtil.getCurrentCustomer());
+        model.addAttribute("customer", userUtil.getCurrentCustomer());
         return "customer/homePage";
     }
 

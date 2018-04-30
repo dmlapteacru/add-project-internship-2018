@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+
+    <title>New Invoice</title>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+
+            <!--<div th:if="${param.success}">-->
+                <!--<div class="alert alert-info">-->
+                    <!--You have successfully created new invoice!-->
+                <!--</div>-->
+            <!--</div>-->
+
+            <h1>new invoice </h1>
+
+            <form th:action="@{/invoice/createNew}" th:object="${invoice}" method="post">
+                    <!--th:classappend="${#fields.hasErrors('company')}? 'has-error':''"-->
+
+                <div class="form-group" >
+                    <label for="contract" class="control-label">Contract</label>
+                    <select class="form-control" id="contract" th:field = "*{contract}">
+                        <option value="">---</option>
+                        <option th:each="contr : ${listOfContracts}"
+                                th:value="${contr.getId()}"
+                                th:text="${contr.getCustomer().getFullName()}">
+                        </option>
+                    </select>
+                    <label>Product</label>
+                    <select class="form-control" id="product">
+                        <option th:each="product: ${productList}"
+                                th:value="${product.getId()}"
+                                th:text="${product.getName()}">
+                        </option>
+
+                    </select>
+                    <label>Issue Date</label><br>
+                    <input class="form-control" name="startDate" type="date">
+                    <label>Due Data</label><br>
+                    <input class="form-control" name="endDate" type="date">
+                    <label>Sum of invoice</label>
+                    <input class="form-control" name="sum" type="text">
+                </div>
+
+                <div>
+
+                </div>
+
+                <!--<div class="form-group"> &lt;!&ndash; Date input &ndash;&gt;-->
+                    <!--<label class="control-label" for="date">Date</label>-->
+                    <!--<input class="form-control" id="date" name="date" placeholder="MM/DD/YYY" type="text"/>-->
+                <!--</div>-->
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Create</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,24 +1,33 @@
 package com.endava.addprojectinternship2018.service;
 
+import com.endava.addprojectinternship2018.dao.CompanyDao;
+import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
 import com.endava.addprojectinternship2018.model.Invoice;
 import com.endava.addprojectinternship2018.model.InvoiceStatus;
-import org.joda.time.LocalDate;
+import com.endava.addprojectinternship2018.model.dto.InvoiceDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.List;
 
+import static com.endava.addprojectinternship2018.model.InvoiceStatus.ACTIVE;
+
 @Service
-// ??
+@Transactional
 public class InvoiceService {
 
     @Autowired
     private InvoiceDao invoiceDao;
 
-//    public Invoice getInvoiceById(int id){
-//        return invoiceDao.findById(id);
-//    }
+    @Autowired
+    private CompanyDao companyDao;
+
+    @Autowired
+    private ContractDao contractDao;
 
     public List<Invoice> getAllInvoices(){
         return invoiceDao.findAll();
@@ -44,4 +53,26 @@ public class InvoiceService {
         return invoiceDao.findAllByContractCustomerId(id);
     }
 
+    public List<Invoice> getInvoicesByCompanyId(int id){
+
+        return invoiceDao.findByContractId(id);
+    }
+
+    public List<Invoice> getInvoicesByCompany(String name){
+        return invoiceDao.findAllByContract_Company_Name(name);
+    };
+
+    public void save(Invoice invoice){
+        invoiceDao.save(invoice);
+    }
+
+    public void saveDto(InvoiceDto invoiceDto){
+        Invoice invoice = new Invoice(invoiceDto.getSum(), invoiceDto.getIssueDate()
+                , invoiceDto.getDueDate(), ACTIVE, invoiceDto.getContract(invoiceDto.getContractId()));
+        invoiceDao.save(invoice);
+    }
+
+    public void deleteInvoice(int id){
+        invoiceDao.deleteById(id);
+    }
 }

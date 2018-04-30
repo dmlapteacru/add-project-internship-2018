@@ -22,6 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ContractController {
 
     @Autowired
+    private UserUtil userUtil;
+
+    @Autowired
     private ContractService contractService;
 
     @Autowired
@@ -32,11 +35,11 @@ public class ContractController {
 
     @GetMapping(value = "createNew")
     public String showNewContract(Model model) {
-        if (UserUtil.getCurrentUser().getRole() == Role.CUSTOMER) {
-            model.addAttribute("owner", UserUtil.getCurrentCustomer());
+        if (userUtil.getCurrentUser().getRole() == Role.CUSTOMER) {
+            model.addAttribute("owner", userUtil.getCurrentCustomer());
             model.addAttribute("listOfAllCompanies", companyService.getAllCompanies());
         } else {
-            model.addAttribute("owner", UserUtil.getCurrentCompany());
+            model.addAttribute("owner", userUtil.getCurrentCompany());
             model.addAttribute("listOfAllCustomers", customerService.getAllCustomers());
         }
         return "contract/newContractPage";
