@@ -3,18 +3,18 @@ package com.endava.addprojectinternship2018.service;
 import com.endava.addprojectinternship2018.dao.CompanyDao;
 import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
+import com.endava.addprojectinternship2018.model.Enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
-import com.endava.addprojectinternship2018.model.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.dto.InvoiceDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.endava.addprojectinternship2018.model.InvoiceStatus.ACTIVE;
+import static com.endava.addprojectinternship2018.model.Enums.InvoiceStatus.ACTIVE;
+
 
 @Service
 @Transactional

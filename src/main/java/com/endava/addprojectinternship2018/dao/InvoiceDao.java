@@ -2,8 +2,8 @@ package com.endava.addprojectinternship2018.dao;
 
 import com.endava.addprojectinternship2018.model.Company;
 import com.endava.addprojectinternship2018.model.Customer;
+import com.endava.addprojectinternship2018.model.Enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
-import com.endava.addprojectinternship2018.model.InvoiceStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,8 +20,7 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
     List<Invoice> findAll();
 
     List<Invoice> findByContractId(int id);
-//    @Query(value = "FROM User WHERE username=:username")
-//@Param("username")
+
     List<Invoice>findAllByStatus(InvoiceStatus invoiceStatus);
 
     List<Invoice> findAllByIssueDate(LocalDate localDate);
