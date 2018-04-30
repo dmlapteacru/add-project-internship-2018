@@ -31,8 +31,6 @@ public class Company {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "company")
-    private List<Product> products;
 
     @OneToMany(mappedBy = "company")
     private List<Contract> contracts;

@@ -83,4 +83,10 @@ public class UserService {
     public List<UserWithProfileDto> getAllUsersWithProfile() {
        return userDao.findAllUsersWithProfile();
     }
+
+    public void changeUserPassword(UserRegistrationDto user){
+        User oldUser = getUserByUsername(user.getUsername()).get();
+        oldUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        userDao.save(oldUser);
+    }
 }

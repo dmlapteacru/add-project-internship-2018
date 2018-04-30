@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <title>Spring Security Tutorial</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/default.css"  />
-
+    <link rel="stylesheet" type="text/css" href="/css/default.css"/>
 </head>
 
 <body>
@@ -15,7 +13,7 @@
         <button class="btn btn-md btn-warning btn-block" type="Submit">Go To Registration Page</button>
     </form>
 
-    <div style="display: flex; flex-direction: column;" class="wrapper">
+    <div class="wrapper">
 
         <form class="login_form" th:action="@{/login}" th:object="${loginForm_}" method="POST">
             <h3 class="form-signin-heading heading"  th:text="Welcome"></h3>
@@ -25,10 +23,7 @@
             <br/>
             <input type="password" th:field="*{password}" th:placeholder="Password"
                    name="password" class="form-control" />
-            <!--<input type="hidden" th:field="*{state}" th:placeholder="state"-->
-                   <!--name="password" class="form-control" />-->
-            <!--<p style="color: #FF1C19" th:if="${#fields.hasErrors('state')}" th:errors="*{state}">Password Errors</p>-->
-            <!--<br />-->
+            <br/>
             <button class="btn btn-lg btn-primary btn-block" name="Submit" value="Login" type="Submit" th:text="Login"></button>
         </form>
         <div align="center" th:if="${param.error}">
@@ -36,6 +31,5 @@
         </div>
     </div>
 </div>
-
 </body>
 </html>

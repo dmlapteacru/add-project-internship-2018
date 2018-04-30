@@ -1,8 +1,18 @@
+@font-face{font-family:'Glyphicons Halflings';
+    src:url(../fonts/glyphicons-halflings-regular.eot);
+    src:url(../fonts/glyphicons-halflings-regular.eot?#iefix)
+    format('embedded-opentype'),
+    url(../fonts/glyphicons-halflings-regular.woff2)
+    format('woff2'),
+    url(../fonts/glyphicons-halflings-regular.woff)
+    format('woff'),
+    url(../fonts/glyphicons-halflings-regular.ttf)
+    format('truetype'),
+    url(../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular)
+    format('svg')}
+
 body, html {
     margin: 0 auto;
-    height: 100%;
-    margin: 0;
-    font-family: Arial;
 }
 .wrap {
     height: 80%;
@@ -10,7 +20,6 @@ body, html {
     align-items: center;
     justify-content: center;
     width: 80%;
-
 }
 .wrap > form {
     width: 30%;
@@ -42,13 +51,10 @@ body, html {
 .login_form {
     width: 60%;
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
     flex-direction: column;
     margin-bottom: 80px;
-}
-.reg_form_href {
-    width: 10%;
 }
 .heading {
     color: rgba(255,255,255,0.2);

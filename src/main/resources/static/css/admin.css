@@ -1,0 +1,91 @@
+.main_wrapper{
+    display: flex;
+    flex-direction: column;
+    padding: 15px 15px 0 15px;
+    height: 100vh;
+}
+
+.logout_form {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 25px;
+}
+.logout_form>img {
+    width: 140px;
+    height: 45px;
+}
+.logout_btn_wrap {
+    display: flex;
+    flex-direction: row-reverse;
+}
+.time-date {
+    margin-right: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.btn{
+    margin-bottom:5px;
+}
+.body_wrapper {
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.menu_wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 5%;
+    border-top: #319e5c 1px solid;
+}
+
+.info_wrapper {
+    display: flex;
+    width: 95%;
+    height: 100%;
+    border-top: #319e5c 1px solid;
+    border-left: #319e5c 1px solid;
+}
+
+/* Style tab links */
+.tablink {
+    background-color: #fff;
+    color: #319e5c;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 10px 10px;
+    font-size: 14px;
+}
+
+.tablink_active {
+    color: #fff;
+    background-color: #319e5c;
+}
+
+.tablink:hover {
+    background-color: #e8e8e8;
+}
+
+.tablink_active:hover {
+    color: #fff;
+    background-color: #319e5c;
+}
+.tabcontent {
+    display: none;
+    height: 100%;
+    width: 100%;
+}
+.tabcontent_active {
+    display: block;
+}
+#users {
+    display: block;
+}
+
+.modal_btn {
+    display: flex;
+    justify-content: space-between;
+}

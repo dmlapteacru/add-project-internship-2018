@@ -4,75 +4,126 @@
     <title>Getting Started: Serving Web Content</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="/css/admin.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <form th:action="@{/logout}" method="post" class="logout_btn">
-
-        <input class="btn btn-danger" type="submit" value="Logout"/>
-        <div class="time-date">
-            <p th:text="${#dates.format(#dates.createNow(), 'HH:mm , dd MMMMMMMMM yyyy')}"></p>
+<div class="main_wrapper">
+    <form th:action="@{/logout}" method="post" class="logout_form">
+        <img src="/img/endava-logo.png"/>
+        <div class="logout_btn_wrap">
+            <input class="btn btn-danger" type="submit" value="Logout"/>
+            <div class="time-date">
+                <p th:text="${#dates.format(#dates.createNow(), 'dd MMMMMMMMM yyyy')}"></p>
+            </div>
         </div>
     </form>
+    <div class="body_wrapper">
+        <div class="menu_wrapper">
+            <button class="tablink tablink_active" onclick="openPage('users', this)">Users</button>
+            <button id="service_btn_req" class="tablink" onclick="openPage('services', this)">Services</button>
+        </div>
+        <div class="info_wrapper">
+            <div id="users" class="tabcontent tabcontent_active">
+                <table class="table table-striped">
+                    <th>Role</th>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th></th>
+                    <th></th>
+                    <tr th:each="user : ${users}">
+                        <td th:text="${user.role}"></td>
+                        <td th:text="${user.name}"></td>
+                        <td th:text="${user.username}"></td>
+                        <td th:text="${user.email}"></td>
+                        <td th:text="${user.userStatus}"></td>
+                        <td th:switch="${user.userStatus}">
+                            <a th:case="${user.userStatus.INACTIVE}"
+                               th:href="@{admin/status?(username=${user.username})}" class="btn btn_activate">ACTIVATE</a>
+                            <a th:case="${user.userStatus.ACTIVE}"
+                               th:href="@{admin/status?(username=${user.username})}" class="btn btn_deactivate">DEACTIVATE</a>
+                        </td>
+                        <td class="change_pass_btn">
+                            <button type="button" class="btn" data-toggle="modal" data-target="#modalPassword" th:value="${user.username}">Change Password</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
 
-    <button style="background-color: #234232" class="tablink" onclick="openPage('Users', this)">Users</button>
-    <button class="tablink" onclick="openPage('Services', this)">Services</button>
-
-    <div id="Users" class="tabcontent">
-        <table class="table">
-            <th>Role</th>
-            <th>Name</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Status</th>
-            <th></th>
-            <th></th>
-            <tr th:each="user : ${users}">
-                <td th:text="${user.role}"></td>
-                <td th:text="${user.name}"></td>
-                <td th:text="${user.username}"></td>
-                <td th:text="${user.email}"></td>
-                <td th:text="${user.userStatus}"></td>
-                <td th:switch="${user.userStatus}">
-                    <a th:case="${user.userStatus.INACTIVE}"
-                       th:href="@{admin/status?(username=${user.username})}" class="btn">ACTIVATE</a>
-                    <a th:case="${user.userStatus.ACTIVE}"
-                       th:href="@{admin/status?(username=${user.username})}" class="btn">DEACTIVATE</a>
-                </td>
-                <td id="passChange">
-                    <span class="input" th:value="${user.username}"></span>
-                    <button class="changePassBtn" th:value="${user.username}">change pass</button>
-                </td>
-            </tr>
-        </table>
+            <div id="services" class="tabcontent">
+                <table id="table-services" class="table table-striped">
+                    <thead>
+                        <th>Service</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th class="new_product_btn">
+                            <button type="button" class="btn" data-toggle="modal" data-target="#modalService">newService</button>
+                        </th>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+    <div class="modal fade" id="modalPassword" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <!-- Modal content-->
+            <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Set new Password</h4>
+                    </div>
+                <form>
+                    <div class="modal-body">
+                        <label>User</label>
+                        <p id="new_pass_username"></p>
+                        <label>Password</label>
+                        <input id="new_pass_input" type="password"
+                               pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\S+$).{8,}$" title="Invalid password"
+                               class="form-control"/>
+                        <label>Confirm Password</label>
+                        <input id="new_pass_input_confirm" type="password" class="form-control" />
+                    </div>
+                    <div class="modal-footer modal_btn">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" style="display: none"></button>
+                        <button id="save_btn" type="submit" class="btn btn-success">Save</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
 
-    <div id="Services" class="tabcontent">
-        <table class="table">
-            <th>Service</th>
-            <th>Name</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Status</th>
-            <th></th>
-            <th></th>
-            <tr th:each="user : ${users}">
-                <td th:text="${user.role}"></td>
-                <td th:text="${user.name}"></td>
-                <td th:text="${user.username}"></td>
-                <td th:text="${user.email}"></td>
-                <td th:text="${user.userStatus}"></td>
-                <td th:switch="${user.userStatus}">
-                    <a th:case="${user.userStatus.INACTIVE}"
-                       th:href="@{admin/status?(username=${user.username})}" class="btn">ACTIVATE</a>
-                    <a th:case="${user.userStatus.ACTIVE}"
-                       th:href="@{admin/status?(username=${user.username})}" class="btn">DEACTIVATE</a>
-                </td>
-            </tr>
-        </table>
+        </div>
     </div>
+    <div class="modal fade" id="modalService" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Set new Password</h4>
+                </div>
+                <form>
+                    <div class="modal-body">
+                        <label>Product name</label>
+                        <input id="new_product_name" type="text"/>
+                        <label>Description</label>
+                        <textarea id="new_product_desc"></textarea>
+                    </div>
+                    <div class="modal-footer modal_btn">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" style="display: none"></button>
+                        <button id="save_btn_product" type="button" class="btn btn-success" data-dismiss="modal">Save</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
 
+        </div>
+    </div>
+</div>
     <script>
         function openPage(pageName,elmnt) {
             var i, tabcontent, tablinks;
@@ -82,21 +133,74 @@
             }
             tablinks = document.getElementsByClassName("tablink");
             for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].style.backgroundColor = "";
+                tablinks[i].classList.remove("tablink_active");
             }
             document.getElementById(pageName).style.display = "block";
-            elmnt.style.backgroundColor = "#234232";
+            elmnt.classList.add("tablink_active");
         }
-        // // Get the element with id="defaultOpen" and click on it
-        // document.getElementById("defaultOpen").click();
 
-        $(".changePassBtn").click(function () {
-            var value = $(this).attr("value");
-            $(".input[value=" + value + "]").each(function () {
-               $(this).html("<input type='text'/>");
-            });
-            $(this).attr("id", "op");
+       $("#service_btn_req").click(function () {
+            $.ajax({url: "/admin/services",
+                    success: function(result){
+                        $("#table-services tbody").html("");
+                        $.each(result, function (id, object) {
+                            $("#table-services tbody").append('<tr id="' + id + '"></tr>');
+                            $.each(object, function (key, value) {
+                                $("#table-services tr[id=" + id + "]").append('<td>' + value + '</td>');
+                            });
+                        });
+                    }});
+             });
+
+        $(".change_pass_btn button").click(function () {
+            $("#new_pass_username").text(this.value);
+            $("#new_pass_input").val("");
         });
+
+        $("#save_btn").click(function () {
+            if (passwordMatches($("#new_pass_input").val(), $("#new_pass_input_confirm").val())){
+                var object = {
+                    "username" : $("#new_pass_username").text(),
+                    "password" : $("#new_pass_input").val()
+                }
+                $.ajax(
+                    {
+                        url: "/admin/newUserPassword",
+                        type: "PUT",
+                        contentType: "application/json",
+                        data: JSON.stringify(object)
+                    }
+                );
+            } else {
+
+            }
+        });
+
+        $(".new_product_btn button").click(function () {
+            $("#new_product_name").val("");
+            $("#new_product_desc").val("");
+        });
+
+        $("#save_btn_product").click(function () {
+                var object = {
+                    "name" : $("#new_product_name").val(),
+                    "description" : $("#new_product_desc").val()
+                }
+                $.ajax(
+                    {
+                        url: "/admin/newProduct",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify(object)
+                    }
+                );
+        });
+
+        function passwordMatches(pass1, pass2){
+            if (pass1 == pass2) return true;
+            else return false;
+        }
+
     </script>
 
 </body>
