@@ -1,14 +1,20 @@
 package com.endava.addprojectinternship2018.service;
 
+import com.endava.addprojectinternship2018.dao.CompanyDao;
+import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
 import com.endava.addprojectinternship2018.model.Invoice;
-import com.endava.addprojectinternship2018.model.Enums.InvoiceStatus;
-import org.joda.time.LocalDate;
+import com.endava.addprojectinternship2018.model.InvoiceStatus;
+import com.endava.addprojectinternship2018.model.dto.InvoiceDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.List;
+
+import static com.endava.addprojectinternship2018.model.InvoiceStatus.ACTIVE;
 
 @Service
 @Transactional
@@ -17,27 +23,29 @@ public class InvoiceService {
     @Autowired
     private InvoiceDao invoiceDao;
 
-    public Invoice getInvoiceById(int id) {
-        return invoiceDao.findById(id);
-    }
+    @Autowired
+    private CompanyDao companyDao;
 
-    public List<Invoice> getAllInvoices() {
+    @Autowired
+    private ContractDao contractDao;
+
+    public List<Invoice> getAllInvoices(){
         return invoiceDao.findAll();
     }
 
-    public List<Invoice> getAllInvoiceByContract(int id) {
+    public List<Invoice> getAllInvoiceByContractId(int id){
         return invoiceDao.findByContractId(id);
     }
 
-    public List<Invoice> getAllInvoicesByStatus(InvoiceStatus status) {
+    public List<Invoice> getAllInvoicesByStatus(InvoiceStatus status){
         return invoiceDao.findAllByStatus(status);
     }
 
-    public List<Invoice> getAllInvoicesByIssueDate(LocalDate localDate) {
+    public List<Invoice> getAllInvoicesByIssueDate(LocalDate localDate){
         return invoiceDao.findAllByIssueDate(localDate);
     }
 
-    public List<Invoice> getAllInvoicesByDueDate(LocalDate localDate) {
+    public List<Invoice> getAllInvoicesByDueDate(LocalDate localDate){
         return invoiceDao.findAllByDueDate(localDate);
     }
 
@@ -45,4 +53,26 @@ public class InvoiceService {
         return invoiceDao.findAllByContractCustomerId(id);
     }
 
+    public List<Invoice> getInvoicesByCompanyId(int id){
+
+        return invoiceDao.findByContractId(id);
+    }
+
+    public List<Invoice> getInvoicesByCompany(String name){
+        return invoiceDao.findAllByContract_Company_Name(name);
+    };
+
+    public void save(Invoice invoice){
+        invoiceDao.save(invoice);
+    }
+
+    public void saveDto(InvoiceDto invoiceDto){
+        Invoice invoice = new Invoice(invoiceDto.getSum(), invoiceDto.getIssueDate()
+                , invoiceDto.getDueDate(), ACTIVE, invoiceDto.getContract(invoiceDto.getContractId()));
+        invoiceDao.save(invoice);
+    }
+
+    public void deleteInvoice(int id){
+        invoiceDao.deleteById(id);
+    }
 }

@@ -1,13 +1,14 @@
 package com.endava.addprojectinternship2018.model;
 
-import com.endava.addprojectinternship2018.model.Enums.InvoiceStatus;
-import com.endava.addprojectinternship2018.util.LocalDateTimeConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import javax.validation.constraints.Pattern;
+import java.security.PrivateKey;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "INVOICE")
@@ -21,15 +22,16 @@ public class Invoice {
     private int id;
 
     @Column
+//    @Pattern(regexp = "[0-9]+[\\.]+[0-9]", message = "Do not match the numerical pattern")
     private double sum;
 
     @Column
-    @Convert(converter = LocalDateTimeConverter.class)
-    private LocalDateTime issueDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate issueDate;
 
     @Column
-    @Convert(converter = LocalDateTimeConverter.class)
-    private LocalDateTime dueDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dueDate;
 
     @Column
     @Enumerated(EnumType.STRING)
@@ -39,10 +41,17 @@ public class Invoice {
     @JoinColumn(name = "contract_id")
     private Contract contract;
 
-    public Invoice(double sum, LocalDateTime issueDate, LocalDateTime dueDate) {
+    public Invoice(double sum, LocalDate issueDate, LocalDate dueDate) {
         this.sum = sum;
         this.issueDate = issueDate;
         this.dueDate = dueDate;
     }
 
+    public Invoice(double sum, LocalDate issueDate, LocalDate dueDate, InvoiceStatus status, Contract contract) {
+        this.sum = sum;
+        this.issueDate = issueDate;
+        this.dueDate = dueDate;
+        this.status = status;
+        this.contract = contract;
+    }
 }

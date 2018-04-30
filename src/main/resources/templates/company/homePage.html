@@ -1,27 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
+
 
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
 
-<h3>Company Page</h3>
-<p th:text="#{home.welcome}"></p>
-    <div>
-        <a href="/company/contracts">Contracts</a>
-    </div>
-<p>
-    <a href="/company/prices">Prices</a>
-</p>
 
-<p>
-    <a href="/company/invoices">Invoices</a>
-</p>
+<!--<p th:text="#{home.welcome}"></p>-->
+<div class="container">
+    <p th:text="${company.getName()}+' company page'"></p>
+    <a href="/company/contracts" class="btn btn-info" role="button">Contracts</a>
+    <a href="/company/prices" class="btn btn-success">Prices</a>
+    <a href="/company/invoices" class="btn btn-danger">Invoices</a>
+</div>
 
 </body>
 </html>

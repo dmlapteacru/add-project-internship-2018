@@ -17,7 +17,12 @@ public interface ContractDao extends JpaRepository<Contract, Integer> {
 
     List<Contract> findByCompanyName (String companyName);
 
+    List<Contract> findAllByCompanyId (int id);
+
     List<Contract> findByCustomerId (int id);
+
+
+
 
 }
 
