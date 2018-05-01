@@ -67,8 +67,13 @@ public class RestController {
 
     @RequestMapping(value = "/admin/newProduct", method = RequestMethod.POST)
     public String saveNewProduct(@RequestBody Product product){
-        System.out.println(product);
         productService.saveProduct(product);
+        return "OK";
+    }
+
+    @RequestMapping(value = "/admin/deleteProduct/{id}", method = RequestMethod.DELETE)
+    public String saveNewProduct(@PathVariable Integer id){
+        productService.deleteProduct(id);
         return "OK";
     }
 

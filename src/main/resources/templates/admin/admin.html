@@ -1,12 +1,13 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Getting Started: Serving Web Content</title>
+    <title>Admin Panel</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="/css/admin.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../../static/css/admin.css">
 </head>
 <body>
 <div class="main_wrapper">
@@ -56,11 +57,12 @@
             <div id="services" class="tabcontent">
                 <table id="table-services" class="table table-striped">
                     <thead>
-                        <th>Service</th>
                         <th>Name</th>
                         <th>Description</th>
                         <th class="new_product_btn">
-                            <button type="button" class="btn" data-toggle="modal" data-target="#modalService">newService</button>
+                            <button style="background-color: #319e5c" type="button" class="btn btn_add_product" data-toggle="modal" data-target="#modalService" title="Add service">
+                                <span style="color: white" class="glyphicon glyphicon-plus"></span>
+                            </button>
                         </th>
                     </thead>
                     <tbody>
@@ -83,13 +85,14 @@
                         <p id="new_pass_username"></p>
                         <label>Password</label>
                         <input id="new_pass_input" type="password"
-                               pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\S+$).{8,}$" title="Invalid password"
+                               pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\S+$).{8,}$"
+                               title="Min 8 characters and at least: 1 upper case letter, 1 lower case letter, 1 special character, 1 number "
                                class="form-control"/>
                         <label>Confirm Password</label>
-                        <input id="new_pass_input_confirm" type="password" class="form-control" />
+                        <input id="new_pass_input_confirm" type="password" class="form-control"/>
+                        <p class="error_pass_match"></p>
                     </div>
                     <div class="modal-footer modal_btn">
-                        <button type="button" class="btn btn-default" data-dismiss="modal" style="display: none"></button>
                         <button id="save_btn" type="submit" class="btn btn-success">Save</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
@@ -104,17 +107,17 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Set new Password</h4>
+                    <h4 class="modal-title">Create new Service</h4>
                 </div>
                 <form>
-                    <div class="modal-body">
+                    <div class="modal-body modal_body_service">
+                        <input id="new_product_id" type="text" hidden="hidden"/>
                         <label>Product name</label>
                         <input id="new_product_name" type="text"/>
                         <label>Description</label>
                         <textarea id="new_product_desc"></textarea>
                     </div>
                     <div class="modal-footer modal_btn">
-                        <button type="button" class="btn btn-default" data-dismiss="modal" style="display: none"></button>
                         <button id="save_btn_product" type="button" class="btn btn-success" data-dismiss="modal">Save</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
@@ -144,14 +147,35 @@
                     success: function(result){
                         $("#table-services tbody").html("");
                         $.each(result, function (id, object) {
-                            $("#table-services tbody").append('<tr id="' + id + '"></tr>');
+                            var ID = object.id;
+                            $("#table-services tbody").append('<tr id="row' + ID + '" class="user_rows"></tr>');
                             $.each(object, function (key, value) {
-                                $("#table-services tr[id=" + id + "]").append('<td>' + value + '</td>');
+                                if (key!="id"){
+                                    $("#table-services tr[id="+ "row" + ID + "]").append('<td id="'+ key + ID +'">' + value + '</td>');
+                                }
                             });
+                            $("#table-services tr[id="+ "row" + ID + "]").append('<td>' +
+                                '<span id="'+ ID + '" class="glyphicon glyphicon-pencil" data-toggle="modal" data-target="#modalService" onclick="editProduct(this)"></span>' +
+                                '<span id="'+ ID + '" class="glyphicon glyphicon-trash" onclick="deleteProduct(this)"></span>' +
+                                '</td>');
                         });
                     }});
              });
 
+        function editProduct(obj) {
+            $("#new_product_id").val(obj.id);
+            $("#new_product_name").val($("#name" + obj.id).text());
+            $("#new_product_desc").val($("#description" + obj.id).text());
+        }
+        function deleteProduct(obj) {
+            $.ajax(
+                {
+                    url: "admin/deleteProduct/" + obj.id,
+                    type: "DELETE",
+                    success: $("#service_btn_req").click()
+                }
+            )
+        }
         $(".change_pass_btn button").click(function () {
             $("#new_pass_username").text(this.value);
             $("#new_pass_input").val("");
@@ -159,9 +183,11 @@
 
         $("#save_btn").click(function () {
             if (passwordMatches($("#new_pass_input").val(), $("#new_pass_input_confirm").val())){
+                $(".error_pass_match").val("");
                 var object = {
                     "username" : $("#new_pass_username").text(),
-                    "password" : $("#new_pass_input").val()
+                    "password" : $("#new_pass_input").val(),
+                    "confirmPassword" : $("#new_pass_input_confirm").val()
                 }
                 $.ajax(
                     {
@@ -172,7 +198,8 @@
                     }
                 );
             } else {
-
+                console.log("AAAD");
+                $(".error_pass_match").val("Passwords are not matches.");
             }
         });
 
@@ -183,6 +210,7 @@
 
         $("#save_btn_product").click(function () {
                 var object = {
+                    "id" : $("#new_product_id").val(),
                     "name" : $("#new_product_name").val(),
                     "description" : $("#new_product_desc").val()
                 }
@@ -191,11 +219,11 @@
                         url: "/admin/newProduct",
                         type: "POST",
                         contentType: "application/json",
-                        data: JSON.stringify(object)
+                        data: JSON.stringify(object),
+                        success: $("#service_btn_req").click()
                     }
                 );
         });
-
         function passwordMatches(pass1, pass2){
             if (pass1 == pass2) return true;
             else return false;

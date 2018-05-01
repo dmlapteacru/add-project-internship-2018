@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -18,6 +19,17 @@ public class ProductService {
     }
 
     public void saveProduct(Product product){
-        productDao.save(product);
+        Optional<Product> oldProduct = productDao.findById(product.getId());
+        if (oldProduct.isPresent()){
+            oldProduct.get().setName(product.getName());
+            oldProduct.get().setDescription(product.getDescription());
+            productDao.save(oldProduct.get());
+        } else {
+            productDao.save(product);
+        }
+    }
+
+    public void deleteProduct(Integer id) {
+        productDao.deleteById(id);
     }
 }

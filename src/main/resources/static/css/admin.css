@@ -85,7 +85,17 @@
     display: block;
 }
 
-.modal_btn {
+.modal_body_service {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+}
+
+textarea {
+    resize: none;
+}
+
+.user_rows {
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
 }
