@@ -5,8 +5,12 @@ import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Range;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Data
@@ -15,22 +19,21 @@ import java.time.LocalDate;
 
 public class InvoiceDto {
 
-
-    private int invoiceId;
-
+    @NotNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate issueDate;
 
+    @NotNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dueDate;
 
+    @Range(min = 1)
     private int contractId;
 
     private Contract contract;
 
-    @NotEmpty
+    @DecimalMin("0.0")
     private double sum;
-
-    @NotEmpty
-    private InvoiceStatus status;
 
     public Contract getContract(int contractId) {
         return contract;

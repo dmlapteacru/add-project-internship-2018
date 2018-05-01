@@ -34,24 +34,44 @@
                         <option value="">---</option>
                         <option th:each="contr : ${listOfContracts}"
                                 th:value="${contr.getId()}"
-                                th:text="${contr.getCustomer().getFullName()}">
+                                th:text="${contr.getCustomer().getFullName()+' '  +contr.getId()}">
                         </option>
                     </select>
-                    <label>Product</label>
-                    <select class="form-control" id="product">
-                        <option th:each="product: ${productList}"
-                                th:value="${product.getId()}"
-                                th:text="${product.getName()}">
-                        </option>
+                    <!--<label>Product</label>-->
+                    <!--<select class="form-control" id="product">-->
+                        <!--<option th:each="product: ${productList}"-->
+                                <!--th:value="${product.getId()}"-->
+                                <!--th:text="${product.getName()}">-->
+                        <!--</option>-->
 
-                    </select>
+                    <!--</select>-->
+
+                    <!--<p th:each="error : ${#fields.errors('email')}" th:text="${error}"></p>-->
+
                     <label>Issue Date</label><br>
-                    <input class="form-control" name="startDate" type="date">
-                    <label>Due Data</label><br>
-                    <input class="form-control" name="endDate" type="date">
+                    <p class="alert alert-danger"  th:each="error: ${#fields.errors('issueDate')}" th:text="${error}"></p>
+                    <input class="form-control" id="issueDate" name ="issueDate" type="date">
+                    <label>Due Date</label><br>
+                    <p class="alert alert-danger"  th:each="error: ${#fields.errors('dueDate')}" th:text="${error}"></p>
+                    <input class="form-control" th:field="*{dueDate}" type="datetime-local">
                     <label>Sum of invoice</label>
-                    <input class="form-control" name="sum" type="text">
+                    <p class="alert alert-danger"  th:each="error: ${#fields.errors('sum')}" th:text="${error}"></p>
+                    <input class="form-control" th:field="*{sum}" type="number" step="0.01">
+
+                    <!--<p class="error-message"-->
+                    <!--th:each="error: ${#fields.errors('sum')}"-->
+                    <!--th:text="${error}">Validation error</p>-->
                 </div>
+
+                <!--<div class="form-group" th:classappend="${#fields.hasErrors('issueDate')}? 'has-error':''">-->
+                    <!--<label for="issueDate" class="control-label">Issue date and time</label>-->
+                    <!--<input type="datetime-local" id="issueDate"-->
+                           <!--class="form-control"-->
+                           <!--th:field="*{issueDate}"/>-->
+                    <!--<p class="error-message"-->
+                       <!--th:each="error: ${#fields.errors('issueDate')}"-->
+                       <!--th:text="${error}">Validation error</p>-->
+                <!--</div>-->
 
                 <div>
 

@@ -21,22 +21,26 @@
             <th>Issue Date</th>
             <th>Expire Date</th>
             <th>SUM</th>
+            <th>Status</th>
             <th>Contract_Id</th>
             <th>Customer Name</th>
-            <th>Customer Name</th>
+            <th>Delete Invoice</th>
         </tr>
         <tr th:each="invoice: ${invoices}">
             <td th:text="${invoice.getId()} ? ${invoice.getId()} : 'null value'"></td>
             <td th:text="${invoice.getIssueDate()} ? ${invoice.getDueDate()} : 'null value'"></td>
             <td th:text="${invoice.getDueDate()} ? ${invoice.getDueDate()} : 'null value'"></td>
             <td th:text="${invoice.getSum()} ? ${invoice.getSum()} : 'null value'"></td>
+            <td th:text="${invoice.getStatus()} ? ${invoice.getStatus()} : 'null value'"></td>
             <td th:text="${invoice.getContract().getId()} ? ${invoice.getContract().getId()} : 'null value'"></td>
             <td th:text="${invoice.getContract().getCustomer().getFullName()} ? ${invoice.getContract().getCustomer().getFullName()} : 'null value'"></td>
-            <td><a href="/admin/deleteUser?username=${user.username}">Delete</a></td>
+            <td>
+                <a th:href="@{/invoice/deleteInvoice?(id=${invoice.id})}" class="btn">DELETE</a>
+            </td>
         </tr>
     </table>
 </div>
-
+<br>
 <a href="/invoice/createNew" class="btn btn-danger">Create New</a>
 
 </body>
