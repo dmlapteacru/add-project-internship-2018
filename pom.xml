@@ -95,6 +95,13 @@
 
     </dependencies>
 
+	<distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <url>https://nexus.endava.net/#admin/repository/repositories:Intens_2018_firs</url>
+        </repository>
+    </distributionManagement>
+
 	<build>
 		<plugins>
 			<plugin>
