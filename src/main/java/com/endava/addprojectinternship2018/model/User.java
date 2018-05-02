@@ -38,6 +38,11 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
     public User(String username, String password, UserStatus userStatus) {
         this.username = username;
         this.password = password;

@@ -71,4 +71,9 @@ public class UserService {
         return userDao.findAllUsersWithProfile();
     }
 
+    public void changeUserPassword(UserDto user){
+        User oldUser = getUserByUsername(user.getUsername()).get();
+        oldUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        userDao.save(oldUser);
+    }
 }

@@ -18,4 +18,5 @@ public interface ProductDao extends JpaRepository<Product, Integer>{
 
     Optional<Product> findById(int id);
 
+    void deleteById(int id);
 }

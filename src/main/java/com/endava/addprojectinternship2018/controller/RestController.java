@@ -2,13 +2,17 @@ package com.endava.addprojectinternship2018.controller;
 
 import com.endava.addprojectinternship2018.model.Company;
 import com.endava.addprojectinternship2018.model.Customer;
+import com.endava.addprojectinternship2018.model.Product;
+import com.endava.addprojectinternship2018.model.dto.UserRegistrationDto;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.CustomerService;
+import com.endava.addprojectinternship2018.service.ProductService;
+import com.endava.addprojectinternship2018.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import javax.swing.text.html.Option;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +24,12 @@ public class RestController {
 
     @Autowired
     private CustomerService customerService;
+
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/rest/getAllCompanies")
     public List<Company> getAllCompanies(){
@@ -41,6 +51,29 @@ public class RestController {
     @GetMapping("/rest/getCompanyByName/{companyName}")
     public Company getCompanyByUsername(@PathVariable String companyName){
         return companyService.getCompanyByName(companyName).get();
+    }
+
+    @RequestMapping(value = "/admin/services", method = RequestMethod.GET)
+    public List<Product> getAllProducts(){
+        return productService.getAllProducts();
+    }
+
+    @RequestMapping(value = "/admin/newUserPassword", method = RequestMethod.PUT)
+    public String setNewPass(@RequestBody @Valid UserRegistrationDto user){
+        userService.changeUserPassword(user);
+        return "OK";
+    }
+
+    @RequestMapping(value = "/admin/newProduct", method = RequestMethod.POST)
+    public String saveNewProduct(@RequestBody Product product){
+        productService.saveProduct(product);
+        return "OK";
+    }
+
+    @RequestMapping(value = "/admin/deleteProduct/{id}", method = RequestMethod.DELETE)
+    public String saveNewProduct(@PathVariable Integer id){
+        productService.deleteProduct(id);
+        return "OK";
     }
 
 //  -------------------------------------------
