@@ -3,7 +3,7 @@ package com.endava.addprojectinternship2018.service;
 import com.endava.addprojectinternship2018.dao.CompanyDao;
 import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
-import com.endava.addprojectinternship2018.model.Enums.InvoiceStatus;
+import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
 import com.endava.addprojectinternship2018.model.dto.InvoiceDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.endava.addprojectinternship2018.model.Enums.InvoiceStatus.ACTIVE;
+import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.ACTIVE;
 
 
 @Service
@@ -75,4 +75,26 @@ public class InvoiceService {
     public void deleteInvoice(int id){
         invoiceDao.deleteById(id);
     }
+
+    public Invoice convertInvoiceDtoToInvoice(InvoiceDto invoiceDto) {
+        Invoice invoice = invoiceDao.findById(invoiceDto.getInvoiceId())
+                .orElseGet(Invoice::new);
+        invoice.setContract(invoiceDto.getContract());
+        invoice.setIssueDate(invoiceDto.getIssueDate());
+        invoice.setDueDate(invoiceDto.getDueDate());
+        invoice.setSum(invoiceDto.getSum());
+        invoice.setStatus(invoiceDto.getStatus());
+        return invoice;
+    }
+
+    public InvoiceDto convertInvoiceToInvoiceDto(Invoice invoice) {
+        InvoiceDto invoiceDto = new InvoiceDto();
+        invoiceDto.setContract(invoice.getContract());
+        invoiceDto.setDueDate(invoice.getDueDate());
+        invoiceDto.setIssueDate(invoice.getIssueDate());
+        invoiceDto.setStatus(invoice.getStatus());
+        invoiceDto.setSum(invoice.getSum());
+        return invoiceDto;
+    }
+
 }

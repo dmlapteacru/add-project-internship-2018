@@ -1,10 +1,9 @@
 package com.endava.addprojectinternship2018.model;
 
-import com.endava.addprojectinternship2018.model.Enums.ContractStatus;
+import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.util.LocalDateTimeConverter;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

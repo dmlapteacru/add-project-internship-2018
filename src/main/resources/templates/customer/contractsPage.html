@@ -31,6 +31,7 @@
     </thead>
     <tbody>
     <tr th:each="contractDto : ${customerContracts}">
+
         <td th:text="${contractDto.selectedCompany.name}">company name</td>
         <td th:text="${#temporals.format(contractDto.getIssueDate(),'dd MMM yyyy')}">issue date</td>
         <td th:text="${#temporals.format(contractDto.getExpireDate(),'dd MMM yyyy')}">expire date</td>
@@ -38,10 +39,11 @@
         <td th:text="${contractDto.selectedProduct.name}">service name</td>
         <td th:text="${contractDto.status}"></td>
         <td>
-            <form th:object="${contractDto}" th:action="@{/contract/updateContract}" th:method="post">
-                <button type="submit" class="btn btn-info">Edit</button>
-            </form>
+            <a th:href="@{/contract/updateContract(contractId=${contractDto.contractId})}"
+               class="btn btn-info">Edit
+            </a>
         </td>
+
     </tr>
     </tbody>
 </table>

@@ -1,15 +1,15 @@
 package com.endava.addprojectinternship2018.controller;
 
+import com.endava.addprojectinternship2018.dao.ContractDao;
+import com.endava.addprojectinternship2018.model.Company;
 import com.endava.addprojectinternship2018.model.Contract;
-import com.endava.addprojectinternship2018.model.Enums.ContractStatus;
-import com.endava.addprojectinternship2018.model.Enums.Role;
+import com.endava.addprojectinternship2018.model.enums.ContractStatus;
+import com.endava.addprojectinternship2018.model.enums.Role;
 import com.endava.addprojectinternship2018.model.dto.ContractDto;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.ContractService;
 import com.endava.addprojectinternship2018.service.ProductService;
-import com.endava.addprojectinternship2018.service.user.UserService;
 import com.endava.addprojectinternship2018.util.UserUtil;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,20 +35,29 @@ public class ContractController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private ContractDao contractDao;
+
     @GetMapping(value = "createContract")
-    public String printContract(@RequestParam(name = "companyId") int companyId,
+    public String getContractPageForCreate(@RequestParam(name = "companyId") int companyId,
                                 Model model) {
-        Role role = userUtil.getCurrentUser().getRole();
+        Role currentUserRole = userUtil.getCurrentUser().getRole();
         ContractDto contractDto = new ContractDto();
-        if (role == Role.CUSTOMER) {
+        if (currentUserRole == Role.CUSTOMER) {
             contractDto.setSelectedCustomer(userUtil.getCurrentCustomer());
             if (companyId != 0) {
                 contractDto.setSelectedCompany(companyService.getCompanyById(companyId).get());
+                contractDto.setProducts(productService.getAllByCompanyId(companyId));
+            } else {
+                contractDto.setCompanies(companyService.getAllCompanies());
+                contractDto.setProducts(productService.getAllProducts());
             }
             contractDto.setStatus(ContractStatus.SIGNED_BY_CUSTOMER);
-        } else if (role == Role.COMPANY) {
-            contractDto.setSelectedCompany(userUtil.getCurrentCompany());
+        } else if (currentUserRole == Role.COMPANY) {
+            Company currentCompany = userUtil.getCurrentCompany();
+            contractDto.setSelectedCompany(currentCompany);
             contractDto.setStatus(ContractStatus.SIGNED_BY_COMPANY);
+            contractDto.setProducts(productService.getAllByCompanyId(currentCompany.getId()));
         }
         contractDto.setIssueDate(LocalDateTime.now());
         LocalDateTime endOfCurrentYear = LocalDateTime.of(LocalDate.now().getYear(), 12, 31, 12, 00);
@@ -58,12 +67,33 @@ public class ContractController {
         return "contract/contractPage";
     }
 
-    @PostMapping(value = "updateContract")
-    public String createNewContract(@ModelAttribute ContractDto contractDto,
-                                    BindingResult result, Model model) {
+    @GetMapping(value = "updateContract")
+    public String getContractPageForUpdate(@RequestParam(name = "contractId") int contractId,
+                                    Model model) {
+        ContractDto contractDto = contractService.convertContractToContractDto(contractService.getContractById(contractId));
         model.addAttribute("contractDto", contractDto);
-        contractService.saveContract(contractDto);
-        return "redirect:/customer/contracts";
+        model.addAttribute("update", true);
+        return "contract/contractPage";
+    }
+
+    @PostMapping(value = "saveContract")
+    public String saveContract(@ModelAttribute(name = "contractDto") ContractDto contractDto,
+                               BindingResult result, Model model) {
+
+        if (result.hasErrors()) {
+            return "contract/contractPage";
+        }
+        if (contractDto.getIssueDate().isAfter(contractDto.getExpireDate())) {
+            result.rejectValue("expireDate", "Issue date can not be more then Expire date!");
+            return "contract/contractPage";
+        }
+        if (contractDto.getSum() < 0) {
+            result.rejectValue("sum", "The sum can not be negative!");
+            return "contract/contractPage";
+        }
+
+        contractDao.save(contractService.convertContractDtoToContract(contractDto));
+        return "redirect:/updateContract?success";
     }
 
 }

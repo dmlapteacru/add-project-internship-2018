@@ -45,6 +45,7 @@ public class ContractService {
         contractDto.setStatus(contract.getStatus());
         contractDto.setExpireDate(contract.getExpireDate());
         contractDto.setSum(contract.getSum());
+        contractDto.setContractId(contract.getId());
         return contractDto;
     }
 

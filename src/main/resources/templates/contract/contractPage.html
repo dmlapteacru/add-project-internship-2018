@@ -32,9 +32,7 @@
                 <h2>Create new contract</h2>
             </div>
 
-            <form th:action="${update} ? @{/contract/updateContract} : @{/contract/createContract}"
-                  th:object="${contractDto}"
-                  method="post">
+            <form th:action="@{/contract/saveContract}" th:object="${contractDto}" method="post">
 
                 <p class="error-message"
                    th:if="${#fields.hasGlobalErrors()}"

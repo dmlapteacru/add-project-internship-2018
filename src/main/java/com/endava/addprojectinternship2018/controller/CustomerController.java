@@ -1,10 +1,8 @@
 package com.endava.addprojectinternship2018.controller;
 
 import com.endava.addprojectinternship2018.model.*;
-import com.endava.addprojectinternship2018.model.Enums.Role;
 import com.endava.addprojectinternship2018.model.dto.ContractDto;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
-import com.endava.addprojectinternship2018.model.dto.UserDto;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.ContractService;
 import com.endava.addprojectinternship2018.service.CustomerService;
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(value = "customer")
@@ -66,12 +65,24 @@ public class CustomerController {
     }
 
     @PostMapping(value = "updateProfile")
-    public String updateProfile(@ModelAttribute("user") @Valid CustomerDto customerDto,
+    public String updateProfile(@ModelAttribute("customerDto") @Valid CustomerDto customerDto,
                                 BindingResult result,
                                 Model model) {
-
+        model.addAttribute("update", true);
         if (result.hasErrors()) {
-            model.addAttribute("update", true);
+            return "registration/customer";
+        }
+
+        Optional<Customer> foundCustomer = customerService.getCustomerByEmail(customerDto.getEmail());
+        if (foundCustomer.isPresent()) {
+            if (foundCustomer.get().getId() != customerDto.getCustomerId()) {
+                result.rejectValue("email", "email.error", "Email is not unique");
+                return "registration/customer";
+            }
+        }
+
+        if (userService.getUserByUsername(customerDto.getUserDto().getUsername()).isPresent()) {
+            result.rejectValue("username", "username.error", "Username is not unique");
             return "registration/customer";
         }
 
@@ -94,7 +105,6 @@ public class CustomerController {
             contractDtoList.add(contractService.convertContractToContractDto(contract));
         }
         model.addAttribute("customerContracts", contractDtoList);
-
         return "customer/contractsPage";
     }
 

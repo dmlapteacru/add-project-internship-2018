@@ -1,10 +1,10 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.model.Enums.Role;
-import com.endava.addprojectinternship2018.model.User;
+import com.endava.addprojectinternship2018.model.enums.Role;
 import com.endava.addprojectinternship2018.model.dto.CompanyDto;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
 import com.endava.addprojectinternship2018.model.dto.UserDto;
+import com.endava.addprojectinternship2018.model.enums.UserStatus;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.CustomerService;
 import com.endava.addprojectinternship2018.service.user.UserService;
@@ -41,20 +41,28 @@ public class UserRegistrationController {
     public String showCustomerRegistrationForm(Model model) {
         UserDto userDto = new UserDto();
         userDto.setRole(Role.CUSTOMER);
+        userDto.setStatus(UserStatus.INACTIVE);
         CustomerDto customerDto = new CustomerDto();
         customerDto.setUserDto(userDto);
         model.addAttribute("customerDto", customerDto);
+        model.addAttribute("update", false);
         return "registration/customer";
     }
 
     @GetMapping(value = "company")
     public String showCompanyRegistrationForm(Model model) {
-        model.addAttribute("user", new CompanyDto());
+        UserDto userDto = new UserDto();
+        userDto.setRole(Role.COMPANY);
+        userDto.setStatus(UserStatus.INACTIVE);
+        CompanyDto companyDto = new CompanyDto();
+        companyDto.setUserDto(userDto);
+        model.addAttribute("companyDto", companyDto);
+        model.addAttribute("update", false);
         return "registration/company";
     }
 
     @PostMapping(value = "company")
-    public String registerCompany(@ModelAttribute("user") @Valid CompanyDto companyDto,
+    public String registerCompany(@ModelAttribute("companyDto") @Valid CompanyDto companyDto,
                                   BindingResult result, Model model) {
 
         if (result.hasErrors()) {
@@ -77,19 +85,20 @@ public class UserRegistrationController {
     }
 
     @PostMapping(value = "customer")
-    public String registerCustomer(@ModelAttribute("user") @Valid CustomerDto customerDto,
+    public String registerCustomer(@ModelAttribute("customerDto") @Valid CustomerDto customerDto,
                                   BindingResult result, Model model) {
-        if (result.hasErrors()) {
-            return "registration/customer";
-        }
 
-        if (userService.getUserByUsername(customerDto.getUserDto().getUsername()).isPresent()) {
-            result.rejectValue("username", "username.error", "Username is not unique");
+        if (result.hasErrors()) {
             return "registration/customer";
         }
 
         if (customerService.getCustomerByEmail(customerDto.getEmail()).isPresent()) {
             result.rejectValue("email", "email.error", "Email is not unique");
+            return "registration/customer";
+        }
+
+        if (userService.getUserByUsername(customerDto.getUserDto().getUsername()).isPresent()) {
+            result.rejectValue("userDto.username", "username.error", "Username is not unique");
             return "registration/customer";
         }
 

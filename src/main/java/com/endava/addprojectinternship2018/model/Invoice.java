@@ -1,14 +1,12 @@
 package com.endava.addprojectinternship2018.model;
 
-import com.endava.addprojectinternship2018.model.Enums.InvoiceStatus;
+import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import javax.validation.constraints.Pattern;
-import java.security.PrivateKey;
 import java.time.LocalDate;
 
 @Entity
@@ -23,7 +21,6 @@ public class Invoice {
     private int id;
 
     @Column
-//    @Pattern(regexp = "[0-9]+[\\.]+[0-9]", message = "Do not match the numerical pattern")
     private double sum;
 
     @Column

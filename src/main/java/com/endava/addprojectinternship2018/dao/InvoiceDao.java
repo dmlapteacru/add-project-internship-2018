@@ -1,21 +1,18 @@
 package com.endava.addprojectinternship2018.dao;
 
-import com.endava.addprojectinternship2018.model.Company;
-import com.endava.addprojectinternship2018.model.Customer;
-import com.endava.addprojectinternship2018.model.Enums.InvoiceStatus;
+import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
 
-    Invoice findById(int id);
+    Optional<Invoice> findById(int id);
 
     List<Invoice> findAll();
 

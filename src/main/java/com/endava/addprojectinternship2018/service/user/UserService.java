@@ -11,8 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.List;
 import java.util.Optional;
 
-import static com.endava.addprojectinternship2018.model.Enums.UserStatus.ACTIVE;
-import static com.endava.addprojectinternship2018.model.Enums.UserStatus.INACTIVE;
+import static com.endava.addprojectinternship2018.model.enums.UserStatus.ACTIVE;
+import static com.endava.addprojectinternship2018.model.enums.UserStatus.INACTIVE;
 
 @Service
 public class UserService {
@@ -44,7 +44,6 @@ public class UserService {
                 .orElseGet(User :: new);
         user.setUsername(userDto.getUsername());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setUserStatus(INACTIVE);
         user.setRole(userDto.getRole());
         user.setUserStatus(userDto.getStatus());
         return user;

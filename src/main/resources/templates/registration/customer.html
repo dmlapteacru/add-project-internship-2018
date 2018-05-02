@@ -43,6 +43,7 @@
                 <input type="hidden" th:field="*{customerId}">
                 <input type="hidden" th:field="*{userDto.userId}">
                 <input type="hidden" th:field="*{userDto.role}">
+                <input type="hidden" th:field="*{userDto.status}">
 
                 <div class="form-group"
                      th:classappend="${#fields.hasErrors('firstName')}? 'has-error':''">

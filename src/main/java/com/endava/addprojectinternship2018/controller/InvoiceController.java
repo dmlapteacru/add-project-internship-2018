@@ -30,26 +30,25 @@ public class InvoiceController {
     private ProductService productService;
 
     @GetMapping(value = "createNew")
-    public String showNewInvoice(Model model){
+    public String showNewInvoice(Model model) {
         model.addAttribute("invoice", new Invoice());
         Company company = userUtil.getCurrentCompany();
         model.addAttribute("listOfContracts", contractService
                 .getContractsByCompanyName(company.getName()));
         model.addAttribute("productList", productService.getAllProducts());
         return "invoice/newInvoice";
-}
+    }
 
     @PostMapping(value = "createNew")
-    public String createNewInvoice(@ModelAttribute InvoiceDto invoiceDto, BindingResult result){
+    public String createNewInvoice(@ModelAttribute InvoiceDto invoiceDto, BindingResult result) {
         invoiceService.saveDto(invoiceDto);
         return "redirect:/company/invoices";
     }
 
     @GetMapping(value = "deleteInvoice")
-    public String deleteUserByUsername(@RequestParam("invoiceId") int invoiceId){
+    public String deleteUserByUsername(@RequestParam("invoiceId") int invoiceId) {
         Invoice invoice = null;
-       invoiceService.deleteInvoice();
-//        userService.deleteUser(username);
+        invoiceService.deleteInvoice(invoiceId);
         return "redirect:/company/contracts";
     }
 

@@ -2,7 +2,7 @@ package com.endava.addprojectinternship2018.model.dto;
 
 import com.endava.addprojectinternship2018.model.Company;
 import com.endava.addprojectinternship2018.model.Customer;
-import com.endava.addprojectinternship2018.model.Enums.ContractStatus;
+import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.model.Product;
 import com.endava.addprojectinternship2018.util.LocalDateTimeConverter;
 import lombok.AllArgsConstructor;
@@ -26,12 +26,12 @@ public class ContractDto {
 
     @NotEmpty
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @Convert(converter = LocalDateTimeConverter.class)
+    //@Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime issueDate;
 
     @NotEmpty
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @Convert(converter = LocalDateTimeConverter.class)
+    //@Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime expireDate;
 
     @NotEmpty
