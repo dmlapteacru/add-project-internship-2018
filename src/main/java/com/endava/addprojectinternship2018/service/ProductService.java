@@ -26,7 +26,6 @@ public class ProductService {
         Optional<Product> oldProduct = productDao.findById(product.getId());
         if (oldProduct.isPresent()){
             oldProduct.get().setName(product.getName());
-            oldProduct.get().setDescription(product.getDescription());
             productDao.save(oldProduct.get());
         } else {
             productDao.save(product);
