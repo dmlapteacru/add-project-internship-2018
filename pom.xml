@@ -95,10 +95,18 @@
 
     </dependencies>
 
-	<distributionManagement>
+	<dependencies>
+     <dependency>
+      <groupId>com.endava</groupId>
+      <artifactId>add-project-internship-2018</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+  <distributionManagement>
         <repository>
             <id>nexus</id>
-            <url>https://nexus.endava.net/#admin/repository/repositories:Intens_2018_firs</url>
+            <url>https://nexus.endava.net/repository/Intens_2018_firs/</url>
         </repository>
     </distributionManagement>
 
