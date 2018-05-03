@@ -2,12 +2,18 @@ package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.model.Contract;
+import com.endava.addprojectinternship2018.model.User;
 import com.endava.addprojectinternship2018.model.dto.ContractDto;
+import com.endava.addprojectinternship2018.model.enums.ContractStatus;
+import com.endava.addprojectinternship2018.model.enums.Role;
+import com.endava.addprojectinternship2018.util.UserUtil;
+import org.omg.PortableInterceptor.ACTIVE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -15,6 +21,9 @@ public class ContractService {
 
     @Autowired
     private ContractDao contractDao;
+
+    @Autowired
+    private UserUtil userUtil;
 
     public List<Contract> getContractsByCompanyName(String companyName) {
         return contractDao.findByCompanyName(companyName);
@@ -60,5 +69,18 @@ public class ContractService {
         contract.setProduct(contractDto.getSelectedProduct());
         contract.setStatus(contractDto.getStatus());
         return contract;
+    }
+
+    public String deleteContract(int contractId) {
+        Optional<Contract> contractOptional = contractDao.findById(contractId);
+        User currentUser = userUtil.getCurrentUser();
+        if (contractOptional.isPresent()) {
+            if (currentUser.getRole() == Role.CUSTOMER && contractOptional.get().getStatus() != ContractStatus.SIGNED_BY_CUSTOMER) {
+                return contractOptional.get().getStatus() + " contract can not be deleted";
+            }
+            contractDao.delete(contractOptional.get());
+            return "OK";
+        }
+        return "Contract not found";
     }
 }

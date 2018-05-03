@@ -17,6 +17,19 @@
 </div>
 <h2 th:text="${customer.getFullName()}+', list of contracts'"></h2>
 <a th:href="@{/contract/createContract(companyId=0)}" class="btn btn-info" role="button">Create new contract</a>
+
+<div th:if="${param.successDelete}">
+    <div class="alert alert-info">
+        <span>Contract was deleted successfully</span>
+    </div>
+</div>
+
+<div th:if="${param.error}">
+    <div class="alert alert-warning">
+        <span th:text="${errorMessage}">error</span>
+    </div>
+</div>
+
 <table class="table table-hover">
     <thead>
     <tr>
@@ -27,10 +40,11 @@
         <th>Service</th>
         <th>Status</th>
         <th></th>
+        <th></th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each="contractDto : ${customerContracts}">
+    <tr th:each="contractDto : ${contractList}">
 
         <td th:text="${contractDto.selectedCompany.name}">company name</td>
         <td th:text="${#temporals.format(contractDto.getIssueDate(),'dd MMM yyyy')}">issue date</td>
@@ -43,7 +57,12 @@
                class="btn btn-info">Edit
             </a>
         </td>
-
+        <td>
+            <a th:href="@{/contract/deleteContract(contractId=${contractDto.contractId})}"
+               onclick="return confirm('Are you sure to delete contract?')"
+               class="btn btn-danger">Delete
+            </a>
+        </td>
     </tr>
     </tbody>
 </table>

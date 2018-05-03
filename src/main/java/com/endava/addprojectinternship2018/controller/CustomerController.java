@@ -81,17 +81,12 @@ public class CustomerController {
             }
         }
 
-        if (userService.getUserByUsername(customerDto.getUserDto().getUsername()).isPresent()) {
-            result.rejectValue("username", "username.error", "Username is not unique");
-            return "registration/customer";
-        }
-
         customerService.saveCustomer(customerDto);
         return "redirect:/customer";
     }
 
     @GetMapping(value = "contracts")
-    public String getContractsPage(Model model) {
+    public String getContractsPage(@ModelAttribute(name = "errorMessage") String errorMessage, Model model) {
 
         Customer currentCustomer = userUtil.getCurrentCustomer();
         if (currentCustomer == null) {
@@ -104,8 +99,9 @@ public class CustomerController {
         for (Contract contract : contracts) {
             contractDtoList.add(contractService.convertContractToContractDto(contract));
         }
-        model.addAttribute("customerContracts", contractDtoList);
-        return "customer/contractsPage";
+        model.addAttribute("contractList", contractDtoList);
+        model.addAttribute("errorMessage", errorMessage);
+        return "contract/contractListPage";
     }
 
     @GetMapping(value = "invoices")

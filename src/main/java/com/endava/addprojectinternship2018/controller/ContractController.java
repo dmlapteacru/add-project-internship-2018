@@ -1,8 +1,6 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.model.Company;
-import com.endava.addprojectinternship2018.model.Contract;
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.model.enums.Role;
 import com.endava.addprojectinternship2018.model.dto.ContractDto;
@@ -35,12 +33,9 @@ public class ContractController {
     @Autowired
     private ProductService productService;
 
-    @Autowired
-    private ContractDao contractDao;
-
     @GetMapping(value = "createContract")
     public String getContractPageForCreate(@RequestParam(name = "companyId") int companyId,
-                                Model model) {
+                                           Model model) {
         Role currentUserRole = userUtil.getCurrentUser().getRole();
         ContractDto contractDto = new ContractDto();
         if (currentUserRole == Role.CUSTOMER) {
@@ -69,17 +64,40 @@ public class ContractController {
 
     @GetMapping(value = "updateContract")
     public String getContractPageForUpdate(@RequestParam(name = "contractId") int contractId,
-                                    Model model) {
+                                           Model model) {
         ContractDto contractDto = contractService.convertContractToContractDto(contractService.getContractById(contractId));
+        contractDto.setProducts(productService.getAllProducts());
         model.addAttribute("contractDto", contractDto);
         model.addAttribute("update", true);
         return "contract/contractPage";
+    }
+
+    @GetMapping(value = "deleteContract")
+    public String deleteContract(@RequestParam(name = "contractId") int contractId,
+                                 Model model) {
+        Role currentUserRole = userUtil.getCurrentUser().getRole();
+        String controllerName = currentUserRole == Role.CUSTOMER ? "customer" : "company";
+        String deleteResult = contractService.deleteContract(contractId);
+        if (deleteResult.equals("OK")) {
+            return "redirect:/"+controllerName+"/contracts?successDelete";
+        } else {
+            model.addAttribute("errorMessage", deleteResult);
+            return "redirect:/"+controllerName+"/contracts?error";
+        }
     }
 
     @PostMapping(value = "saveContract")
     public String saveContract(@ModelAttribute(name = "contractDto") ContractDto contractDto,
                                BindingResult result, Model model) {
 
+        String resultString;
+        if (contractDto.getContractId() == 0) {
+            model.addAttribute("update", false);
+            resultString = "redirect:/contract/createContract?companyId=" + contractDto.getSelectedCompany().getId() + "&success";
+        } else {
+            model.addAttribute("update", true);
+            resultString = "redirect:/contract/updateContract?contractId=" + contractDto.getContractId() + "&success";
+        }
         if (result.hasErrors()) {
             return "contract/contractPage";
         }
@@ -92,8 +110,9 @@ public class ContractController {
             return "contract/contractPage";
         }
 
-        contractDao.save(contractService.convertContractDtoToContract(contractDto));
-        return "redirect:/updateContract?success";
+        contractService.saveContract(contractDto);
+
+        return resultString;
     }
 
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(value = "company")
@@ -40,10 +41,10 @@ public class CompanyController {
 
     @GetMapping(value = "")
     public String showCompanyPage(Model model) {
-        if (userUtil.getCurrentCompany() == null){
+        if (userUtil.getCurrentCompany() == null) {
             return "company/error";
         }
-            model.addAttribute("company", userUtil.getCurrentCompany());
+        model.addAttribute("company", userUtil.getCurrentCompany());
         return "company/homePage";
     }
 
@@ -76,19 +77,19 @@ public class CompanyController {
     public String updateProfile(@ModelAttribute("companyDto") @Valid CompanyDto companyDto,
                                 BindingResult result,
                                 Model model) {
+
         model.addAttribute("update", true);
+
         if (result.hasErrors()) {
             return "registration/company";
         }
 
-        if (userService.getUserByUsername(companyDto.getUserDto().getUsername()).isPresent()) {
-            result.rejectValue("username", "username.error", "Username is not unique");
-            return "registration/company";
-        }
-
-        if (companyService.getCompanyByEmail(companyDto.getEmail()).isPresent()) {
-            result.rejectValue("email", "email.error", "Email is not unique");
-            return "registration/company";
+        Optional<Company> foundCompany = companyService.getCompanyByEmail(companyDto.getEmail());
+        if (foundCompany.isPresent()) {
+            if (foundCompany.get().getId() != companyDto.getCompanyId()) {
+                result.rejectValue("email", "email.error", "Email is not unique");
+                return "registration/company";
+            }
         }
 
         companyService.saveCompany(companyDto);
