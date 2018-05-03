@@ -22,11 +22,11 @@
     <div class="body_wrapper">
         <div class="menu_wrapper">
             <button class="tablink tablink_active" onclick="openPage('users', this)">Users</button>
-            <button id="service_btn_req" class="tablink" onclick="openPage('services', this)">Services</button>
+            <button id="categories_btn_req" class="tablink" onclick="openPage('categories', this)">Categories</button>
         </div>
         <div class="info_wrapper">
             <div id="users" class="tabcontent tabcontent_active">
-                <table class="table table-striped">
+                <table class="table table-striped table-users">
                     <th>Role</th>
                     <th>Name</th>
                     <th>Username</th>
@@ -35,31 +35,31 @@
                     <th></th>
                     <th></th>
                     <tr th:each="user : ${users}">
-                        <td th:text="${user.role}"></td>
-                        <td th:text="${user.name}"></td>
-                        <td th:text="${user.username}"></td>
-                        <td th:text="${user.email}"></td>
-                        <td th:text="${user.userStatus}"></td>
+                        <td th:text="${user.role}" valign="center"></td>
+                        <td th:text="${user.name}" valign="center"></td>
+                        <td th:text="${user.username}" valign="center"></td>
+                        <td th:text="${user.email}" valign="center"></td>
+                        <td th:text="${user.userStatus}" valign="center"></td>
                         <td th:switch="${user.userStatus}">
                             <a th:case="${user.userStatus.INACTIVE}"
-                               th:href="@{admin/status?(username=${user.username})}" class="btn btn_activate">ACTIVATE</a>
+                               th:href="@{admin/status?(username=${user.username})}" class="btn-status-change btn_activate">ACTIVATE</a>
                             <a th:case="${user.userStatus.ACTIVE}"
-                               th:href="@{admin/status?(username=${user.username})}" class="btn btn_deactivate">DEACTIVATE</a>
+                               th:href="@{admin/status?(username=${user.username})}" class="btn-status-change btn_deactivate">DEACTIVATE</a>
                         </td>
                         <td class="change_pass_btn">
-                            <button type="button" class="btn" data-toggle="modal" data-target="#modalPassword" th:value="${user.username}">Change Password</button>
+                            <a class="btn-pass-change" data-toggle="modal" data-target="#modalPassword" th:value="${user.username}">Change Password</a>
                         </td>
                     </tr>
                 </table>
             </div>
 
-            <div id="services" class="tabcontent">
-                <table id="table-services" class="table table-striped">
+            <div id="categories" class="tabcontent">
+                <table id="table-categories" class="table table-striped">
                     <thead>
                     <th>Name</th>
-                    <th>Description</th>
-                    <th class="new_product_btn">
-                        <button style="background-color: #319e5c" type="button" class="btn btn_add_product" data-toggle="modal" data-target="#modalService" title="Add service">
+                    <th class="new_category_btn">
+                        <button style="background-color: #319e5c" type="button" class="btn btn_add_category" data-toggle="modal"
+                                data-target="#modalCategory" title="Add category">
                             <span style="color: white" class="glyphicon glyphicon-plus"></span>
                         </button>
                     </th>
@@ -98,25 +98,23 @@
 
         </div>
     </div>
-    <div class="modal fade" id="modalService" role="dialog">
+    <div class="modal fade" id="modalCategory" role="dialog">
         <div class="modal-dialog">
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Create new Service</h4>
+                    <h4 class="modal-title">Create new Category</h4>
                 </div>
                 <form>
-                    <div class="modal-body modal_body_service">
-                        <input id="new_product_id" type="text" hidden="hidden"/>
-                        <label>Product name</label>
-                        <input id="new_product_name" type="text"/>
-                        <label>Description</label>
-                        <textarea id="new_product_desc"></textarea>
+                    <div class="modal-body modal_body_category">
+                        <input id="new_category_id" type="text" hidden="hidden"/>
+                        <label>Category name</label>
+                        <input id="new_category_name" type="text"/>
                     </div>
                     <div class="modal-footer modal_btn">
                         <button type="button" style="display: none;" class="btn"></button>
-                        <button id="save_btn_product" type="button" class="btn btn-success">Save</button>
+                        <button id="save_btn_category" type="button" class="btn btn-success">Save</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
                 </form>
@@ -139,47 +137,57 @@
         document.getElementById(pageName).style.display = "block";
         elmnt.classList.add("tablink_active");
     }
-    $("#service_btn_req").click(function () {
-        $.ajax({url: "/admin/services",
+    $("#categories_btn_req").click(function () {
+        $.ajax({url: "/admin/categories",
             success: function(result){
-                $("#table-services tbody").html("");
+                $("#table-categories tbody").html("");
                 $.each(result, function (id, object) {
                     var ID = object.id;
-                    $("#table-services tbody").append('<tr id="row' + ID + '" class="user_rows"></tr>');
+                    $("#table-categories tbody").append('<tr id="row' + ID + '"></tr>');
                     $.each(object, function (key, value) {
                         if (key!="id"){
-                            $("#table-services tr[id="+ "row" + ID + "]").append('<td id="'+ key + ID +'">' + value + '</td>');
+                            $("#table-categories tr[id="+ "row" + ID + "]").append('<td id="'+ key + ID +'">' + value + '</td>');
                         }
                     });
-                    $("#table-services tr[id="+ "row" + ID + "]").append('<td>' +
-                        '<span id="'+ ID + '" class="glyphicon glyphicon-pencil edit_product_pencil" data-toggle="modal" data-target="#modalService" onclick="editProduct(this)"></span>' +
-                        '<span id="'+ ID + '" class="glyphicon glyphicon-trash delete_product_pencil" onclick="deleteProduct(this)"></span>' +
+                    $("#table-categories tr[id="+ "row" + ID + "]").append('<td>' +
+                        // '<span id="'+ ID + '" class="glyphicon glyphicon-pencil edit_product_pencil" data-toggle="modal" data-target="#modalService" onclick="editProduct(this)"></span>' +
+                        '<span id="'+ ID + '" class="glyphicon glyphicon-trash delete_category_pencil" onclick="deleteCategory(this)"></span>' +
                         '</td>');
                 });
             }});
     });
-    function editProduct(obj) {
-        $("#new_product_id").val(obj.id);
-        $("#new_product_name").val($("#name" + obj.id).text());
-        $("#new_product_desc").val($("#description" + obj.id).text());
-    }
-    function deleteProduct(obj) {
+    // function editProduct(obj) {
+    //     $("#new_product_id").val(obj.id);
+    //     $("#new_product_name").val($("#name" + obj.id).text());
+    //     $("#new_product_desc").val($("#description" + obj.id).text());
+    // }
+    function deleteCategory(obj) {
         $.ajax(
             {
-                url: "admin/deleteProduct/" + obj.id,
+                url: "admin/deleteCategory/" + obj.id,
                 type: "DELETE",
                 success: function () {
-                    $("#service_btn_req").click();
+                    $("#categories_btn_req").click();
                 }
             }
         )
     }
-    $(".change_pass_btn button").click(function () {
-        $("#new_pass_username").text(this.value);
+    $(".btn-pass-change").click(function () {
+        $("#new_pass_username").text($(this).attr("value"));
         $("#new_pass_input").val("");
+        $("#new_pass_input_confirm").val("");
+        $(".error_pass_match").text("");
     });
+    var passwordPattern =  new RegExp('^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$');
     $("#save_btn").click(function () {
-        if (passwordMatches($("#new_pass_input").val(), $("#new_pass_input_confirm").val())){
+        if ($("#new_pass_input").val()==""){
+            $(".error_pass_match").text("Passwords can't be empty.");
+        } else if (!passwordPattern.test($("#new_pass_input").val())){
+            $(".error_pass_match").text("Password must contain : at least 1 upper case letter," +
+                " 1 lower case letter," +
+                " 1 special character," +
+                " 1 number");
+        } else if (passwordMatches($("#new_pass_input").val(), $("#new_pass_input_confirm").val())){
             $(".error_pass_match").val("");
             var object = {
                 "username" : $("#new_pass_username").text(),
@@ -201,25 +209,22 @@
             $(".error_pass_match").text("Passwords don't match.");
         }
     });
-    $(".new_product_btn button").click(function () {
-        $("#new_product_name").val("");
-        $("#new_product_desc").val("");
+    $(".new_category_btn button").click(function () {
+        $("#new_category_name").val("");
     });
-    $("#save_btn_product").click(function () {
+    $("#save_btn_category").click(function () {
         var object = {
-            "id" : $("#new_product_id").val(),
-            "name" : $("#new_product_name").val(),
-            "description" : $("#new_product_desc").val()
+            "name" : $("#new_category_name").val()
         }
         $.ajax(
             {
-                url: "/admin/newProduct",
+                url: "/admin/newCategory",
                 type: "POST",
                 contentType: "application/json",
                 data: JSON.stringify(object),
                 success: function () {
-                    $("#modalService").modal("hide");
-                    $("#service_btn_req").click();
+                    $("#modalCategory").modal("hide");
+                    $("#categories_btn_req").click();
                 }
             }
         );

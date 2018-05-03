@@ -1,4 +1,4 @@
--- insert into users (password, role, user_status, username) values ('$2a$10$IE4XZPWC.BfLtTIqD5rZ0ewiF8YKIKVKIldHOhNgsASdKn7fu4o.G', 'ADMIN', 'ACTIVE', 'admin');
+insert into users (password, role, user_status, username) values ('$2a$10$IE4XZPWC.BfLtTIqD5rZ0ewiF8YKIKVKIldHOhNgsASdKn7fu4o.G', 'ADMIN', 'ACTIVE', 'admin');
 --
 -- insert into company VALUES (1, '444444444', 'orange@gmail.com', 'Orange', 3);
 -- insert into company VALUES (2, '333333333', 'moldcell@gmail.com', 'Moldcell', 3);
