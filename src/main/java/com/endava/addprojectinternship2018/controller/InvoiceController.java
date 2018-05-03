@@ -1,19 +1,27 @@
 package com.endava.addprojectinternship2018.controller;
 
 import com.endava.addprojectinternship2018.model.Company;
+import com.endava.addprojectinternship2018.model.Enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
 import com.endava.addprojectinternship2018.model.dto.InvoiceDto;
 import com.endava.addprojectinternship2018.service.ContractService;
 import com.endava.addprojectinternship2018.service.InvoiceService;
 import com.endava.addprojectinternship2018.service.ProductService;
 import com.endava.addprojectinternship2018.util.UserUtil;
+import com.sun.org.apache.xpath.internal.operations.Mod;
+import org.omg.PortableInterceptor.ACTIVE;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.jws.WebParam;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "invoice")
@@ -33,17 +41,18 @@ public class InvoiceController {
 
     @GetMapping(value = "createNew")
     public String showNewInvoice(Model model){
-        model.addAttribute("invoice", new InvoiceDto());
+        InvoiceDto invoiceDto = new InvoiceDto(LocalDateTime.now(), LocalDateTime.now(), 123.00);
+
+        model.addAttribute("invoice", invoiceDto);
         Company company = userUtil.getCurrentCompany();
         model.addAttribute("listOfContracts", contractService
                 .getContractsByCompanyName(company.getName()));
-        model.addAttribute("productList", productService.getAllProducts());
         return "invoice/newInvoice";
 }
 
     @PostMapping(value = "createNew")
-    public String createNewInvoice(@ModelAttribute @Valid InvoiceDto invoiceDto, BindingResult bindingResult
-                                    , Model model){
+    public String createNewInvoice( @ModelAttribute("invoice") @Valid InvoiceDto invoiceDto, BindingResult bindingResult,
+                                   Model model ){
         System.out.println(invoiceDto);
 
         if (bindingResult.hasErrors()){
@@ -51,7 +60,7 @@ public class InvoiceController {
             Company company = userUtil.getCurrentCompany();
             model.addAttribute("listOfContracts", contractService
                     .getContractsByCompanyName(company.getName()));
-            model.addAttribute("productList", productService.getAllProducts());
+            System.out.println(bindingResult.getAllErrors());
             return "invoice/newInvoice";
         }
         invoiceService.saveDto(invoiceDto);
@@ -63,5 +72,38 @@ public class InvoiceController {
         invoiceService.deleteInvoice(invoiceId);
         return "redirect:/company/invoices";
     }
+
+    @GetMapping(value = "updateInvoice")
+    public String updateInvoiceById(Model model, @RequestParam("id") int invoiceId){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        Invoice invoice = invoiceService.getInvoiceById(invoiceId);
+        model.addAttribute("formatter",formatter);
+        model.addAttribute("invoice", invoice);
+        model.addAttribute("invoiceList", invoiceService.getAllInvoices());
+        Company company = userUtil.getCurrentCompany();
+        List<Invoice> invoiceList = invoiceService.getInvoicesByCompany(company.getName());
+        return "invoice/updateInvoice";
+
+        //todo verify id invoice if mine
+    }
+
+    @GetMapping(value = "changeStatus")
+    public String changeInvoiceStatus(Model model, @RequestParam(value = "id") int id){
+       invoiceService.changeInvoiceStatus(id);
+       Invoice invoice = invoiceService.getInvoiceById(id);
+       model.addAttribute("invoice", invoice);
+       model.addAttribute("invoiceList", invoiceService.getAllInvoices());
+       model.addAttribute("id", id);
+        return "invoice/updateInvoice";
+    }
+
+    @GetMapping(value = "filterByActiveStatus")
+    public String showInvoicesByStatus(Model model,@RequestParam InvoiceStatus status){
+        Company company = userUtil.getCurrentCompany();
+        model.addAttribute("invoices", invoiceService
+                .getInvoicesByStatus(status));
+        return "company/invoicesByCompany";
+    }
+
 
 }

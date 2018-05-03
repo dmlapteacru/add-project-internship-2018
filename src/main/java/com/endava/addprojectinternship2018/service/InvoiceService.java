@@ -5,8 +5,10 @@ import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
+import com.endava.addprojectinternship2018.model.User;
 import com.endava.addprojectinternship2018.model.dto.InvoiceDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -14,7 +16,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.ACTIVE;
-
 
 @Service
 @Transactional
@@ -32,6 +33,8 @@ public class InvoiceService {
     public List<Invoice> getAllInvoices(){
         return invoiceDao.findAll();
     }
+
+    public Invoice getInvoiceById(int invoiceId){return invoiceDao.findById(invoiceId).get();}
 
     public List<Invoice> getAllInvoiceByContractId(int id){
         return invoiceDao.findByContractId(id);
@@ -68,7 +71,7 @@ public class InvoiceService {
 
     public void saveDto(InvoiceDto invoiceDto){
         Invoice invoice = new Invoice(invoiceDto.getSum(), invoiceDto.getIssueDate()
-                , invoiceDto.getDueDate(), ACTIVE, invoiceDto.getContract(invoiceDto.getContractId()));
+                , invoiceDto.getDueDate(), ACTIVE, invoiceDto.getContract());
         invoiceDao.save(invoice);
     }
 
@@ -97,4 +100,21 @@ public class InvoiceService {
         return invoiceDto;
     }
 
+
+    public void changeInvoiceStatus(int invoiceId) {
+        Invoice invoice = invoiceDao.findById(invoiceId).get();
+        if (invoice.getStatus() == InvoiceStatus.ACTIVE) {
+            invoice.setStatus(IN_PROGRESS);
+        } else invoice.setStatus(ACTIVE);
+    }
+
+    public List<Invoice> getInvoicesByStatus(InvoiceStatus invoiceStatus){
+        return invoiceDao.findAllByStatus(invoiceStatus);
+    }
+
+//    public List<Invoice> getInvoicesByIssueDateOrdered(){
+//        return invoiceDao.findAllByOrderByIssueDate(Sort.Direction.ASC);
+//    }
+
+//    public List<InvoiceStatus> getAllInvoiceStatuses(){return InvoiceStatus.values();}
 }

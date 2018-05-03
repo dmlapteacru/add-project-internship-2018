@@ -1,17 +1,20 @@
 package com.endava.addprojectinternship2018.model.dto;
 
 import com.endava.addprojectinternship2018.model.Contract;
-import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
+import com.endava.addprojectinternship2018.model.Enums.InvoiceStatus;
+import com.endava.addprojectinternship2018.util.LocalDateTimeConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Convert;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -19,23 +22,29 @@ import java.time.LocalDate;
 
 public class InvoiceDto {
 
-    @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate issueDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime issueDate;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime dueDate;
 
     @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dueDate;
-
-    @Range(min = 1)
-    private int contractId;
-
     private Contract contract;
+
+    private InvoiceStatus status;
 
     @DecimalMin("0.0")
     private double sum;
 
-    public Contract getContract(int contractId) {
+    public Contract getContract() {
         return contract;
+    }
+
+    public InvoiceDto(LocalDateTime issueDate,LocalDateTime dueDate, @DecimalMin("0.0") double sum) {
+        this.issueDate = issueDate;
+        this.dueDate = dueDate;
+        this.sum = sum;
     }
 }

@@ -2,6 +2,7 @@ package com.endava.addprojectinternship2018.dao;
 
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -27,5 +28,7 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
     List<Invoice> findAllByContractCustomerId(int id);
 
     List<Invoice> findAllByContract_Company_Name(String name);
+
+//    List<Invoice> findAllByOrderByIssueDate(Sort.Direction direction);
 
 }

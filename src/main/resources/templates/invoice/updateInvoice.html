@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <title>New Invoice</title>
+</head>
+
+<!--<form th:action="@{/invoice/createNew}" th:object="${invoice}" method="post">-->
+
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <form th:action="@{/invoice/updateInvoice}" th:object="${invoice}" method="post">
+
+                <div>
+                    <label>Invoice Sum</label><br>
+                    <input class="form-control" type="text" th:readonly="true" th:value="${invoice.id}" th:field="*{id}"/>
+                </div>
+
+                <div>
+                    <label>Invoice Sum</label><br>
+                    <input class="form-control" type="text" th:value="*{sum}" th:field="*{sum}"/>
+                </div>
+
+                <div>
+                    <label>Status</label><br>
+                    <input class="form-control" type="text" th:value="${invoice.status}" th:field="*{status}"/>
+                    <a th:href="@{/invoice/changeStatus?(id=${invoice.id})}">CHANGE Status</a>
+                </div>
+
+                <label>Issue Date</label><br>
+                <p class="alert alert-danger"  th:each="error: ${#fields.errors('issueDate')}" th:text="${error}"></p>
+                <input class="form-control" id="issueDate" th:field="*{issueDate}" type="datetime-local">
+
+                <label>Due Date</label><br>
+                <p class="alert alert-danger"  th:each="error: ${#fields.errors('dueDate')}" th:text="${error}"></p>
+                <input class="form-control" th:field="*{dueDate}" type="datetime-local">
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Apply</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
