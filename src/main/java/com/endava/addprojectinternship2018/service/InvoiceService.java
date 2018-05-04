@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.ACTIVE;
+import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.IN_PROGRESS;
 
 @Service
 @Transactional

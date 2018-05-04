@@ -1,7 +1,7 @@
 package com.endava.addprojectinternship2018.model.dto;
 
 import com.endava.addprojectinternship2018.model.Contract;
-import com.endava.addprojectinternship2018.model.Enums.InvoiceStatus;
+import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.util.LocalDateTimeConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +21,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 
 public class InvoiceDto {
+
+    private int invoiceId;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Convert(converter = LocalDateTimeConverter.class)

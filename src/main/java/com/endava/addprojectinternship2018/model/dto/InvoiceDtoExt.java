@@ -1,6 +1,6 @@
 package com.endava.addprojectinternship2018.model.dto;
 
-import com.endava.addprojectinternship2018.model.Enums.InvoiceStatus;
+import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 
 import java.time.LocalDateTime;
 

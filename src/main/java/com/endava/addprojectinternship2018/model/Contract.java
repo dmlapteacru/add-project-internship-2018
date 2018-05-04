@@ -30,6 +30,7 @@ public class Contract {
     private double sum;
 
     @Column
+    @Enumerated(value = EnumType.STRING)
     private ContractStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,0 +1,13 @@
+.header_wrapper {
+    display: flex;
+    background-color: #319e5c;
+}
+
+.logo_wrapper > img {
+    width: 140px;
+    height: 45px;
+}
+
+body {
+    background-color: #319e5c;
+}

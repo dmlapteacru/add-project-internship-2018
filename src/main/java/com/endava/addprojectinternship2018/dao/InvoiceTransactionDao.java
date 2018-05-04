@@ -1,6 +1,6 @@
 package com.endava.addprojectinternship2018.dao;
 
-import com.endava.addprojectinternship2018.model.Enums.InvoiceStatus;
+import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.dto.InvoiceDtoExt;
 import org.springframework.stereotype.Repository;
 

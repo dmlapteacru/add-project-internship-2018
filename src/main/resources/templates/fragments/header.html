@@ -1,45 +1,42 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <head>
     <title>ADD Power application</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/header.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
-
 <body>
-<div class="navbar navbar-inverse navbar-fixed" th:fragment="header">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">ADD Power project</a>
+<div class="header_wrapper" th:fragment="header">
+    <div class="logo_wrapper">
+        <img src="/img/endava-logo.png"/>
+    </div>
+    <div class="menu_wrapper">
+        <div class="menu_customer" sec:authorize="hasAuthority('CUSTOMER')">
+            <a th:href="@{/customer/home}" class="menu_item"> Home </a>
+            <a th:href="@{/customer/services}" class="menu_item"> Services </a>
+            <a th:href="@{/customer/contracts}" class="menu_item"> Contracts </a>
+            <a th:href="@{/customer/invoices}" class="menu_item"> Invoices </a>
+            <a th:href="@{/customer/bank}" class="menu_item"> Bank operations </a>
         </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li>
-                    <a href="#" th:href="@{/customer}">Home</a>
-                </li>
-                <li>
-                    <a href="#" th:href="@{/customer/profile}">Profile</a>
-                </li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="/logout" th:href="@{#}" onclick="$('#form').submit();">
-                        <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>&nbsp;Logout
-                    </a>
-                    <form style="visibility: hidden" id="form" method="post" action="#" th:action="@{/logout}"></form>
-                </li>
-            </ul>
+        <div class="menu_company" sec:authorize="hasAuthority('COMPANY')">
+            <a th:href="@{/company/home}" class="menu_item"> Home </a>
+            <a th:href="@{/company/services}" class="menu_item"> Services </a>
+            <a th:href="@{/company/contracts}" class="menu_item"> Contracts </a>
+            <a th:href="@{/company/invoices}" class="menu_item"> Invoices </a>
+            <a th:href="@{/company/bank}" class="menu_item"> Bank operations </a>
         </div>
+    </div>
+    <div class="logout_wrapper">
+        <form th:action="@{/logout}" method="post" class="logout_form">
+            <input class="btn btn-danger" type="submit" value="Logout"/>
+        </form>
     </div>
 </div>
 </body>
