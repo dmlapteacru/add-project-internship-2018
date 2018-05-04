@@ -1,7 +1,9 @@
 package com.endava.addprojectinternship2018.util;
 
 import javax.persistence.AttributeConverter;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class LocalDateTimeConverter implements AttributeConverter<LocalDateTime, Timestamp> {
@@ -15,4 +17,6 @@ public class LocalDateTimeConverter implements AttributeConverter<LocalDateTime,
     public LocalDateTime convertToEntityAttribute(Timestamp dbData) {
         return dbData != null ? dbData.toLocalDateTime() : null;
     }
+
 }
+

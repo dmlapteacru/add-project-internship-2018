@@ -10,9 +10,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </head>
-<div th:replace="fragments/header :: header">
 
-</div>
 <body>
 
 <p> Here we have invoices </p>
@@ -20,7 +18,6 @@
 <div class="container">
     <table class="table table-hover">
         <tr>
-            <th>Id_Invoice</th>
             <th>Issue Date</th>
             <th>Expire Date</th>
             <th>SUM</th>
@@ -30,7 +27,7 @@
             <th>Delete Invoice</th>
         </tr>
         <tr th:each="invoice: ${invoices}">
-            <td th:text="${invoice.getId()} ? ${invoice.getId()} : 'null value'"></td>
+            <!--<td th:text="${invoice.getId()} ? ${invoice.getId()} : 'null value'"></td>-->
             <td th:text="${invoice.getIssueDate()} ? ${invoice.getDueDate()} : 'null value'"></td>
             <td th:text="${invoice.getDueDate()} ? ${invoice.getDueDate()} : 'null value'"></td>
             <td th:text="${invoice.getSum()} ? ${invoice.getSum()} : 'null value'"></td>

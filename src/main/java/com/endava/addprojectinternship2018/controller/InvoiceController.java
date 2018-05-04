@@ -8,17 +8,14 @@ import com.endava.addprojectinternship2018.service.ContractService;
 import com.endava.addprojectinternship2018.service.InvoiceService;
 import com.endava.addprojectinternship2018.service.ProductService;
 import com.endava.addprojectinternship2018.util.UserUtil;
-import com.sun.org.apache.xpath.internal.operations.Mod;
-import org.omg.PortableInterceptor.ACTIVE;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.jws.WebParam;
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -41,7 +38,7 @@ public class InvoiceController {
 
     @GetMapping(value = "createNew")
     public String showNewInvoice(Model model){
-        InvoiceDto invoiceDto = new InvoiceDto(LocalDateTime.now(), LocalDateTime.now(), 123.00);
+        InvoiceDto invoiceDto = new InvoiceDto(LocalDate.now(), LocalDate.now(), 123.00);
 
         model.addAttribute("invoice", invoiceDto);
         Company company = userUtil.getCurrentCompany();
@@ -76,9 +73,9 @@ public class InvoiceController {
     @GetMapping(value = "updateInvoice")
     public String updateInvoiceById(Model model, @RequestParam("id") int invoiceId){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-        Invoice invoice = invoiceService.getInvoiceById(invoiceId);
+        InvoiceDto invoiceDto = invoiceService.convertInvoiceToInvoiceDto(invoiceService.getInvoiceById(invoiceId));
         model.addAttribute("formatter",formatter);
-        model.addAttribute("invoice", invoice);
+        model.addAttribute("invoice", invoiceDto);
         model.addAttribute("invoiceList", invoiceService.getAllInvoices());
         Company company = userUtil.getCurrentCompany();
         List<Invoice> invoiceList = invoiceService.getInvoicesByCompany(company.getName());

@@ -3,6 +3,7 @@ package com.endava.addprojectinternship2018.service;
 import com.endava.addprojectinternship2018.dao.CompanyDao;
 import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
+import com.endava.addprojectinternship2018.model.Product;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
 import com.endava.addprojectinternship2018.model.User;
@@ -113,9 +114,4 @@ public class InvoiceService {
         return invoiceDao.findAllByStatus(invoiceStatus);
     }
 
-//    public List<Invoice> getInvoicesByIssueDateOrdered(){
-//        return invoiceDao.findAllByOrderByIssueDate(Sort.Direction.ASC);
-//    }
-
-//    public List<InvoiceStatus> getAllInvoiceStatuses(){return InvoiceStatus.values();}
 }

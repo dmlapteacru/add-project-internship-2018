@@ -42,7 +42,7 @@
 
                 <div class="form-group" th:classappend="${#fields.hasErrors('issueDate')}? 'has-error':''">
                     <label for="issueDate" class="control-label">Issue date and time</label>
-                    <input type="datetime-local" id="issueDate"
+                    <input type="date" id="issueDate"
                            class="form-control"
                            th:field="*{issueDate}"/>
                     <p class="error-message"
@@ -52,7 +52,7 @@
 
                 <div class="form-group" th:classappend="${#fields.hasErrors('expireDate')}? 'has-error':''">
                     <label for="expireDate" class="control-label">Expire date and time</label>
-                    <input type="datetime-local" id="expireDate"
+                    <input type="date" id="expireDate"
                            class="form-control"
                            th:field="*{expireDate}"/>
                     <p class="error-message"

@@ -1,12 +1,12 @@
 package com.endava.addprojectinternship2018.model;
 
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
-import com.endava.addprojectinternship2018.util.LocalDateTimeConverter;
+import com.endava.addprojectinternship2018.util.LocalDateConverter;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "CONTRACT")
@@ -19,18 +19,18 @@ public class Contract {
     private int id;
 
     @Column
-    @Convert(converter = LocalDateTimeConverter.class)
-    private LocalDateTime issueDate;
+    @Convert(converter = LocalDateConverter.class)
+    private LocalDate issueDate;
 
     @Column
-    @Convert(converter = LocalDateTimeConverter.class)
-    private LocalDateTime expireDate;
+    @Convert(converter = LocalDateConverter.class)
+    private LocalDate expireDate;
 
     @Column
     private double sum;
 
     @Column
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private ContractStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,7 +45,7 @@ public class Contract {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    public Contract(LocalDateTime issueDate, LocalDateTime expireDate, double sum) {
+    public Contract(LocalDate issueDate, LocalDate expireDate, double sum) {
         this.issueDate = issueDate;
         this.expireDate = expireDate;
         this.sum = sum;

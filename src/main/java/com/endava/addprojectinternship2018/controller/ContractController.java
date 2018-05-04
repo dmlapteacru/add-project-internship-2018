@@ -54,9 +54,7 @@ public class ContractController {
             contractDto.setStatus(ContractStatus.SIGNED_BY_COMPANY);
             contractDto.setProducts(productService.getAllByCompanyId(currentCompany.getId()));
         }
-        contractDto.setIssueDate(LocalDateTime.now());
-        LocalDateTime endOfCurrentYear = LocalDateTime.of(LocalDate.now().getYear(), 12, 31, 12, 00);
-        contractDto.setExpireDate(endOfCurrentYear);
+        contractDto.setIssueDate(LocalDate.now());
         model.addAttribute("contractDto", contractDto);
         model.addAttribute("update", false);
         return "contract/contractPage";

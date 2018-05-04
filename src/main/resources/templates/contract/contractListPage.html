@@ -7,15 +7,15 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/table-filter.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/js/table-filter.js"></script>
 </head>
 
 <body>
 <div th:replace="fragments/header :: header">
 
 </div>
-<h2 th:text="${customer.getFullName()}+', list of contracts'"></h2>
 <a th:href="@{/contract/createContract(companyId=0)}" class="btn btn-info" role="button">Create new contract</a>
 
 <div th:if="${param.successDelete}">
@@ -30,43 +30,52 @@
     </div>
 </div>
 
-<table class="table table-hover">
-    <thead>
-    <tr>
-        <th>Company name</th>
-        <th>Issue date</th>
-        <th>Expire date</th>
-        <th>Sum</th>
-        <th>Service</th>
-        <th>Status</th>
-        <th></th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="contractDto : ${contractList}">
+<div class="panel panel-primary filterable">
+    <div class="panel-heading">
+        <h3 class="panel-title">Contracts</h3>
+        <div class="pull-right">
+            <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter
+            </button>
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+        <tr class="filters">
+            <th><input type="text" class="form-control" placeholder="Company name" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Issue date" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Expire date" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Service name" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Status" disabled></th>
+        </tr>
 
-        <td th:text="${contractDto.selectedCompany.name}">company name</td>
-        <td th:text="${#temporals.format(contractDto.getIssueDate(),'dd MMM yyyy')}">issue date</td>
-        <td th:text="${#temporals.format(contractDto.getExpireDate(),'dd MMM yyyy')}">expire date</td>
-        <td th:text="${contractDto.sum}">sum</td>
-        <td th:text="${contractDto.selectedProduct.name}">service name</td>
-        <td th:text="${contractDto.status}"></td>
-        <td>
-            <a th:href="@{/contract/updateContract(contractId=${contractDto.contractId})}"
-               class="btn btn-info">Edit
-            </a>
-        </td>
-        <td>
-            <a th:href="@{/contract/deleteContract(contractId=${contractDto.contractId})}"
-               onclick="return confirm('Are you sure to delete contract?')"
-               class="btn btn-danger">Delete
-            </a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        <tr th:each="contractDto : ${contractList}">
 
+            <td th:text="${contractDto.selectedCompany.name}">company name</td>
+            <td th:text="${#temporals.format(contractDto.getIssueDate(),'dd MMM yyyy')}">issue date</td>
+            <td th:text="${#temporals.format(contractDto.getExpireDate(),'dd MMM yyyy')}">expire date</td>
+            <td th:text="${contractDto.selectedProduct.name}">service name</td>
+            <td th:text="${contractDto.sum}">sum</td>
+            <td th:text="${contractDto.status}"></td>
+            <td>
+                <a th:href="@{/contract/updateContract(contractId=${contractDto.contractId})}"
+                   class="btn btn-info">Edit
+                </a>
+            </td>
+            <td>
+                <a th:href="@{/contract/deleteContract(contractId=${contractDto.contractId})}"
+                   onclick="return confirm('Are you sure to delete contract?')"
+                   class="btn btn-danger">Delete
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
+
 </body>
+
+
 </html>

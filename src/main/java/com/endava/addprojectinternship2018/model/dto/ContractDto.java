@@ -12,8 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -24,12 +23,12 @@ public class ContractDto {
     private int contractId;
 
     @NotEmpty
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime issueDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate issueDate;
 
     @NotEmpty
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime expireDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate expireDate;
 
     @NotEmpty
     private double sum;
@@ -48,13 +47,12 @@ public class ContractDto {
     @NotEmpty
     private Customer selectedCustomer;
 
-
     private List<Product> products;
 
     @NotEmpty
     private Product selectedProduct;
 
-    public ContractDto(@NotEmpty LocalDateTime issueDate, @NotEmpty LocalDateTime expireDate,
+    public ContractDto(@NotEmpty LocalDate issueDate, @NotEmpty LocalDate expireDate,
                        @NotEmpty double sum) {
         this.issueDate = issueDate;
         this.expireDate = expireDate;
