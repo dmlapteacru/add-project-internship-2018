@@ -1,5 +1,6 @@
 package com.endava.addprojectinternship2018.controller;
 
+import com.endava.addprojectinternship2018.dao.InvoiceTransactionDao;
 import com.endava.addprojectinternship2018.model.Company;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
@@ -101,5 +102,11 @@ public class InvoiceController {
         return "company/invoicesByCompany";
     }
 
+    @GetMapping("/test")
+    public List getTest(){
 
+        return dao.getInvoiceDtoExt(1,1,InvoiceStatus.ACTIVE);
+    }
+    @Autowired
+    InvoiceTransactionDao dao=new InvoiceTransactionDao();
 }
