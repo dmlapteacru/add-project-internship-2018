@@ -1,4 +1,4 @@
-package com.endava.addprojectinternship2018.service.user;
+package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.UserDao;
 import com.endava.addprojectinternship2018.model.*;

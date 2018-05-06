@@ -94,6 +94,11 @@
     cursor: pointer;
 }
 
+.edit_category_pencil {
+    cursor: pointer;
+    margin-right: 10px;
+}
+
 .btn-status-change {
     text-decoration: none;
     border: 1px #cccccc solid;

@@ -19,14 +19,13 @@ public class CategoryService {
     }
 
     public void saveCategory(Category category){
-//        Optional<Category> oldCategory = categoryDao.findById(category.getId());
-//        if (oldCategory.isPresent()){
-//            oldCategory.get().setName(category.getName());
-//            categoryDao.save(oldCategory.get());
-//        } else {
-//            categoryDao.save(category);
-//        }
-        categoryDao.save(category);
+        Optional<Category> oldCategory = categoryDao.findById(category.getId());
+        if (oldCategory.isPresent()){
+            oldCategory.get().setDescription(category.getDescription());
+            categoryDao.save(oldCategory.get());
+        } else {
+            categoryDao.save(category);
+        }
     }
 
     public void deleteCategory(int id){

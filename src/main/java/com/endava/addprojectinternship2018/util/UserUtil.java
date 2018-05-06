@@ -5,11 +5,10 @@ import com.endava.addprojectinternship2018.model.Customer;
 import com.endava.addprojectinternship2018.model.User;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.CustomerService;
-import com.endava.addprojectinternship2018.service.user.UserService;
+import com.endava.addprojectinternship2018.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 

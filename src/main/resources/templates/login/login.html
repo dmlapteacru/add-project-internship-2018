@@ -24,15 +24,12 @@
             <br/>
             <input type="password" th:field="*{password}" th:placeholder="Password"
                    name="password" class="form-control" />
-            <!--<input type="hidden" th:field="*{state}" th:placeholder="state"-->
-                   <!--name="password" class="form-control" />-->
-            <!--<p style="color: #FF1C19" th:if="${#fields.hasErrors('state')}" th:errors="*{state}">Password Errors</p>-->
+            <div align="center" th:if="${session[SPRING_SECURITY_LAST_EXCEPTION].message}">
+                <p style="font-size: 14px; color: #FF1C19;">A</p>
+            </div>
             <br/>
             <button class="btn btn-lg btn-primary btn-block" name="Submit" value="Login" type="Submit" th:text="Login"></button>
         </form>
-        <div align="center" th:if="${param.error}">
-            <p style="font-size: 20px; color: #FF1C19;">Username or Password invalid, please verify</p>
-        </div>
     </div>
 </div>
 

@@ -8,7 +8,7 @@ import com.endava.addprojectinternship2018.service.CategoryService;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.CustomerService;
 import com.endava.addprojectinternship2018.service.ProductService;
-import com.endava.addprojectinternship2018.service.user.UserService;
+import com.endava.addprojectinternship2018.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,24 +66,12 @@ public class RestController {
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/newProduct", method = RequestMethod.POST)
-    public String saveNewProduct(@RequestBody Product product){
-        productService.saveProduct(product);
-        return "OK";
-    }
-
-    @RequestMapping(value = "/admin/deleteProduct/{id}", method = RequestMethod.DELETE)
-    public String deleteProduct(@PathVariable Integer id){
-        productService.deleteProduct(id);
-        return "OK";
-    }
-
     @RequestMapping(value = "/admin/categories", method = RequestMethod.GET)
     public List<Category> getAllCategory(){
         return categoryService.getAllCategory();
     }
 
-    @RequestMapping(value = "/admin/newCategory", method = RequestMethod.POST)
+    @RequestMapping(value = "/admin/newCategory", method = RequestMethod.PUT)
     public String saveNewCategory(@RequestBody Category category){
         categoryService.saveCategory(category);
         return "OK";

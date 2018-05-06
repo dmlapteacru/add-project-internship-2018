@@ -22,7 +22,7 @@
     <div class="body_wrapper">
         <div class="menu_wrapper">
             <button class="tablink tablink_active" onclick="openPage('users', this)">Users</button>
-            <button id="categories_btn_req" class="tablink" onclick="openPage('categories', this)">Categories</button>
+            <button id="categories_btn_req" class="tablink" onclick="openPage('categories', this)">Service Categories</button>
         </div>
         <div class="info_wrapper">
             <div id="users" class="tabcontent tabcontent_active">
@@ -47,7 +47,7 @@
                                th:href="@{admin/status?(username=${user.username})}" class="btn-status-change btn_deactivate">DEACTIVATE</a>
                         </td>
                         <td class="change_pass_btn">
-                            <a class="btn-pass-change" data-toggle="modal" data-target="#modalPassword" th:value="${user.username}">Change Password</a>
+                            <a class="btn-pass-change" th:value="${user.username}">Reset Password</a>
                         </td>
                     </tr>
                 </table>
@@ -57,6 +57,7 @@
                 <table id="table-categories" class="table table-striped">
                     <thead>
                     <th>Name</th>
+                    <th>Description</th>
                     <th class="new_category_btn">
                         <button style="background-color: #319e5c" type="button" class="btn btn_add_category" data-toggle="modal"
                                 data-target="#modalCategory" title="Add category">
@@ -111,6 +112,9 @@
                         <input id="new_category_id" type="text" hidden="hidden"/>
                         <label>Category name</label>
                         <input id="new_category_name" type="text"/>
+                        <label>Description</label>
+                        <input id="new_category_desc" type="text"/>
+                        <p id="error_category" style="color: #FF1C19"></p>
                     </div>
                     <div class="modal-footer modal_btn">
                         <button type="button" style="display: none;" class="btn"></button>
@@ -119,121 +123,27 @@
                     </div>
                 </form>
             </div>
-
+        </div>
+    </div>
+    <div class="modal fade" id="modalDeleteConfirm" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Are you sure?</h4>
+                    <input id="delete_category_id" type="text" hidden="hidden"/>
+                </div>
+                <div class="modal-footer modal_btn">
+                    <button type="button" style="display: none;" class="btn"></button>
+                    <button id="delete_btn_category" type="button" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-<script>
-    function openPage(pageName,elmnt) {
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tabcontent");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-        }
-        tablinks = document.getElementsByClassName("tablink");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].classList.remove("tablink_active");
-        }
-        document.getElementById(pageName).style.display = "block";
-        elmnt.classList.add("tablink_active");
-    }
-    $("#categories_btn_req").click(function () {
-        $.ajax({url: "/admin/categories",
-            success: function(result){
-                $("#table-categories tbody").html("");
-                $.each(result, function (id, object) {
-                    var ID = object.id;
-                    $("#table-categories tbody").append('<tr id="row' + ID + '"></tr>');
-                    $.each(object, function (key, value) {
-                        if (key!="id"){
-                            $("#table-categories tr[id="+ "row" + ID + "]").append('<td id="'+ key + ID +'">' + value + '</td>');
-                        }
-                    });
-                    $("#table-categories tr[id="+ "row" + ID + "]").append('<td>' +
-                        // '<span id="'+ ID + '" class="glyphicon glyphicon-pencil edit_product_pencil" data-toggle="modal" data-target="#modalService" onclick="editProduct(this)"></span>' +
-                        '<span id="'+ ID + '" class="glyphicon glyphicon-trash delete_category_pencil" onclick="deleteCategory(this)"></span>' +
-                        '</td>');
-                });
-            }});
-    });
-    // function editProduct(obj) {
-    //     $("#new_product_id").val(obj.id);
-    //     $("#new_product_name").val($("#name" + obj.id).text());
-    //     $("#new_product_desc").val($("#description" + obj.id).text());
-    // }
-    function deleteCategory(obj) {
-        $.ajax(
-            {
-                url: "admin/deleteCategory/" + obj.id,
-                type: "DELETE",
-                success: function () {
-                    $("#categories_btn_req").click();
-                }
-            }
-        )
-    }
-    $(".btn-pass-change").click(function () {
-        $("#new_pass_username").text($(this).attr("value"));
-        $("#new_pass_input").val("");
-        $("#new_pass_input_confirm").val("");
-        $(".error_pass_match").text("");
-    });
-    var passwordPattern =  new RegExp('^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$');
-    $("#save_btn").click(function () {
-        if ($("#new_pass_input").val()==""){
-            $(".error_pass_match").text("Passwords can't be empty.");
-        } else if (!passwordPattern.test($("#new_pass_input").val())){
-            $(".error_pass_match").text("Password must contain : at least 1 upper case letter," +
-                " 1 lower case letter," +
-                " 1 special character," +
-                " 1 number");
-        } else if (passwordMatches($("#new_pass_input").val(), $("#new_pass_input_confirm").val())){
-            $(".error_pass_match").val("");
-            var object = {
-                "username" : $("#new_pass_username").text(),
-                "password" : $("#new_pass_input").val(),
-                "confirmPassword" : $("#new_pass_input_confirm").val()
-            }
-            $.ajax(
-                {
-                    url: "/admin/newUserPassword",
-                    type: "PUT",
-                    contentType: "application/json",
-                    data: JSON.stringify(object),
-                    success: function () {
-                        $("#modalPassword").modal("hide");
-                    }
-                }
-            );
-        } else {
-            $(".error_pass_match").text("Passwords don't match.");
-        }
-    });
-    $(".new_category_btn button").click(function () {
-        $("#new_category_name").val("");
-    });
-    $("#save_btn_category").click(function () {
-        var object = {
-            "name" : $("#new_category_name").val()
-        }
-        $.ajax(
-            {
-                url: "/admin/newCategory",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify(object),
-                success: function () {
-                    $("#modalCategory").modal("hide");
-                    $("#categories_btn_req").click();
-                }
-            }
-        );
-    });
-    function passwordMatches(pass1, pass2){
-        if (pass1 == pass2) return true;
-        else return false;
-    }
-</script>
+<script src="/js/admin.js"></script>
 
 </body>
 </html>

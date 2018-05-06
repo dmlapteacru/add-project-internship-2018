@@ -3,7 +3,6 @@ package com.endava.addprojectinternship2018.service;
 import com.endava.addprojectinternship2018.dao.CompanyDao;
 import com.endava.addprojectinternship2018.model.Company;
 import com.endava.addprojectinternship2018.model.dto.CompanyDto;
-import com.endava.addprojectinternship2018.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

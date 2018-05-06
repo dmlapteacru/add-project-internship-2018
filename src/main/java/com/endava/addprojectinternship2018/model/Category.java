@@ -18,8 +18,15 @@ public class Category {
     @Column(unique = true)
     private String name;
 
+    @Column
+    private String description;
+
     public Category(String name) {
         this.name = name;
     }
 
+    public Category(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 }

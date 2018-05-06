@@ -1,8 +1,8 @@
-package com.endava.addprojectinternship2018.service.user.detailsService;
+package com.endava.addprojectinternship2018.service.userDetailsService;
 
 import com.endava.addprojectinternship2018.model.User;
 import com.endava.addprojectinternship2018.model.enums.UserStatus;
-import com.endava.addprojectinternship2018.service.user.UserService;
+import com.endava.addprojectinternship2018.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

@@ -7,7 +7,7 @@ import com.endava.addprojectinternship2018.model.dto.UserDto;
 import com.endava.addprojectinternship2018.model.enums.UserStatus;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.CustomerService;
-import com.endava.addprojectinternship2018.service.user.UserService;
+import com.endava.addprojectinternship2018.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
