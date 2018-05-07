@@ -93,7 +93,7 @@ public class CustomerController {
         for (Contract contract : contracts) {
             contractDtoList.add(contractService.convertContractToContractDto(contract));
         }
-
+        model.addAttribute("contractDto", new ContractDto());
         model.addAttribute("contractList", contractDtoList);
         model.addAttribute("errorMessage", errorMessage);
         return "contract/contractListPage";
