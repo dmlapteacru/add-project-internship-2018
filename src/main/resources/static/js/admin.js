@@ -10,6 +10,9 @@ function openPage(pageName,elmnt) {
     }
     document.getElementById(pageName).style.display = "block";
     elmnt.classList.add("tablink_active");
+    if (elmnt.id == "messages_btn_req"){
+        $(".sub_tablink").css("display", "block");
+    } else $(".sub_tablink").css("display", "none");
 }
 $("#categories_btn_req").click(function () {
     $.ajax({url: "/admin/categories",

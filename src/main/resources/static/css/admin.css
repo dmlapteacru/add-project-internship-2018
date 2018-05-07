@@ -59,7 +59,10 @@
     padding: 10px 10px;
     font-size: 14px;
 }
-
+.sub_tablink {
+    font-size: 12px;
+    display: none;
+}
 .tablink_active {
     color: #fff;
     background-color: #319e5c;
@@ -101,4 +104,10 @@
 
 a{
     cursor: pointer;
+}
+#table-messages td:nth-child(1){
+    width: 10%;
+}
+#table-messages td:nth-child(2){
+    width: 25%;
 }

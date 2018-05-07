@@ -25,6 +25,10 @@
         <div class="menu_wrapper">
             <button class="tablink tablink_active" onclick="openPage('users', this)">Users</button>
             <button id="categories_btn_req" class="tablink" onclick="openPage('categories', this)">Service Categories</button>
+            <button id="messages_btn_req" class="tablink" onclick="openPage('messages', this)">Messages
+                <button class="tablink sub_tablink">Read</button>
+                <button class="tablink sub_tablink">Unread</button>
+            </button>
         </div>
         <div class="info_wrapper">
             <div id="users" class="tabcontent tabcontent_active">
@@ -94,6 +98,12 @@
                         </button>
                     </th>
                     </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="messages" class="tabcontent">
+                <table id="table-messages" class="table">
                     <tbody>
                     </tbody>
                 </table>
@@ -192,6 +202,29 @@
             }
         )
     });
+
+    $("#messages_btn_req").click(function () {
+        $.ajax(
+            {
+                url: "/admin/messages",
+                success: function (result) {
+                    loadMessages(result);
+                }
+            }
+        )
+    });
+    function loadMessages(data) {
+        $("#table-messages tbody").html("");
+        $.each(data, function (id, object) {
+            var messageID = object.id;
+            $("#table-messages tbody").append('<tr id="' + messageID + '"></tr>');
+            $.each(object, function (key, value) {
+                if (key != "id" && key != "status"){
+                    $("#table-messages tr[id="+ "" + messageID + "]").append("<td></td><td>" + value + "</td>");
+                }
+            })
+        })
+    }
 </script>
 </body>
 </html>

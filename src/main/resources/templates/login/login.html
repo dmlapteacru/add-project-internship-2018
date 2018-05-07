@@ -6,6 +6,7 @@
     <title>ADD login page</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="/css/default.css"  />
 </head>
 
@@ -40,10 +41,65 @@
             <div class="reg_forms">
                     <a class="btn btn-warning" th:href="@{/registration/company}">Company Registration</a>
                     <a class="btn btn-warning" th:href="@{/registration/customer}">Customer Registration</a>
+                <br/>
+                <div class="modal_links">
+                    <a class="btn_contact_admin" data-target="#modalMessage" data-toggle="modal">Have a question?..</a>
+                    <a class="btn_contact_admin" data-target="#modalMessage" data-toggle="modal">Forgot your password?</a>
+                </div>
             </div>
         </form>
     </div>
 </div>
+<!--MODALS-->
+<div class="modal fade" id="modalMessage" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Send message to Admin</h4>
+            </div>
+            <form>
+                <div class="modal-body modal_body_custom">
+                    <label>Email</label>
+                    <input id="new_message_email" type="text"
+                           pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Email is invalid" required/>
+                    <label>Message</label>
+                    <textarea maxlength="250" placeholder="Your message.." id="new_message" required></textarea>
+                </div>
+                <div class="modal-footer modal_btn">
+                    <button type="button" style="display: none;" class="btn"></button>
+                    <button id="save_btn_message" type="submit" class="btn btn-success">Save</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script src="/js/show_pass.js"></script>
+<script>
+    $("#save_btn_message").click(function () {
+        var message = {
+            "message" : $("#new_message").val(),
+            "user_email" : $("#new_message_email").val()
+        }
+        $.ajax(
+            {
+                url: "/message/send",
+                type: "post",
+                contentType: "application/json",
+                data: JSON.stringify(message),
+                success: function () {
+                    $("#modalService").modal("hide");
+                }
+            }
+        )
+    });
+    $(".btn_contact_admin").click(function () {
+        $("#new_message").val("");
+        $("#new_message_email").val("");
+    });
+
+</script>
 </body>
 </html>

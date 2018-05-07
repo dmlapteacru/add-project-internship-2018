@@ -1,10 +1,10 @@
 package com.endava.addprojectinternship2018.controller;
 
 import com.endava.addprojectinternship2018.model.*;
+import com.endava.addprojectinternship2018.model.dto.ContractDto;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
 import com.endava.addprojectinternship2018.model.dto.ProductDto;
 import com.endava.addprojectinternship2018.service.*;
-import com.endava.addprojectinternship2018.service.user.UserService;
 import com.endava.addprojectinternship2018.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -103,10 +103,28 @@ public class CustomerController {
         int currentCustomerId = userUtil.getCurrentCustomer().getId();
         List<Product> productList = productService.getAllProducts();
         List<Category> categoryList = categoryService.getAllCategory();
+        model.addAttribute("contractDto", new ContractDto());
         model.addAttribute("categoryList", categoryList);
         model.addAttribute("products", productList);
         model.addAttribute("customerId", currentCustomerId);
 
+        return "product/productListPage";
+    }
+
+    @GetMapping(value = "services/newcontract")
+    public String getProductsPageSignContract(@RequestParam(name = "customerId") int customerId,
+                                           @RequestParam(name = "companyId") int companyId,
+                                           @RequestParam(name = "productId") int productId,
+                                           Model model) {
+        ContractDto contractDto = contractService.createNewContractDto(customerId, companyId, productId);
+        int currentCustomerId = userUtil.getCurrentCustomer().getId();
+        List<Product> productList = productService.getAllProducts();
+        List<Category> categoryList = categoryService.getAllCategory();
+        model.addAttribute("contractDto", contractDto);
+        model.addAttribute("categoryList", categoryList);
+        model.addAttribute("products", productList);
+        model.addAttribute("customerId", currentCustomerId);
+        model.addAttribute("update", false);
         return "product/productListPage";
     }
 
