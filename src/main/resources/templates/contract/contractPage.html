@@ -117,8 +117,11 @@
                        th:text="${error}">Validation error</p>
                 </div>
 
-                <input type="hidden" class="form-control" th:field="*{status}"/>
-                <input type="hidden" class="form-control" th:field="*{contractId}"/>
+                <input type="hidden" th:field="*{status}"/>
+                <input type="hidden" th:field="*{contractId}"/>
+                <input type="hidden" th:field="*{products}"/>
+                <input type="hidden" th:field="*{companies}"/>
+                <input type="hidden" th:field="*{customers}"/>
 
                 <div class="form-group">
                     <button type="submit" class="btn btn-success">Save</button>

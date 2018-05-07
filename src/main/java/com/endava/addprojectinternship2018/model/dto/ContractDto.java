@@ -11,7 +11,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -22,40 +24,34 @@ public class ContractDto {
 
     private int contractId;
 
-    @NotEmpty
+    @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate issueDate;
 
-    @NotEmpty
+    @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate expireDate;
 
-    @NotEmpty
+    @DecimalMin("0.0")
     private double sum;
 
-    @NotEmpty
+    @NotNull
     @Enumerated(EnumType.STRING)
     private ContractStatus status;
 
     private List<Company> companies;
 
-    @NotEmpty
+    @NotNull
     private Company selectedCompany;
 
     private List<Customer> customers;
 
-    @NotEmpty
+    @NotNull
     private Customer selectedCustomer;
 
     private List<Product> products;
 
-    @NotEmpty
+    @NotNull
     private Product selectedProduct;
 
-    public ContractDto(@NotEmpty LocalDate issueDate, @NotEmpty LocalDate expireDate,
-                       @NotEmpty double sum) {
-        this.issueDate = issueDate;
-        this.expireDate = expireDate;
-        this.sum = sum;
-    }
 }
