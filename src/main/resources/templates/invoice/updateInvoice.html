@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/header.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <title>New Invoice</title>
@@ -31,11 +32,11 @@
 
                 <label>Issue Date</label><br>
                 <p class="alert alert-danger"  th:each="error: ${#fields.errors('issueDate')}" th:text="${error}"></p>
-                <input class="form-control" id="issueDate" th:field="*{issueDate}" type="datetime-local">
+                <input class="form-control" id="issueDate" th:field="*{issueDate}" type="date">
 
                 <label>Due Date</label><br>
                 <p class="alert alert-danger"  th:each="error: ${#fields.errors('dueDate')}" th:text="${error}"></p>
-                <input class="form-control" th:field="*{dueDate}" type="datetime-local">
+                <input class="form-control" th:field="*{dueDate}" type="date">
                 <div class="form-group">
                     <button type="submit" class="btn btn-success">Apply</button>
                 </div>

@@ -38,8 +38,7 @@ public class InvoiceController {
 
     @GetMapping(value = "createNew")
     public String showNewInvoice(Model model){
-        InvoiceDto invoiceDto = new InvoiceDto(LocalDate.now(), LocalDate.now(), 123.00);
-
+        InvoiceDto invoiceDto = new InvoiceDto(LocalDate.now(), InvoiceStatus.ISSUED);
         model.addAttribute("invoice", invoiceDto);
         Company company = userUtil.getCurrentCompany();
         model.addAttribute("listOfContracts", contractService
@@ -52,6 +51,8 @@ public class InvoiceController {
                                    Model model ){
         System.out.println(invoiceDto);
 
+        boolean success = true;
+
         if (bindingResult.hasErrors()){
             model.addAttribute("invoice", invoiceDto);
             Company company = userUtil.getCurrentCompany();
@@ -60,8 +61,16 @@ public class InvoiceController {
             System.out.println(bindingResult.getAllErrors());
             return "invoice/newInvoice";
         }
+
+
+        if (!success){
+            return "invoice/newInvoice";
+        }
+
         invoiceService.saveDto(invoiceDto);
         return "redirect:/company/invoices";
+
+
     }
 
     @GetMapping(value = "deleteInvoice")
@@ -99,7 +108,7 @@ public class InvoiceController {
         Company company = userUtil.getCurrentCompany();
         model.addAttribute("invoices", invoiceService
                 .getInvoicesByStatus(status));
-        return "company/invoicesByCompany";
+        return "invoice/invoicesByCompany";
     }
 
     @GetMapping("/test")
