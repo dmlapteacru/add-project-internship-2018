@@ -1,21 +1,19 @@
 package com.endava.addprojectinternship2018.controller;
 
+import com.endava.addprojectinternship2018.model.Category;
 import com.endava.addprojectinternship2018.model.Company;
-import com.endava.addprojectinternship2018.model.Customer;
 import com.endava.addprojectinternship2018.model.Product;
-import com.endava.addprojectinternship2018.model.User;
-import com.endava.addprojectinternship2018.model.dto.UserRegistrationDto;
+import com.endava.addprojectinternship2018.model.dto.UserDto;
+import com.endava.addprojectinternship2018.service.CategoryService;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.CustomerService;
 import com.endava.addprojectinternship2018.service.ProductService;
-import com.endava.addprojectinternship2018.service.user.UserService;
+import com.endava.addprojectinternship2018.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @org.springframework.web.bind.annotation.RestController
 public class RestController {
@@ -31,6 +29,9 @@ public class RestController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     @GetMapping("/rest/getAllCompanies")
     public List<Company> getAllCompanies(){
@@ -60,38 +61,25 @@ public class RestController {
     }
 
     @RequestMapping(value = "/admin/newUserPassword", method = RequestMethod.PUT)
-    public String setNewPass(@RequestBody @Valid UserRegistrationDto user){
+    public String setNewPass(@RequestBody @Valid UserDto user){
         userService.changeUserPassword(user);
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/newProduct", method = RequestMethod.POST)
-    public String saveNewProduct(@RequestBody Product product){
-        productService.saveProduct(product);
+    @RequestMapping(value = "/admin/categories", method = RequestMethod.GET)
+    public List<Category> getAllCategory(){
+        return categoryService.getAllCategory();
+    }
+
+    @RequestMapping(value = "/admin/newCategory", method = RequestMethod.PUT)
+    public String saveNewCategory(@RequestBody Category category){
+        categoryService.saveCategory(category);
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/deleteProduct/{id}", method = RequestMethod.DELETE)
-    public String saveNewProduct(@PathVariable Integer id){
-        productService.deleteProduct(id);
+    @RequestMapping(value = "/admin/deleteCategory/{id}", method = RequestMethod.DELETE)
+    public String deleteCategory(@PathVariable Integer id){
+        categoryService.deleteCategory(id);
         return "OK";
     }
-
-//  -------------------------------------------
-
-//
-
-//
-//    @GetMapping("rest/customerById/{id}")
-//    public Customer getCustomerById(@PathVariable int id){
-//        return customerService.getCustomerById(id);
-//    }
-
-//    @GetMapping("rest/customerByName/{name}")
-//    public Optional<Customer> getCustomerByNameSurname(String name){
-//        return customerService.getCustomerByName(name);
-//    }
-
-
-
 }

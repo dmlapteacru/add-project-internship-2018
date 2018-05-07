@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>ADD Power application</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/header.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="header_wrapper" th:fragment="header">
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#"><img src="/img/endava-logo.png"/></a>
+            </div>
+            <ul class="nav navbar-nav" sec:authorize="hasAuthority('CUSTOMER')">
+                <li><a th:href="@{/customer/home}" class="menu_item"> Home </a></li>
+                <li><a th:href="@{/customer/services}" class="menu_item"> Services </a></li>
+                <li><a th:href="@{/customer/contracts}" class="menu_item"> Contracts </a></li>
+                <li><a th:href="@{/customer/invoices}" class="menu_item"> Invoices </a></li>
+                <li><a th:href="@{/customer/bank}" class="menu_item"> Bank operations </a></li>
+            </ul>
+            <ul class="nav navbar-nav" sec:authorize="hasAuthority('COMPANY')">
+                <li><a th:href="@{/company/home}" class="menu_item"> Home </a></li>
+                <li><a th:href="@{/company/services}" class="menu_item"> Services </a></li>
+                <li><a th:href="@{/company/contracts}" class="menu_item"> Contracts </a></li>
+                <li><a th:href="@{/company/invoices}" class="menu_item"> Invoices </a></li>
+                <li><a th:href="@{/company/bank}" class="menu_item"> Bank operations </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right" sec:authorize="hasAuthority('CUSTOMER')">
+                <li><a th:href="@{/customer/profile}" class="menu_item"> Personal cabinet </a></li>
+                <li><a th:href="@{/logout}" class="menu_item"> LOGOUT </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right" sec:authorize="hasAuthority('COMPANY')">
+                <li><a th:href="@{/company/profile}" class="menu_item"> Personal cabinet </a></li>
+                <li><a th:href="@{/logout}" class="menu_item"> LOGOUT </a></li>
+            </ul>
+        </div>
+    </nav>
+                <!--<div class="logo_wrapper">-->
+        <!--<img src="/img/endava-logo.png"/>-->
+    <!--</div>-->
+    <!--<div class="menu_wrapper">-->
+        <!--<div class="menu_customer" sec:authorize="hasAuthority('CUSTOMER')">-->
+            <!--<div class="main_menu_wrapper">-->
+                <!--<div class="main_menu_items_wrapper">-->
+                    <!--<a th:href="@{/customer/home}" class="menu_item"> Home </a>-->
+                    <!--<a th:href="@{/customer/services}" class="menu_item"> Services </a>-->
+                    <!--<a th:href="@{/customer/contracts}" class="menu_item"> Contracts </a>-->
+                    <!--<a th:href="@{/customer/invoices}" class="menu_item"> Invoices </a>-->
+                    <!--<a th:href="@{/customer/bank}" class="menu_item"> Bank operations </a>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="profile_menu_wrapper">-->
+                <!--<a th:href="@{/customer/profile}" class="menu_item"> Personal cabinet </a>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="menu_company" sec:authorize="hasAuthority('COMPANY')">-->
+            <!--<div class="main_menu_wrapper">-->
+                <!--<div class="main_menu_items_wrapper">-->
+                    <!--<a th:href="@{/company/home}" class="menu_item"> Home </a>-->
+                    <!--<a th:href="@{/company/services}" class="menu_item"> Services </a>-->
+                    <!--<a th:href="@{/company/contracts}" class="menu_item"> Contracts </a>-->
+                    <!--<a th:href="@{/company/invoices}" class="menu_item"> Invoices </a>-->
+                    <!--<a th:href="@{/company/bank}" class="menu_item"> Bank operations </a>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="profile_menu_wrapper">-->
+                <!--<a th:href="@{/company/profile}" class="menu_item"> Personal cabinet </a>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<div class="logout_wrapper">-->
+        <!--<form th:action="@{/logout}" method="post" class="logout_form">-->
+            <!--<input class="btn btn-danger" type="submit" value="Logout"/>-->
+        <!--</form>-->
+    <!--</div>-->
+</div>
+</body>
+</html>

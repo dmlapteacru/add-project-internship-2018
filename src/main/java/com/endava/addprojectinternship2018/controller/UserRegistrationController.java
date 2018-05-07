@@ -1,11 +1,13 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.model.dto.CompanyRegistrationDto;
-import com.endava.addprojectinternship2018.model.dto.CustomerRegistrationDto;
-import com.endava.addprojectinternship2018.model.dto.UserRegistrationDto;
+import com.endava.addprojectinternship2018.model.enums.Role;
+import com.endava.addprojectinternship2018.model.dto.CompanyDto;
+import com.endava.addprojectinternship2018.model.dto.CustomerDto;
+import com.endava.addprojectinternship2018.model.dto.UserDto;
+import com.endava.addprojectinternship2018.model.enums.UserStatus;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.CustomerService;
-import com.endava.addprojectinternship2018.service.user.UserService;
+import com.endava.addprojectinternship2018.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,57 +39,70 @@ public class UserRegistrationController {
 
     @GetMapping(value = "customer")
     public String showCustomerRegistrationForm(Model model) {
-        model.addAttribute("user", new CustomerRegistrationDto());
+        UserDto userDto = new UserDto();
+        userDto.setRole(Role.CUSTOMER);
+        userDto.setStatus(UserStatus.INACTIVE);
+        CustomerDto customerDto = new CustomerDto();
+        customerDto.setUserDto(userDto);
+        model.addAttribute("customerDto", customerDto);
+        model.addAttribute("update", false);
         return "registration/customer";
     }
 
     @GetMapping(value = "company")
     public String showCompanyRegistrationForm(Model model) {
-        model.addAttribute("user", new CompanyRegistrationDto());
+        UserDto userDto = new UserDto();
+        userDto.setRole(Role.COMPANY);
+        userDto.setStatus(UserStatus.INACTIVE);
+        CompanyDto companyDto = new CompanyDto();
+        companyDto.setUserDto(userDto);
+        model.addAttribute("companyDto", companyDto);
+        model.addAttribute("update", false);
         return "registration/company";
     }
 
     @PostMapping(value = "company")
-    public String registerCompany(@ModelAttribute("user") @Valid CompanyRegistrationDto user,
+    public String registerCompany(@ModelAttribute("companyDto") @Valid CompanyDto companyDto,
                                   BindingResult result, Model model) {
 
         if (result.hasErrors()) {
             return "registration/company";
         }
 
-        if (userService.getUserByUsername(user.getUsername()).isPresent()) {
+        if (userService.getUserByUsername(companyDto.getUserDto().getUsername()).isPresent()) {
             result.rejectValue("username", "username.error", "Username is not unique");
             return "registration/company";
         }
 
-        if (companyService.getCompanyByEmail(user.getEmail()).isPresent()) {
+        if (companyService.getCompanyByEmail(companyDto.getEmail()).isPresent()) {
             result.rejectValue("email", "email.error", "Email is not unique");
             return "registration/company";
         }
 
-        userService.saveUser(user);
+        companyService.saveCompany(companyDto);
         return "redirect:/registration/company?success";
 
     }
 
     @PostMapping(value = "customer")
-    public String registerCustomer(@ModelAttribute("user") @Valid CustomerRegistrationDto user,
+    public String registerCustomer(@ModelAttribute("customerDto") @Valid CustomerDto customerDto,
                                   BindingResult result, Model model) {
+
         if (result.hasErrors()) {
             return "registration/customer";
         }
 
-        if (userService.getUserByUsername(user.getUsername()).isPresent()) {
-            result.rejectValue("username", "username.error", "Username is not unique");
-            return "registration/customer";
-        }
-
-        if (customerService.getCustomerByEmail(user.getEmail()).isPresent()) {
+        if (customerService.getCustomerByEmail(customerDto.getEmail()).isPresent()) {
             result.rejectValue("email", "email.error", "Email is not unique");
             return "registration/customer";
         }
 
-        userService.saveUser(user);
+        if (userService.getUserByUsername(customerDto.getUserDto().getUsername()).isPresent()) {
+            result.rejectValue("userDto.username", "username.error", "Username is not unique");
+            return "registration/customer";
+        }
+
+        customerService.saveCustomer(customerDto);
         return "redirect:/registration/customer?success";
     }
 

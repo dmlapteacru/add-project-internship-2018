@@ -2,33 +2,35 @@
 <html lang="en">
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/3.3.7/css/bootstrap.min.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}"/>
-
     <title>Contracts</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 
 <body>
-    <h3>Here must be contracts</h3>
 
-    <table border="1">
-        <tr>
-            <th>Id</th>
-            <th>Sum</th>
-            <th>Issue Date</th>
-            <th>Expire Date</th>
-        </tr>
-        <tr th:each="var : ${contracts}">
-            <td th:text="${var.getId()} ? ${var.getId()} : 'null value !'"></td>
-            <td th:text="${var.getSum()} ? ${var.getSum()} : 'null value !'"></td>
-            <td th:text="${var.getIssueDate()} ? ${var.getIssueDate()} : 'null value !'"></td>
-            <td th:text="${var.getExpireDate()} ? ${var.getExpireDate()} : 'null value !'"> </td>
-        </tr>
-    </table>
+    <div class="container">
+        <h3>Here are all contracts</h3><br>
+        <table class="table table-hover">
+            <tr>
+                <th>Id</th>
+                <th>Sum</th>
+                <th>Issue Date</th>
+                <th>Expire Date</th>
+            </tr>
+            <tr th:each="contract : ${contracts}">
+                <td th:text="${contract.getId()} ? ${contract.getId()} : 'null value !'"></td>
+                <td th:text="${contract.getSum()} ? ${contract.getSum()} : 'null value !'"></td>
+                <td th:text="${contract.getIssueDate()} ? ${contract.getIssueDate()} : 'null value !'"></td>
+                <td th:text="${contract.getExpireDate()} ? ${contract.getExpireDate()} : 'null value !'"> </td>
+            </tr>
+        </table>
+
+    </div>
+
 <div>Some text in div section</div>
 </body>
 </html>

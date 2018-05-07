@@ -1,19 +1,15 @@
 insert into users (password, role, user_status, username) values ('$2a$10$IE4XZPWC.BfLtTIqD5rZ0ewiF8YKIKVKIldHOhNgsASdKn7fu4o.G', 'ADMIN', 'ACTIVE', 'admin');
--- insert into users values (2, '123456', 'CUSTOMER', 'ACTIVE', 'petea');
--- insert into users values (3, '123456', 'COMPANY', 'INCTIVE', 'orange');
--- insert into users values (4, '123456', 'customer', 'ACTIVE', 'vova');
--- INSERT INTO users VALUES (5, '123456', 'company', 'INCTIVE', 'cvas');
 --
--- insert into company VALUES (1, '444444444', 'comp1@gmail.com', 'company1', 3);
--- insert into company VALUES (2, '333333333', 'comp2@gmail.com', 'company2', 3);
+-- insert into company VALUES (1, '444444444', 'orange@gmail.com', 'Orange', 3);
+-- insert into company VALUES (2, '333333333', 'moldcell@gmail.com', 'Moldcell', 3);
 -- insert into company VALUES (3, '00000000011111', 'cvasprom@gmail.com', 'CvasPromRussia', 5);
 --
 -- insert into customer VALUES (1, '55555555', 'petea@gmail.com', 'petr', 'pupkin', 2);
 -- insert into customer VALUES (2, '11111222222200', 'vova@gmail.com', 'vladimir', 'ivanov', 4);
 --
--- insert into service VALUES (1, 'GSM service Chisinau', 'GSM service', 100.50);
--- insert into service VALUES (2, 'Apacanal not-service Moldova', 'Apacanal', 25.50);
--- insert into service VALUES (3, 'Gas service Gazprom', 'Gas', 10000.59);
+-- insert into category VALUES (1, 'GSM service Chisinau', 'GSM service', 100.50);
+-- insert into category VALUES (2, 'Apacanal not-service Moldova', 'Apacanal', 25.50);
+-- insert into category VALUES (3, 'Gas service Gazprom', 'Gas', 10000.59);
 --
 -- INSERT INTO company_services VALUES (1, 1);
 -- INSERT INTO company_services VALUES (2, 2);

@@ -27,12 +27,8 @@ public class Company {
     @Column
     private String accountNumber;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
-
-
-    @OneToMany(mappedBy = "company")
-    private List<Contract> contracts;
 
 }

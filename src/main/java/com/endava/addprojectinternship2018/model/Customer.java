@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "CUSTOMER")
@@ -31,13 +30,9 @@ public class Customer {
     @Column
     private String bankAccount;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
-
-    @OneToMany(mappedBy = "customer")
-    private List<Contract> contracts;
-
 
     public Customer(String firstName, String lastName) {
         this.firstName = firstName;

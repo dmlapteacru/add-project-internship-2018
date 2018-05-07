@@ -9,19 +9,22 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/header.css"/>
 </head>
 
 <body>
+<div th:replace="fragments/header :: header">
+</div>
 <div class="container">
 
-    <h1 th:text="'Welcome, '+${customer}"></h1>
-
-    <!--<ul class="nav nav-pills nav-stacked">-->
-        <!--<li class="active"><a href="#">Home</a></li>-->
-        <!--<li><a th:href="@{/customer/contracts}"> Contracts </a></li>-->
-        <!--<li><a th:href="@{/customer/invoices}"> Invoices </a></li>-->
-    <!--</ul>-->
-
+    <h2 th:text="'Welcome, '+${customer.getFullName()}"></h2>
+    <div class="list-group">
+        <a th:href="@{/customer/products}" class="list-group-item"> Services </a>
+        <a th:href="@{/customer/contracts}" class="list-group-item"> Contracts </a>
+        <a th:href="@{/customer/invoices}" class="list-group-item"> Invoices </a>
+        <a th:href="@{/customer/bank}" class="list-group-item"> Bank operations </a>
+    </div>
 </div>
+<div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

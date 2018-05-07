@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>new Contract page</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+
+<body>
+<div th:replace="fragments/header :: header">
+
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+
+            <div th:if="${param.success}">
+                <div class="alert alert-info">
+                    <span th:if="not ${update}">New contract was saved successfully</span>
+                    <span th:if="${update}">Contract was updated successfully</span>
+                </div>
+            </div>
+
+            <div th:if="${update}">
+                <h1>Edit contract</h1>
+            </div>
+
+            <div th:if="not ${update}">
+                <h2>Create new contract</h2>
+            </div>
+
+            <form th:action="@{/contract/saveContract}" th:object="${contractDto}" method="post">
+
+                <p class="error-message"
+                   th:if="${#fields.hasGlobalErrors()}"
+                   th:each="error : ${#fields.errors('global')}"
+                   th:text="${error}"> Validation error
+                </p>
+
+                <div class="form-group" th:classappend="${#fields.hasErrors('issueDate')}? 'has-error':''">
+                    <label for="issueDate" class="control-label">Issue date and time</label>
+                    <input type="date" id="issueDate"
+                           class="form-control"
+                           th:field="*{issueDate}"/>
+                    <p class="error-message"
+                       th:each="error: ${#fields.errors('issueDate')}"
+                       th:text="${error}">Validation error</p>
+                </div>
+
+                <div class="form-group" th:classappend="${#fields.hasErrors('expireDate')}? 'has-error':''">
+                    <label for="expireDate" class="control-label">Expire date and time</label>
+                    <input type="date" id="expireDate"
+                           class="form-control"
+                           th:field="*{expireDate}"/>
+                    <p class="error-message"
+                       th:each="error: ${#fields.errors('expireDate')}"
+                       th:text="${error}">Validation error</p>
+                </div>
+
+                <div class="form-group" th:classappend="${#fields.hasErrors('selectedCustomer')}? 'has-error':''">
+                    <label for="customer" class="control-label">Customer</label>
+                    <select class="form-control" id="customer" th:field="*{selectedCustomer}">
+                        <option th:if="*{selectedCustomer}"
+                                th:value="*{selectedCustomer.getId()}"
+                                th:text="*{selectedCustomer.getFullName()}" selected>-select-
+                        </option>
+                        <option th:if="not *{selectedCustomer}"
+                                value="" selected>-select-
+                        </option>
+                        <option th:if="not *{selectedCustomer}"
+                                th:each="customer : *{customers}"
+                                th:value="${customer.getId()}"
+                                th:text="${customer.getFullName()}">
+                        </option>
+                    </select>
+                    <p class="error-message"
+                       th:each="error: ${#fields.errors('selectedCustomer')}"
+                       th:text="${error}">Validation error</p>
+                </div>
+
+                <div class="form-group" th:classappend="${#fields.hasErrors('selectedCompany')}? 'has-error':''">
+                    <label for="selectedCompany" class="control-label">Company</label>
+                    <select class="form-control" id="selectedCompany" th:field="*{selectedCompany}">
+                        <option th:if="*{selectedCompany}"
+                                th:value="*{selectedCompany.getId()}"
+                                th:text="*{selectedCompany.getName()}" selected>-select-
+                        </option>
+                        <option th:if="not *{selectedCompany}"
+                                value="" selected>-select-
+                        </option>
+                        <option th:if="not *{selectedCompany}"
+                                th:each="company : *{companies}"
+                                th:value="${company.getId()}"
+                                th:text="${company.getName()}">
+                        </option>
+                    </select>
+                    <p class="error-message"
+                       th:each="error: ${#fields.errors('selectedCompany')}"
+                       th:text="${error}">Validation error</p>
+                </div>
+
+                <div class="form-group" th:classappend="${#fields.hasErrors('selectedProduct')}? 'has-error':''">
+                    <label for="selectedProduct" class="control-label">Product</label>
+                    <select class="form-control" id="selectedProduct" th:field="*{selectedProduct}">
+                        <option value="">-select-</option>
+                        <option th:each="product : *{products}"
+                                th:value="${product.getId()}"
+                                th:text="${product.getName()}">
+                        </option>
+                    </select>
+                    <p class="error-message"
+                       th:each="error: ${#fields.errors('selectedProduct')}"
+                       th:text="${error}">Validation error</p>
+                </div>
+
+                <div class="form-group" th:classappend="${#fields.hasErrors('sum')}? 'has-error':''">
+                    <label for="sum" class="control-label">Sum</label>
+                    <input type="number" min="0" step="0.01" id="sum"
+                           class="form-control"
+                           th:field="*{sum}"/>
+                    <p class="error-message"
+                       th:each="error: ${#fields.errors('sum')}"
+                       th:text="${error}">Validation error</p>
+                </div>
+
+                <input type="hidden" class="form-control" th:field="*{status}"/>
+                <input type="hidden" class="form-control" th:field="*{contractId}"/>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <a th:href="@{/customer/contracts}"
+                       class="btn btn-default" role="button">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</html>

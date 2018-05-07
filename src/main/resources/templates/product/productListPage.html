@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Customer contracts list</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/table-filter.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/js/table-filter.js"></script>
+</head>
+
+<body>
+<div th:replace="fragments/header :: header">
+
+</div>
+
+<div class="panel panel-primary filterable">
+    <div class="panel-heading">
+        <h3 class="panel-title">Contracts</h3>
+        <div class="pull-right">
+            <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter
+            </button>
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+        <tr class="filters">
+            <th><input type="text" class="form-control" placeholder="Category" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Name" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Company" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Price" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Description" disabled></th>
+        </tr>
+
+        </thead>
+        <tbody>
+        <tr th:each="product : ${products}">
+
+            <td th:text="${product.getCategory().getName()}">category</td>
+            <td th:text="${product.getName()}">name</td>
+            <td th:text="${product.getCompany().getName()}">company</td>
+            <td th:text="${product.getPrice()}">price</td>
+            <td th:text="${product.getDescription()}">description</td>
+
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+
+
+</html>
