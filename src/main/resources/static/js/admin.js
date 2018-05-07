@@ -51,43 +51,6 @@ $("#delete_btn_category").click(function () {
 function deleteCategory(obj) {
     $("#delete_btn_category").val(obj.id);
 }
-// $(".btn-pass-change").click(function () {
-//     $("#new_pass_username").text($(this).attr("value"));
-//     $("#new_pass_input").val("");
-//     $("#new_pass_input_confirm").val("");
-//     $(".error_pass_match").text("");
-// });
-// var passwordPattern =  new RegExp('^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$');
-// $("#save_btn").click(function () {
-//     if ($("#new_pass_input").val()==""){
-//         $(".error_pass_match").text("Passwords can't be empty.");
-//     } else if (!passwordPattern.test($("#new_pass_input").val())){
-//         $(".error_pass_match").text("Password must contain : at least 1 upper case letter," +
-//             " 1 lower case letter," +
-//             " 1 special character," +
-//             " 1 number");
-//     } else if (passwordMatches($("#new_pass_input").val(), $("#new_pass_input_confirm").val())){
-//         $(".error_pass_match").val("");
-//         var object = {
-//             "username" : $("#new_pass_username").text(),
-//             "password" : $("#new_pass_input").val(),
-//             "confirmPassword" : $("#new_pass_input_confirm").val()
-//         }
-//         $.ajax(
-//             {
-//                 url: "/admin/newUserPassword",
-//                 type: "PUT",
-//                 contentType: "application/json",
-//                 data: JSON.stringify(object),
-//                 success: function () {
-//                     $("#modalPassword").modal("hide");
-//                 }
-//             }
-//         );
-//     } else {
-//         $(".error_pass_match").text("Passwords don't match.");
-//     }
-// });
 $(".new_category_btn button").click(function () {
     $("#new_category_id").val("");
     $("#new_category_name").val("");
@@ -115,7 +78,3 @@ $("#save_btn_category").click(function () {
         }
     );
 });
-// function passwordMatches(pass1, pass2){
-//     if (pass1 == pass2) return true;
-//     else return false;
-// }

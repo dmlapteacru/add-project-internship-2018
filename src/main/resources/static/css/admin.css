@@ -99,34 +99,6 @@
     margin-right: 10px;
 }
 
-.btn-status-change {
-    text-decoration: none;
-    border: 1px #cccccc solid;
-    border-radius: 5px;
-    padding: 8px;
-    background-color: goldenrod;
-    color: #fff;
-}
-
-.btn-status-change:hover {
-    text-decoration: none;
-    color: #cccccc;
-}
-
-.btn-pass-change {
-    text-decoration: none;
-    border: 1px #cccccc solid;
-    border-radius: 5px;
-    padding: 8px;
-    background-color: royalblue;
-    color: #fff;
-}
-
-.btn-pass-change:hover {
-    text-decoration: none;
-    color: #cccccc;
-}
-
 a{
     cursor: pointer;
 }

@@ -5,10 +5,14 @@ import com.endava.addprojectinternship2018.model.dto.CompanyDto;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
 import com.endava.addprojectinternship2018.model.dto.UserDto;
 import com.endava.addprojectinternship2018.model.enums.UserStatus;
+import com.endava.addprojectinternship2018.security.config.LoginAuthenticationSuccessHandler;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.CustomerService;
 import com.endava.addprojectinternship2018.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -32,9 +36,12 @@ public class UserRegistrationController {
     @Autowired
     private CompanyService companyService;
 
+    @Autowired
+    private LoginAuthenticationSuccessHandler loginAuthenticationSuccessHandler;
+
     @GetMapping(value = "")
     public String showRegistrationForm() {
-        return "registration/commonForm";
+        return "redirect:/login";
     }
 
     @GetMapping(value = "customer")
@@ -46,6 +53,11 @@ public class UserRegistrationController {
         customerDto.setUserDto(userDto);
         model.addAttribute("customerDto", customerDto);
         model.addAttribute("update", false);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)){
+            return "redirect:" + loginAuthenticationSuccessHandler.authenticatedRedirectDefaultPage(authentication);
+        }
         return "registration/customer";
     }
 
@@ -58,6 +70,11 @@ public class UserRegistrationController {
         companyDto.setUserDto(userDto);
         model.addAttribute("companyDto", companyDto);
         model.addAttribute("update", false);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)){
+            return "redirect:" + loginAuthenticationSuccessHandler.authenticatedRedirectDefaultPage(authentication);
+        }
         return "registration/company";
     }
 
@@ -80,7 +97,7 @@ public class UserRegistrationController {
         }
 
         companyService.saveCompany(companyDto);
-        return "redirect:/registration/company?success";
+        return "redirect:/login";
 
     }
 
@@ -103,7 +120,7 @@ public class UserRegistrationController {
         }
 
         customerService.saveCustomer(customerDto);
-        return "redirect:/registration/customer?success";
+        return "redirect:/login";
     }
 
 }

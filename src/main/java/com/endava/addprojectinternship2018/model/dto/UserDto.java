@@ -34,4 +34,8 @@ public class UserDto {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
+    public UserDto(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 }

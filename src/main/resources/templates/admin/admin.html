@@ -5,8 +5,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="/css/admin.css" />
+    <link rel="stylesheet" type="text/css" href="/css/table-filter.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/js/table-filter.js"></script>
 </head>
 <body>
 <div class="main_wrapper">
@@ -26,31 +28,58 @@
         </div>
         <div class="info_wrapper">
             <div id="users" class="tabcontent tabcontent_active">
-                <table class="table table-striped table-users">
-                    <th>Role</th>
-                    <th>Name</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Status</th>
-                    <th></th>
-                    <th></th>
-                    <tr th:each="user : ${users}">
-                        <td th:text="${user.role}" valign="center"></td>
-                        <td th:text="${user.name}" valign="center"></td>
-                        <td th:text="${user.username}" valign="center"></td>
-                        <td th:text="${user.email}" valign="center"></td>
-                        <td th:text="${user.userStatus}" valign="center"></td>
-                        <td th:switch="${user.userStatus}">
-                            <a th:case="${user.userStatus.INACTIVE}"
-                               th:href="@{admin/status?(username=${user.username})}" class="btn-status-change btn_activate">ACTIVATE</a>
-                            <a th:case="${user.userStatus.ACTIVE}"
-                               th:href="@{admin/status?(username=${user.username})}" class="btn-status-change btn_deactivate">DEACTIVATE</a>
-                        </td>
-                        <td class="change_pass_btn">
-                            <a class="btn-pass-change" th:value="${user.username}">Reset Password</a>
-                        </td>
-                    </tr>
-                </table>
+                <div class="filterable" style="margin-top: 0;">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr class="filters">
+                            <th>
+                                <select class="sel_roles" disabled>
+                                    <option selected value="Roles">Roles</option>
+                                    <option>COMPANY</option>
+                                    <option>CUSTOMER</option>
+                                    <option>ADMIN</option>
+                                </select>
+                            </th>
+                            <th><input type="text" class="form-control" placeholder="Name" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="Username" disabled></th>
+                            <th><input type="text" class="form-control" placeholder="Email" disabled></th>
+                            <th>
+                                <select class="sel_status" disabled>
+                                    <option selected value="Status">Status</option>
+                                    <option>ACTIVE</option>
+                                    <option>INACTIVE</option>
+                                </select>
+                            </th>
+                            <th></th>
+                            <th>
+                                <div class="pull-right">
+                                    <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+
+                        </thead>
+                        <tbody class="filter_body">
+                        <tr th:each="user : ${users}">
+                            <td class="filter_role" th:text="${user.role}" valign="center"></td>
+                            <td th:text="${user.name}" valign="center"></td>
+                            <td th:text="${user.username}" valign="center"></td>
+                            <td th:text="${user.email}" valign="center"></td>
+                            <td class="filter_status" th:text="${user.userStatus}" valign="center"></td>
+                            <td th:switch="${user.userStatus}">
+                                <a th:case="${user.userStatus.INACTIVE}"
+                                   th:href="@{admin/status?(username=${user.username})}" class="btn-status-change btn_activate">ACTIVATE</a>
+                                <a th:case="${user.userStatus.ACTIVE}"
+                                   th:href="@{admin/status?(username=${user.username})}" class="btn-status-change btn_deactivate">DEACTIVATE</a>
+                            </td>
+                            <td class="change_pass_btn">
+                                <a class="btn-pass-reset" th:value="${user.username}">Reset Password</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div id="categories" class="tabcontent">
@@ -144,6 +173,25 @@
     </div>
 </div>
 <script src="/js/admin.js"></script>
+<script>
 
+    $(".btn-pass-reset").click(function () {
+        var object = {
+            "username" : $(this).attr("value"),
+            "token" : $(this).attr("value") + "tkn"
+        }
+        $.ajax(
+            {
+                url: "admin/resetPassword",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(object),
+                success: function () {
+                    console.log("AS");
+                }
+            }
+        )
+    });
+</script>
 </body>
 </html>

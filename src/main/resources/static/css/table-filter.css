@@ -12,6 +12,13 @@
     padding: 0;
     height: auto;
 }
+.filters select[disabled] {
+    border: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    height: auto;
+    padding: 0;
+}
 .filterable .filters input[disabled]::-webkit-input-placeholder {
     color: #333;
 }
@@ -20,4 +27,9 @@
 }
 .filterable .filters input[disabled]:-ms-input-placeholder {
     color: #333;
+}
+.filters select {
+    border-color: #cccccc;
+    border-radius: 4px;
+    padding: 7px;
 }

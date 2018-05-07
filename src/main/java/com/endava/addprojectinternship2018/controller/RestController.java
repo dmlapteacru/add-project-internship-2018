@@ -2,13 +2,10 @@ package com.endava.addprojectinternship2018.controller;
 
 import com.endava.addprojectinternship2018.model.Category;
 import com.endava.addprojectinternship2018.model.Company;
+import com.endava.addprojectinternship2018.model.PasswordToken;
 import com.endava.addprojectinternship2018.model.Product;
 import com.endava.addprojectinternship2018.model.dto.UserDto;
-import com.endava.addprojectinternship2018.service.CategoryService;
-import com.endava.addprojectinternship2018.service.CompanyService;
-import com.endava.addprojectinternship2018.service.CustomerService;
-import com.endava.addprojectinternship2018.service.ProductService;
-import com.endava.addprojectinternship2018.service.UserService;
+import com.endava.addprojectinternship2018.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +29,10 @@ public class RestController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private PasswordTokenService passwordTokenService;
+
 
     @GetMapping("/rest/getAllCompanies")
     public List<Company> getAllCompanies(){
@@ -60,8 +61,8 @@ public class RestController {
         return productService.getAllProducts();
     }
 
-    @RequestMapping(value = "/admin/newUserPassword", method = RequestMethod.PUT)
-    public String setNewPass(@RequestBody @Valid UserDto user){
+    @RequestMapping(value = "/newUserPassword", method = RequestMethod.PUT)
+    public String setNewPass(@RequestBody UserDto user){
         userService.changeUserPassword(user);
         return "OK";
     }
@@ -80,6 +81,12 @@ public class RestController {
     @RequestMapping(value = "/admin/deleteCategory/{id}", method = RequestMethod.DELETE)
     public String deleteCategory(@PathVariable Integer id){
         categoryService.deleteCategory(id);
+        return "OK";
+    }
+
+    @RequestMapping(value = "/admin/resetPassword", method = RequestMethod.POST)
+    public String resetPassword(@RequestBody PasswordToken passwordToken){
+        passwordTokenService.save(passwordToken);
         return "OK";
     }
 }

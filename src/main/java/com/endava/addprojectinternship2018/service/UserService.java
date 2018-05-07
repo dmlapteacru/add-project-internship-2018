@@ -4,6 +4,7 @@ import com.endava.addprojectinternship2018.dao.UserDao;
 import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.model.dto.UserDto;
 import com.endava.addprojectinternship2018.model.dto.UserWithProfileDto;
+import com.endava.addprojectinternship2018.model.dto.UsersEmailDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,6 +23,9 @@ public class UserService {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private PasswordTokenService passwordTokenService;
 
     public Optional<User> getUserByUsername(String username) {
         return userDao.findUserByUsername(username);
@@ -74,5 +78,10 @@ public class UserService {
         User oldUser = getUserByUsername(user.getUsername()).get();
         oldUser.setPassword(passwordEncoder.encode(user.getPassword()));
         userDao.save(oldUser);
+        passwordTokenService.deleteToken(user.getUsername());
     }
+
+//    public UsersEmailDto getUsersEmailByUsername(String username){
+//       return userDao.findUsersEmailByUsername(username);
+//    }
 }

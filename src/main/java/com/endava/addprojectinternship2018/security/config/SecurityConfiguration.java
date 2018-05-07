@@ -29,6 +29,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private LoginAuthenticationSuccessHandler loginAuthenticationSuccessHandler;
+    @Autowired
+    private LoginAuthenticationFailureHandler loginAuthenticationFailureHandler;
 
     @Autowired
     public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
@@ -53,7 +55,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.authorizeRequests()
-                .antMatchers("/login", "/registration/**", "/").permitAll()
+                .antMatchers("/login", "/registration/**", "/", "/reset/password", "/newUserPassword", "/email").permitAll()
                 .antMatchers("/admin/**").access("hasAuthority('ADMIN')")
                 .antMatchers("/customer/**").access("hasAuthority('CUSTOMER')")
                 .antMatchers("/company/**").access("hasAuthority('COMPANY')")
@@ -63,6 +65,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and().formLogin().loginPage("/login")
                 .successHandler(loginAuthenticationSuccessHandler)
+                .failureHandler(loginAuthenticationFailureHandler)
                 .usernameParameter("username").passwordParameter("password")
                 .and().csrf().disable();
     }
