@@ -6,7 +6,6 @@ import com.endava.addprojectinternship2018.dao.UserDao;
 import com.endava.addprojectinternship2018.model.Contract;
 import com.endava.addprojectinternship2018.model.Customer;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
-import com.endava.addprojectinternship2018.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

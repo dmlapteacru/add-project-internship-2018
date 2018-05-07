@@ -3,9 +3,9 @@ package com.endava.addprojectinternship2018.controller;
 import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.model.dto.CompanyDto;
+import com.endava.addprojectinternship2018.model.dto.ContractDto;
 import com.endava.addprojectinternship2018.model.dto.ProductDto;
 import com.endava.addprojectinternship2018.service.*;
-import com.endava.addprojectinternship2018.service.user.UserService;
 import com.endava.addprojectinternship2018.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -86,8 +86,9 @@ public class CompanyController {
             productDtoList.add(productService.convertProductToProductDto(product));
         }
         List<Category> categoryList = categoryService.getAllCategory();
+        model.addAttribute("contractDto", new ContractDto());
         model.addAttribute("categoryList", categoryList);
-        model.addAttribute("products", productDtoList);
+        model.addAttribute("products", products);
         return "product/productListPage";
     }
 
