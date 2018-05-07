@@ -3,6 +3,7 @@ package com.endava.addprojectinternship2018.service;
 import com.endava.addprojectinternship2018.dao.ProductDao;
 import com.endava.addprojectinternship2018.model.Product;
 import com.endava.addprojectinternship2018.model.dto.ProductDto;
+import com.endava.addprojectinternship2018.model.dto.ProductDtoTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,12 @@ public class ProductService {
 
     @Autowired
     private ProductDao productDao;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private CompanyService companyService;
 
     public List<Product> getAllByCompanyId(int id) {
         return productDao.findAllByCompanyId(id);
@@ -70,5 +77,19 @@ public class ProductService {
         productDto.setPrice(product.getPrice());
         productDto.setDescription(product.getDescription());
         return productDto;
+    }
+
+    public void save(ProductDtoTest product){
+        productDao.save(convertDTOToProduct(product));
+    }
+
+    public Product convertDTOToProduct(ProductDtoTest productDtoTest){
+        Product product = new Product();
+        product.setName(productDtoTest.getName());
+        product.setDescription(productDtoTest.getDescription());
+        product.setPrice(productDtoTest.getPrice());
+        product.setCategory(categoryService.getCategoryById(productDtoTest.getCategory_id()));
+        product.setCompany(companyService.getCompanyById(productDtoTest.getCompany_id()).get());
+        return product;
     }
 }

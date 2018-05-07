@@ -1,9 +1,7 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.model.Category;
-import com.endava.addprojectinternship2018.model.Company;
-import com.endava.addprojectinternship2018.model.PasswordToken;
-import com.endava.addprojectinternship2018.model.Product;
+import com.endava.addprojectinternship2018.model.*;
+import com.endava.addprojectinternship2018.model.dto.ProductDtoTest;
 import com.endava.addprojectinternship2018.model.dto.UserDto;
 import com.endava.addprojectinternship2018.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,9 @@ public class RestController {
 
     @Autowired
     private PasswordTokenService passwordTokenService;
+
+    @Autowired
+    private AdminMessageService adminMessageService;
 
 
     @GetMapping("/rest/getAllCompanies")
@@ -72,6 +73,11 @@ public class RestController {
         return categoryService.getAllCategory();
     }
 
+    @RequestMapping(value = "/categories", method = RequestMethod.GET)
+    public List<Category> getAllCategories(){
+        return categoryService.getAllCategory();
+    }
+
     @RequestMapping(value = "/admin/newCategory", method = RequestMethod.PUT)
     public String saveNewCategory(@RequestBody Category category){
         categoryService.saveCategory(category);
@@ -87,6 +93,31 @@ public class RestController {
     @RequestMapping(value = "/admin/resetPassword", method = RequestMethod.POST)
     public String resetPassword(@RequestBody PasswordToken passwordToken){
         passwordTokenService.save(passwordToken);
+        return "OK";
+    }
+    @RequestMapping(value = "/company/newService", method = RequestMethod.POST)
+    public String addNewService(@RequestBody ProductDtoTest product){
+        productService.save(product);
+        return "OK";
+    }
+
+    @RequestMapping(value = "/admin/messages", method = RequestMethod.GET)
+    public List<AdminMessage> showMessages(){
+        return adminMessageService.getAllMessages();
+    }
+    @RequestMapping(value = "/admin/messages/unread", method = RequestMethod.GET)
+    public List<AdminMessage> showMessagesByStatusUnread(){
+        return adminMessageService.getAllMessagesByStatusUnread();
+    }
+    @RequestMapping(value = "/admin/messages/read", method = RequestMethod.GET)
+    public List<AdminMessage> showMessagesByStatusRead(){
+        return adminMessageService.getAllMessagesByStatusRead();
+    }
+
+    @RequestMapping(value = "/message/send", method = RequestMethod.POST)
+    public String addNewMessage(@RequestBody AdminMessage adminMessage){
+        System.out.println("con " + adminMessage);
+        adminMessageService.save(adminMessage);
         return "OK";
     }
 }

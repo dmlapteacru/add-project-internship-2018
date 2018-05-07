@@ -31,4 +31,8 @@ public class CategoryService {
     public void deleteCategory(int id){
         categoryDao.deleteById(id);
     }
+
+    public Category getCategoryById(int id){
+        return categoryDao.getOne(id);
+    }
 }

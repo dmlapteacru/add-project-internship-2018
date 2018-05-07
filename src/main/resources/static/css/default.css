@@ -14,6 +14,9 @@
 body, html {
     margin: 0 auto;
 }
+a{
+    cursor: pointer;
+}
 .wrap {
     height: 80%;
     display: flex;
@@ -74,6 +77,10 @@ body, html {
     width: 100%;
 }
 
+.modal_links {
+    display: flex;
+    justify-content: space-around;
+}
 .btn{
     padding: 5px;
 }
@@ -111,4 +118,19 @@ body, html {
     justify-content:center;
     height: 100%;
     width: 50%;
+}
+.modal_body_custom {
+    display: flex;
+    flex-direction: column;
+}
+.modal_body_custom > input {
+    padding: 5px;
+    border: 1px #cccccc solid;
+    border-radius: 2px;
+}
+.modal_body_custom > textarea {
+    border: 1px #cccccc solid;
+    border-radius: 2px;
+    resize: none;
+    box-sizing: border-box;
 }

@@ -89,6 +89,7 @@ public class CompanyController {
         model.addAttribute("contractDto", new ContractDto());
         model.addAttribute("categoryList", categoryList);
         model.addAttribute("products", products);
+        model.addAttribute("company", company);
         return "product/productListPage";
     }
 

@@ -20,7 +20,7 @@
 </div>
 
 <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalService"
-   class="btn btn-info" role="button">Create new service</a>
+   class="btn btn-info" role="button" onclick="getCategories()">Create new service</a>
 
 <div class="panel panel-primary filterable">
     <div class="panel-heading">
@@ -178,20 +178,21 @@
             </div>
             <form>
                 <div class="modal-body modal_body_category">
+                    <p id="company_id" th:text="${company.getId()}" style="display: none"></p>
                     <input id="new_category_id" type="text" hidden="hidden"/>
                     <label>Category name</label>
                     <select id="select_category"></select>
                     <label>Name</label>
-                    <input id="new_service_name" type="text"/>
+                    <input id="new_service_name" type="text" required/>
                     <label>Price</label>
-                    <input id="new_service_price" type="number" min="0" step="0.01"/>
+                    <input id="new_service_price" type="number" min="0" step="0.01" value="0.0" required/>
                     <label>Description</label>
-                    <input id="new_category_desc" type="text"/>
-                    <p id="error_category" style="color: #FF1C19"></p>
+                    <input id="new_service_desc" type="text" required/>
+                    <p id="error_service" style="color: #FF1C19"></p>
                 </div>
                 <div class="modal-footer modal_btn">
                     <button type="button" style="display: none;" class="btn"></button>
-                    <button id="save_btn_category" type="button" class="btn btn-success">Save</button>
+                    <button id="save_btn_service" type="submit" class="btn btn-success">Save</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </form>
@@ -209,11 +210,48 @@
         }
     });
 
-    $.ajax(
-        {
-            url: "/"
+    function getCategories() {
+        $.ajax(
+            {
+                url: "/categories",
+                success: function (result) {
+                    loadCategories(result);
+                }
+            }
+        )
+    }
+
+    function loadCategories(data) {
+        $.each(data, function (id, object) {
+            var categoryID = object.id;
+            $.each(object, function (key, value) {
+                if (key == "name"){
+                    $("#select_category").append("<option id='" + categoryID + "'>" + value + "</option>")
+                }
+            });
+        });
+    }
+
+    $("#save_btn_service").click(function () {
+        var newServiceData = {
+            "name" : $("#new_service_name").val(),
+            "price" : $("#new_service_price").val(),
+            "company_id" : $("#company_id").text(),
+            "category_id" : $("#select_category").children(":selected").attr("id"),
+            "description" : $("#new_service_desc").val()
         }
-    )
+
+        $.ajax(
+            {
+                url: "/company/newService",
+                type: "post",
+                contentType: "application/json",
+                data: JSON.stringify(newServiceData),
+                success: function () {
+                }
+            }
+        )
+    });
 </script>
 
 </html>
