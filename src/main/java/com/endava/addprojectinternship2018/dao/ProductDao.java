@@ -16,7 +16,13 @@ public interface ProductDao extends JpaRepository<Product, Integer>{
 
     List<Product> findAllByCompanyId(int id);
 
+    List<Product> findAllByCompanyIdAndCategoryId(int companyId, int categoryId);
+
     Optional<Product> findById(int id);
 
+    Optional<Product> findByNameAndCompanyId(String name, int companyId);
+
     void deleteById(int id);
+
+    Optional<Product> findByNameAndCategoryId(String name, int categoryId);
 }

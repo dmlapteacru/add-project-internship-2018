@@ -1,6 +1,10 @@
 package com.endava.addprojectinternship2018.controller;
 
+import com.endava.addprojectinternship2018.dao.CompanyDao;
+import com.endava.addprojectinternship2018.dao.CustomerDao;
+import com.endava.addprojectinternship2018.dao.ProductDao;
 import com.endava.addprojectinternship2018.model.Company;
+import com.endava.addprojectinternship2018.model.User;
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.model.enums.Role;
 import com.endava.addprojectinternship2018.model.dto.ContractDto;
@@ -15,7 +19,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping(value = "contract")
@@ -25,36 +28,14 @@ public class ContractController {
     private ContractService contractService;
 
     @Autowired
-    private CompanyService companyService;
-
-    @Autowired
     private UserUtil userUtil;
 
-    @Autowired
-    private ProductService productService;
-
     @GetMapping(value = "createContract")
-    public String getContractPageForCreate(@RequestParam(name = "companyId") int companyId,
+    public String getContractPageForCreate(@RequestParam(name = "customerId") int customerId,
+                                           @RequestParam(name = "companyId") int companyId,
+                                           @RequestParam(name = "productId") int productId,
                                            Model model) {
-        Role currentUserRole = userUtil.getCurrentUser().getRole();
-        ContractDto contractDto = new ContractDto();
-        if (currentUserRole == Role.CUSTOMER) {
-            contractDto.setSelectedCustomer(userUtil.getCurrentCustomer());
-            if (companyId != 0) {
-                contractDto.setSelectedCompany(companyService.getCompanyById(companyId).get());
-                contractDto.setProducts(productService.getAllByCompanyId(companyId));
-            } else {
-                contractDto.setCompanies(companyService.getAllCompanies());
-                contractDto.setProducts(productService.getAllProducts());
-            }
-            contractDto.setStatus(ContractStatus.SIGNED_BY_CUSTOMER);
-        } else if (currentUserRole == Role.COMPANY) {
-            Company currentCompany = userUtil.getCurrentCompany();
-            contractDto.setSelectedCompany(currentCompany);
-            contractDto.setStatus(ContractStatus.SIGNED_BY_COMPANY);
-            contractDto.setProducts(productService.getAllByCompanyId(currentCompany.getId()));
-        }
-        contractDto.setIssueDate(LocalDate.now());
+        ContractDto contractDto = contractService.createNewContractDto(customerId, companyId, productId);
         model.addAttribute("contractDto", contractDto);
         model.addAttribute("update", false);
         return "contract/contractPage";
@@ -63,8 +44,7 @@ public class ContractController {
     @GetMapping(value = "updateContract")
     public String getContractPageForUpdate(@RequestParam(name = "contractId") int contractId,
                                            Model model) {
-        ContractDto contractDto = contractService.convertContractToContractDto(contractService.getContractById(contractId));
-        contractDto.setProducts(productService.getAllProducts());
+        ContractDto contractDto = contractService.createUpdateContractDto(contractId);
         model.addAttribute("contractDto", contractDto);
         model.addAttribute("update", true);
         return "contract/contractPage";
@@ -77,10 +57,10 @@ public class ContractController {
         String controllerName = currentUserRole == Role.CUSTOMER ? "customer" : "company";
         String deleteResult = contractService.deleteContract(contractId);
         if (deleteResult.equals("OK")) {
-            return "redirect:/"+controllerName+"/contracts?successDelete";
+            return "redirect:/" + controllerName + "/contracts?successDelete";
         } else {
             model.addAttribute("errorMessage", deleteResult);
-            return "redirect:/"+controllerName+"/contracts?error";
+            return "redirect:/" + controllerName + "/contracts?error";
         }
     }
 

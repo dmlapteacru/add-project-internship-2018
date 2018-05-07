@@ -1,17 +1,21 @@
 package com.endava.addprojectinternship2018.service;
 
+import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.dao.CustomerDao;
+import com.endava.addprojectinternship2018.dao.UserDao;
+import com.endava.addprojectinternship2018.model.Contract;
 import com.endava.addprojectinternship2018.model.Customer;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
+import com.endava.addprojectinternship2018.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
 public class CustomerService {
 
     @Autowired
@@ -44,6 +48,7 @@ public class CustomerService {
         return customerDao.findByUserId(id);
     }
 
+    @Transactional
     public void saveCustomer(CustomerDto customerDto) {
         customerDao.save(convertCustomerDtoToCustomer(customerDto));
     }

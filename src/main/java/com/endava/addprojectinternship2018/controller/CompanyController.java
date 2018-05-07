@@ -1,14 +1,11 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.model.Company;
-import com.endava.addprojectinternship2018.model.Product;
+import com.endava.addprojectinternship2018.dao.ContractDao;
+import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.model.dto.CompanyDto;
 import com.endava.addprojectinternship2018.model.dto.ProductDto;
-import com.endava.addprojectinternship2018.service.CompanyService;
-import com.endava.addprojectinternship2018.service.ContractService;
-import com.endava.addprojectinternship2018.service.InvoiceService;
-import com.endava.addprojectinternship2018.service.ProductService;
-import com.endava.addprojectinternship2018.service.UserService;
+import com.endava.addprojectinternship2018.service.*;
+import com.endava.addprojectinternship2018.service.user.UserService;
 import com.endava.addprojectinternship2018.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -46,32 +43,41 @@ public class CompanyController {
     @Autowired
     private ProductService productService;
 
-    @GetMapping(value = "")
+    @Autowired
+    private CategoryService categoryService;
+
+    @GetMapping(value = "home")
     public String showCompanyPage(Model model) {
-        if (userUtil.getCurrentCompany() == null) {
-            return "company/error";
-        }
         model.addAttribute("company", userUtil.getCurrentCompany());
         return "company/homePage";
     }
 
     @GetMapping(value = "contracts")
-    public String showCompanyContracts(Model model) {
-        Company company = userUtil.getCurrentCompany();
-        model.addAttribute("contracts", contractService
-                .getContractsByCompanyName(company.getName()));
-        return "company/contractsPage";
+    public String showCompanyContracts(@ModelAttribute(name = "errorMessage") String errorMessage, Model model) {
+
+        int currentCompanyId = userUtil.getCurrentCompany().getId();
+        List<Contract> contractList = contractService.getAllByCompanyId(currentCompanyId);
+
+        model.addAttribute("contractList", contractList);
+        model.addAttribute("errorMessage", errorMessage);
+        model.addAttribute("customerId", 0);
+        model.addAttribute("companyId", currentCompanyId);
+        model.addAttribute("productId", 0);
+
+        return "contract/contractListPage";
     }
 
     @GetMapping(value = "invoices")
     public String showInvoicesByContractId(Model model) {
-        Company company = userUtil.getCurrentCompany();
-        model.addAttribute("invoices", invoiceService
-                .getInvoicesByCompany(company.getName()));
+
+        int currentCompanyId = userUtil.getCurrentCompany().getId();
+        List<Invoice> invoices = invoiceService.getInvoicesByCompanyId(currentCompanyId);
+        model.addAttribute("customerInvoices", invoices);
+
         return "company/invoicesByCompany";
     }
 
-    @GetMapping(value = "products")
+    @GetMapping(value = "services")
     public String showProductsByContractId(Model model) {
         Company company = userUtil.getCurrentCompany();
         List<Product> products = productService.getAllByCompanyId(company.getId());
@@ -79,6 +85,8 @@ public class CompanyController {
         for (Product product : products) {
             productDtoList.add(productService.convertProductToProductDto(product));
         }
+        List<Category> categoryList = categoryService.getAllCategory();
+        model.addAttribute("categoryList", categoryList);
         model.addAttribute("products", productDtoList);
         return "product/productListPage";
     }

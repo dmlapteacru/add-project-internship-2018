@@ -14,8 +14,8 @@ import java.util.Set;
 public class LoginAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private static final String DEFAULT_URL_ADMIN = "/admin";
-    private static final String DEFAULT_URL_COMPANY = "/company";
-    private static final String DEFAULT_URL_CUSTOMER = "/customer";
+    private static final String DEFAULT_URL_COMPANY = "/company/home";
+    private static final String DEFAULT_URL_CUSTOMER = "/customer/home";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -34,10 +34,10 @@ public class LoginAuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
     public String authenticatedRedirectDefaultPage(Authentication authentication) {
         Set<String> setOfAuthorities = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
         if (setOfAuthorities.contains("ADMIN")) {
-            return "/admin";
+            return DEFAULT_URL_ADMIN;
         } else if (setOfAuthorities.contains("COMPANY")) {
-            return "/company";
+            return DEFAULT_URL_COMPANY;
         } else
-            return "/customer";
+            return DEFAULT_URL_CUSTOMER;
     }
 }

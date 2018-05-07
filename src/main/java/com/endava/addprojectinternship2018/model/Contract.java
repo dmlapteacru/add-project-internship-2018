@@ -2,6 +2,7 @@ package com.endava.addprojectinternship2018.model;
 
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.util.LocalDateConverter;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 @Table(name = "CONTRACT")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Contract {
 
     @Id

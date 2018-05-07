@@ -1,11 +1,10 @@
 package com.endava.addprojectinternship2018.controller;
 
 import com.endava.addprojectinternship2018.model.*;
-import com.endava.addprojectinternship2018.model.dto.ContractDto;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
 import com.endava.addprojectinternship2018.model.dto.ProductDto;
 import com.endava.addprojectinternship2018.service.*;
-import com.endava.addprojectinternship2018.service.UserService;
+import com.endava.addprojectinternship2018.service.user.UserService;
 import com.endava.addprojectinternship2018.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,13 +22,7 @@ import java.util.Optional;
 public class CustomerController {
 
     @Autowired
-    private ContractService contractService;
-
-    @Autowired
     private InvoiceService invoiceService;
-
-    @Autowired
-    private CompanyService companyService;
 
     @Autowired
     private UserUtil userUtil;
@@ -43,7 +36,13 @@ public class CustomerController {
     @Autowired
     private ProductService productService;
 
-    @GetMapping(value = "")
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private ContractService contractService;
+
+    @GetMapping(value = "home")
     public String getHomePage(Model model) {
         Customer currentCustomer = userUtil.getCurrentCustomer();
         if (currentCustomer == null) {
@@ -86,60 +85,44 @@ public class CustomerController {
     @GetMapping(value = "contracts")
     public String getContractsPage(@ModelAttribute(name = "errorMessage") String errorMessage, Model model) {
 
-        Customer currentCustomer = userUtil.getCurrentCustomer();
+        int currentCustomerId = userUtil.getCurrentCustomer().getId();
+        List<Contract> contractList = contractService.getAllByCustomerId(currentCustomerId);
 
-        List<Contract> contracts = contractService.getContractsByCustomerId(currentCustomer.getId());
-        List<ContractDto> contractDtoList = new ArrayList<>();
-        for (Contract contract : contracts) {
-            contractDtoList.add(contractService.convertContractToContractDto(contract));
-        }
-        model.addAttribute("contractDto", new ContractDto());
-        model.addAttribute("contractList", contractDtoList);
+        model.addAttribute("contractList", contractList);
         model.addAttribute("errorMessage", errorMessage);
+        model.addAttribute("customerId", currentCustomerId);
+        model.addAttribute("companyId", 0);
+        model.addAttribute("productId", 0);
         return "contract/contractListPage";
+
     }
 
-    @GetMapping(value = "products")
+    @GetMapping(value = "services")
     public String getProductsPage(Model model) {
-        List<ProductDto> productDtoList = new ArrayList<>();
-        for (Product product : productService.getAllProducts()) {
-            productDtoList.add(productService.convertProductToProductDto(product));
-        }
-        model.addAttribute("products", productDtoList);
+
+        int currentCustomerId = userUtil.getCurrentCustomer().getId();
+        List<Product> productList = productService.getAllProducts();
+        List<Category> categoryList = categoryService.getAllCategory();
+        model.addAttribute("categoryList", categoryList);
+        model.addAttribute("products", productList);
+        model.addAttribute("customerId", currentCustomerId);
+
         return "product/productListPage";
     }
 
     @GetMapping(value = "invoices")
     public String getInvoicesPage(Model model) {
-        Customer currentCustomer = userUtil.getCurrentCustomer();
-        if (currentCustomer == null) {
-            return "customer/error";
-        }
-        model.addAttribute("customer", currentCustomer);
 
-        List<Invoice> invoices = invoiceService.getInvoicesByCustomerId(currentCustomer.getId());
+        int currentCustomerId = userUtil.getCurrentCustomer().getId();
+        List<Invoice> invoices = invoiceService.getInvoicesByCustomerId(currentCustomerId);
         model.addAttribute("customerInvoices", invoices);
 
         return "invoice/invoiceListPage";
     }
 
-    @GetMapping(value = "companies")
-    public String getCompaniesPage(Model model) {
-
-        Customer currentCustomer = userUtil.getCurrentCustomer();
-        if (currentCustomer == null) {
-            return "customer/error";
-        }
-        model.addAttribute("customer", currentCustomer);
-
-        List<Company> companyList = companyService.getAllCompanies();
-        model.addAttribute("companies", companyList);
-
-        return "customer/companiesPage";
-    }
-
     @GetMapping(value = "bank")
     public String getBankPage(Model model) {
+
         return "customer/bankPage";
     }
 

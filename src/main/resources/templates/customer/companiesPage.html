@@ -28,7 +28,6 @@
     <tr th:each="company : ${companies}">
         <td th:text="${company.getName()}">company name</td>
         <td th:text="${company.getEmail()}">company email</td>
-        <td><a th:href="@{/contract/createContract(companyId=${company.getId()})}" class="btn btn-info" role="button">Create new contract</a></td>
     </tr>
     </tbody>
 </table>

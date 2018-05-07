@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -43,7 +42,7 @@ public class InvoiceController {
         model.addAttribute("invoice", invoiceDto);
         Company company = userUtil.getCurrentCompany();
         model.addAttribute("listOfContracts", contractService
-                .getContractsByCompanyName(company.getName()));
+                .getAllByCompanyName(company.getName()));
         return "invoice/newInvoice";
 }
 
@@ -56,7 +55,7 @@ public class InvoiceController {
             model.addAttribute("invoice", invoiceDto);
             Company company = userUtil.getCurrentCompany();
             model.addAttribute("listOfContracts", contractService
-                    .getContractsByCompanyName(company.getName()));
+                    .getAllByCompanyName(company.getName()));
             System.out.println(bindingResult.getAllErrors());
             return "invoice/newInvoice";
         }

@@ -26,12 +26,6 @@ public class InvoiceService {
     @Autowired
     private InvoiceDao invoiceDao;
 
-    @Autowired
-    private CompanyDao companyDao;
-
-    @Autowired
-    private ContractDao contractDao;
-
     public List<Invoice> getAllInvoices(){
         return invoiceDao.findAll();
     }

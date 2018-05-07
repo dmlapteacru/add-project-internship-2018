@@ -29,6 +29,4 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
 
     List<Invoice> findAllByContract_Company_Name(String name);
 
-//    List<Invoice> findAllByOrderByIssueDate(Sort.Direction direction);
-
 }

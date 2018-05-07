@@ -5,6 +5,7 @@ import com.endava.addprojectinternship2018.model.Product;
 import com.endava.addprojectinternship2018.model.dto.ProductDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,16 +24,28 @@ public class ProductService {
         return productDao.findAll();
     }
 
-    public void saveProduct(Product product){
-        Optional<Product> oldProduct = productDao.findById(product.getId());
-        if (oldProduct.isPresent()){
-            oldProduct.get().setName(product.getName());
-            productDao.save(oldProduct.get());
-        } else {
-            productDao.save(product);
-        }
+    public List<Product> getAllByCategoryId(int categoryId) {
+        return productDao.findAllByCategoryId(categoryId);
     }
 
+    public List<Product> getAllByCompanyIdAndCategoryId(int companyId, int categoryId) {
+        return productDao.findAllByCompanyIdAndCategoryId(companyId, categoryId);
+    }
+
+    public Optional<Product> getByNameAndCompanyId(String name, int companyId) {
+        return productDao.findByNameAndCompanyId(name, companyId);
+    }
+
+    public Optional<Product> getByNameAndCategoryId(String name, int categoryId) {
+        return productDao.findByNameAndCategoryId(name, categoryId);
+    }
+
+    @Transactional
+    public void saveProduct(ProductDto productDto){
+        productDao.save(convertProductDtoToProduct(productDto));
+    }
+
+    @Transactional
     public void deleteProduct(int id) {
         productDao.deleteById(id);
     }
