@@ -2,10 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Admin Panel</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/admin.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/table-filter.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/admin.css" />
+    <link rel="stylesheet" type="text/css" href="/css/table-filter.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="/js/table-filter.js"></script>
@@ -24,11 +24,11 @@
     <div class="body_wrapper">
         <div class="menu_wrapper">
             <button class="tablink tablink_active" onclick="openPage('users', this)">Users</button>
-            <button id="categories_btn_req" class="tablink" onclick="openPage('categories', this)">Service Categories
-            </button>
+            <button id="categories_btn_req" class="tablink" onclick="openPage('categories', this)">Service Categories</button>
             <button id="messages_btn_req" class="tablink" onclick="openPage('messages', this)">Messages
-                <button class="tablink sub_tablink">Read</button>
-                <button class="tablink sub_tablink">Unread</button>
+                <button id="messages_read_all_req" class="tablink sub_tablink" onclick="activateLink(this)">All</button>
+                <button id="messages_read_req" class="tablink sub_tablink" onclick="activateLink(this)">Read</button>
+                <button id="messages_unread_req" class="tablink sub_tablink" onclick="activateLink(this)">Unread</button>
             </button>
         </div>
         <div class="info_wrapper">
@@ -58,8 +58,7 @@
                             <th></th>
                             <th>
                                 <div class="pull-right">
-                                    <button class="btn btn-default btn-xs btn-filter"><span
-                                            class="glyphicon glyphicon-filter"></span> Filter
+                                    <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter
                                     </button>
                                 </div>
                             </th>
@@ -72,14 +71,15 @@
                             <td th:text="${user.name}" valign="center"></td>
                             <td th:text="${user.username}" valign="center"></td>
                             <td th:text="${user.email}" valign="center"></td>
-                            <td class="filter_status" th:text="${user.userStatus}" valign="center"></td>
+                            <td class="filter_status" th:switch="${user.userStatus}" valign="center">
+                                <span th:case="${user.userStatus.ACTIVE}" style="color: #78ab46;"> ACTIVE </span>
+                                <span th:case="${user.userStatus.INACTIVE}" style="color: #FF1C19;"> INACTIVE </span>
+                            </td>
                             <td th:switch="${user.userStatus}">
                                 <a th:case="${user.userStatus.INACTIVE}"
-                                   th:href="@{admin/status?(username=${user.username})}"
-                                   class="btn-status-change btn_activate">ACTIVATE</a>
+                                   th:href="@{admin/status?(username=${user.username})}" class="btn-status-change btn_activate">ACTIVATE</a>
                                 <a th:case="${user.userStatus.ACTIVE}"
-                                   th:href="@{admin/status?(username=${user.username})}"
-                                   class="btn-status-change btn_deactivate">DEACTIVATE</a>
+                                   th:href="@{admin/status?(username=${user.username})}" class="btn-status-change btn_deactivate">DEACTIVATE</a>
                             </td>
                             <td class="change_pass_btn">
                                 <a class="btn-pass-reset" th:value="${user.username}">Reset Password</a>
@@ -95,10 +95,8 @@
                     <thead>
                     <th>Name</th>
                     <th>Description</th>
-                    `
                     <th class="new_category_btn">
-                        <button style="background-color: #319e5c" type="button" class="btn btn_add_category"
-                                data-toggle="modal"
+                        <button style="background-color: #319e5c" type="button" class="btn btn_add_category" data-toggle="modal"
                                 data-target="#modalCategory" title="Add category">
                             <span style="color: white" class="glyphicon glyphicon-plus"></span>
                         </button>
@@ -110,6 +108,12 @@
             </div>
             <div id="messages" class="tabcontent">
                 <table id="table-messages" class="table">
+                    <thead>
+                    <th></th>
+                    <th>Email</th>
+                    <th>Subject</th>
+                    <th>Date</th>
+                    </thead>
                     <tbody>
                     </tbody>
                 </table>
@@ -181,7 +185,7 @@
                 </div>
                 <div class="modal-footer modal_btn">
                     <button type="button" style="display: none;" class="btn"></button>
-                    <button id="delete_btn_category" type="button" class="btn btn-danger">Delete</button>
+                    <button id="delete_btn_confirm" type="button" class="btn btn-danger" data-delete-info="">Delete</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -189,90 +193,5 @@
     </div>
 </div>
 <script src="/js/admin.js"></script>
-<script>
-
-    $(".btn-pass-reset").click(function () {
-        var object = {
-            "username": $(this).attr("value"),
-            "token": $(this).attr("value") + "tkn"
-        }
-        $.ajax(
-            {
-                url: "admin/resetPassword",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify(object),
-                success: function () {
-                    alert("Password reset");
-                }
-            }
-        )
-    });
-
-    $("#messages_btn_req").click(function () {
-        $.ajax(
-            {
-                url: "/admin/messages",
-                success: function (result) {
-                    loadMessages(result);
-                }
-            }
-        )
-    });
-    $("#messages_unread_req").click(function () {
-        $.ajax(
-            {
-                url: "/admin/messages/unread",
-                success: function (result) {
-                    loadMessages(result);
-                }
-            }
-        )
-    });
-    $("#messages_read_req").click(function () {
-        $.ajax(
-            {
-                url: "/admin/messages/read",
-                success: function (result) {
-                    loadMessages(result);
-                }
-            }
-        )
-    });
-
-    function loadMessages(data) {
-        $("#table-messages tbody").html("");
-        $.each(data, function (id, object) {
-            var messageID = object.id;
-            if (object.status.toLowerCase() == "unread") {
-                $("#table-messages tbody").append('<tr id="' + messageID + '" class="unread_message_bold"><td><span class="circle circle_active" onclick="changeMessageStatus(this)"></span></td></tr>');
-                $("#table-messages tr[id=" + "" + messageID + "]").append("<td onclick='showMessage(this)'>" + object.user_email + "</td>");
-                $("#table-messages tr[id=" + "" + messageID + "]").append("<td onclick='showMessage(this)'>" + object.message + " <div style='display: none;' id='mess" + messageID + "'>" + object.message + "</div></td>");
-            } else {
-                $("#table-messages tbody").append('<tr id="' + messageID + '"><td><span class="circle" onclick="changeMessageStatus(this)"></span></td></tr>');
-                $("#table-messages tr[id=" + "" + messageID + "]").append("<td onclick='showMessage(this)'>" + object.user_email + "</td>");
-                $("#table-messages tr[id=" + "" + messageID + "]").append("<td onclick='showMessage(this)'>" + object.message + " <div style='display: none;' id='mess" + messageID + "'>" + object.message + "</div></td>");
-            }
-            $("#table-messages tr[id=" + "" + messageID + "]").append("<td></td>");
-        })
-    }
-
-    function changeMessageStatus(circle) {
-        $(circle).toggleClass("circle_active");
-        $(circle).parent().parent().toggleClass("unread_message_bold");
-
-        $.ajax(
-            {
-                url: "/admin/message/changeStatus/" + $(circle).parent().parent().attr("id"),
-                type: "PUT"
-            }
-        )
-    }
-
-    function showMessage(col) {
-        console.log("debil stop");
-        $("#mess" + $(col).parent().attr("id")).slideToggle("slow");
-    }
-</script>
 </body>
 </html>
