@@ -106,8 +106,36 @@ a{
     cursor: pointer;
 }
 #table-messages td:nth-child(1){
-    width: 10%;
+    /*width: 20%;*/
 }
 #table-messages td:nth-child(2){
     width: 25%;
+}
+
+.circle{
+    cursor: pointer;
+    display: none;
+    width: 10px;
+    height: 10px;
+    border: 1px solid blue;
+    border-radius: 50%;
+}
+.circle_active {
+    cursor: pointer;
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border: 1px solid blue;
+    border-radius: 50%;
+    background-color: blue;
+}
+#table-messages > tbody > tr:hover .circle{
+    display: inline-block;
+}
+#table-messages > tbody > tr:hover{
+    cursor: pointer;
+    background-color: #e8e8e8;
+}
+.unread_message_bold {
+    font-weight: bold;
 }
