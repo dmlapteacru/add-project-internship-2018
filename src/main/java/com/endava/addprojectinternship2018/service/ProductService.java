@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,6 +80,7 @@ public class ProductService {
         return productDto;
     }
 
+    @Transactional
     public void save(ProductDtoTest product){
         productDao.save(convertDTOToProduct(product));
     }
@@ -91,5 +93,9 @@ public class ProductService {
         product.setCategory(categoryService.getCategoryById(productDtoTest.getCategory_id()));
         product.setCompany(companyService.getCompanyById(productDtoTest.getCompany_id()).get());
         return product;
+    }
+
+    public Product getById(int productId) {
+        return productDao.findById(productId).get();
     }
 }

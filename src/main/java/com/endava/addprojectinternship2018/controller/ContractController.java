@@ -51,7 +51,7 @@ public class ContractController {
         return "contract/contractPage";
     }
 
-    @GetMapping(value = "deleteContract")
+    @GetMapping(value = "deleteContractOld")
     public String deleteContract(@RequestParam(name = "contractId") int contractId,
                                  Model model) {
         Role currentUserRole = userUtil.getCurrentUser().getRole();

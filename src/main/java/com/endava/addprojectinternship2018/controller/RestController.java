@@ -1,14 +1,25 @@
 package com.endava.addprojectinternship2018.controller;
 
 import com.endava.addprojectinternship2018.model.*;
+import com.endava.addprojectinternship2018.model.dto.ContractDto;
+import com.endava.addprojectinternship2018.model.dto.ContractDtoTest;
 import com.endava.addprojectinternship2018.model.dto.ProductDtoTest;
 import com.endava.addprojectinternship2018.model.dto.UserDto;
+import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.service.*;
+import com.endava.addprojectinternship2018.validation.ErrorMessage;
+import com.endava.addprojectinternship2018.validation.ValidationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @org.springframework.web.bind.annotation.RestController
 public class RestController {
@@ -23,6 +34,9 @@ public class RestController {
     private ProductService productService;
 
     @Autowired
+    private ContractService contractService;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -33,6 +47,7 @@ public class RestController {
 
     @Autowired
     private AdminMessageService adminMessageService;
+    private ObjectError error;
 
 
     @GetMapping("/rest/getAllCompanies")
@@ -88,6 +103,46 @@ public class RestController {
     public String deleteCategory(@PathVariable Integer id){
         categoryService.deleteCategory(id);
         return "OK";
+    }
+
+    @RequestMapping(value = "/contract/newContract", method = RequestMethod.POST)
+    public @ResponseBody ValidationResponse saveNewContract(@Valid @RequestBody ContractDtoTest contractDtoTest,
+                                                            BindingResult bindingResult) {
+
+        ValidationResponse response = new ValidationResponse();
+        response.setStatus("SUCCESS");
+        final List<ErrorMessage> errorMessageList = new ArrayList<>();
+
+        if (bindingResult.hasErrors()) {
+            response.setStatus("FAIL");
+            bindingResult.getFieldErrors().stream()
+                    .map(fieldError -> new ErrorMessage(fieldError.getField(), fieldError.getDefaultMessage()))
+                    .forEach(errorMessageList::add);
+        } else if (contractDtoTest.getExpireDate().isBefore(contractDtoTest.getIssueDate())) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("expireDate", "can not be more than issue date"));
+        }
+
+        response.setErrorMessageList(errorMessageList);
+
+        if (response.getStatus().equals("SUCCESS")) {
+            ContractDto contractDto = new ContractDto();
+            contractDto.setSelectedProduct(productService.getById(contractDtoTest.getProductId()));
+            contractDto.setSelectedCustomer(customerService.getCustomerById(contractDtoTest.getCustomerId()).get());
+            contractDto.setSelectedCompany(companyService.getCompanyById(contractDtoTest.getCompanyId()).get());
+            contractDto.setSum(contractDtoTest.getSum());
+            contractDto.setIssueDate(contractDtoTest.getIssueDate());
+            contractDto.setExpireDate(contractDtoTest.getExpireDate());
+            contractDto.setStatus(ContractStatus.valueOf(contractDtoTest.getStatus()));
+            contractService.saveContract(contractDto);
+        }
+
+        return response;
+    }
+
+    @RequestMapping(value = "/contract/deleteContract", method = RequestMethod.POST)
+    public String deleteContract(@RequestParam(name = "contractId") int contractId) {
+        return contractService.deleteContract(contractId);
     }
 
     @RequestMapping(value = "/admin/resetPassword", method = RequestMethod.POST)

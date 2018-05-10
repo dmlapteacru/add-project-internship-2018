@@ -14,13 +14,14 @@ import javax.persistence.Enumerated;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContractDto {
+public class ContractDto implements Serializable {
 
     private int contractId;
 

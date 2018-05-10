@@ -1,4 +1,4 @@
-function openPage(pageName,elmnt) {
+function openPage(pageName, elmnt) {
     var i, tabcontent, tablinks;
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
@@ -14,25 +14,29 @@ function openPage(pageName,elmnt) {
         $(".sub_tablink").css("display", "block");
     } else $(".sub_tablink").css("display", "none");
 }
+
 $("#categories_btn_req").click(function () {
-    $.ajax({url: "/admin/categories",
-        success: function(result){
+    $.ajax({
+        url: "/admin/categories",
+        success: function (result) {
             $("#table-categories tbody").html("");
             $.each(result, function (id, object) {
                 var ID = object.id;
                 $("#table-categories tbody").append('<tr id="row' + ID + '"></tr>');
                 $.each(object, function (key, value) {
-                    if (key!="id"){
-                        $("#table-categories tr[id="+ "row" + ID + "]").append('<td id="'+ key + ID +'">' + value + '</td>');
+                    if (key != "id") {
+                        $("#table-categories tr[id=" + "row" + ID + "]").append('<td id="' + key + ID + '">' + value + '</td>');
                     }
                 });
-                $("#table-categories tr[id="+ "row" + ID + "]").append('<td>' +
-                    '<span id="'+ ID + '" class="glyphicon glyphicon-pencil edit_category_pencil" data-toggle="modal" data-target="#modalCategory" onclick="editProduct(this)"></span>' +
-                    '<span id="'+ ID + '" class="glyphicon glyphicon-trash delete_category_pencil" data-toggle="modal" data-target="#modalDeleteConfirm" onclick="deleteCategory(this)"></span>' +
+                $("#table-categories tr[id=" + "row" + ID + "]").append('<td>' +
+                    '<span id="' + ID + '" class="glyphicon glyphicon-pencil edit_category_pencil" data-toggle="modal" data-target="#modalCategory" onclick="editProduct(this)"></span>' +
+                    '<span id="' + ID + '" class="glyphicon glyphicon-trash delete_category_pencil" data-toggle="modal" data-target="#modalDeleteConfirm" onclick="deleteCategory(this)"></span>' +
                     '</td>');
             });
-        }});
+        }
+    });
 });
+
 function editProduct(obj) {
     $("#new_category_id").val(obj.id);
     $("#new_category_name").val($("#name" + obj.id).text());
@@ -51,9 +55,11 @@ $("#delete_btn_category").click(function () {
         }
     )
 });
+
 function deleteCategory(obj) {
     $("#delete_btn_category").val(obj.id);
 }
+
 $(".new_category_btn button").click(function () {
     $("#new_category_id").val("");
     $("#new_category_name").val("");
@@ -61,9 +67,9 @@ $(".new_category_btn button").click(function () {
 });
 $("#save_btn_category").click(function () {
     var object = {
-        "id" : $("#new_category_id").val(),
-        "name" : $("#new_category_name").val(),
-        "description" : $("#new_category_desc").val()
+        "id": $("#new_category_id").val(),
+        "name": $("#new_category_name").val(),
+        "description": $("#new_category_desc").val()
     }
     $.ajax(
         {
