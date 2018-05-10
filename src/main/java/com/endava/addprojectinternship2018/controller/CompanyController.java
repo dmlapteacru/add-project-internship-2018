@@ -72,6 +72,7 @@ public class CompanyController {
 
         int currentCompanyId = userUtil.getCurrentCompany().getId();
         List<Invoice> invoices = invoiceService.getInvoicesByCompanyId(currentCompanyId);
+        model.addAttribute("companyId", currentCompanyId);
         model.addAttribute("invoices", invoices);
 
         return "invoice/invoicesByCompany";

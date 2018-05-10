@@ -12,11 +12,134 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="/js/table-filter.js"></script>
+    <script th:src="@{/js/moment.js}"></script>
+
+    <script>
+        function editInvoice(elementFromView) {
+            console.log(elementFromView);
+            var id = elementFromView.id;
+            console.log("id:" + id);
+            var issueDate = $("#issueDate" + id).text();
+            console.log(issueDate);
+            var dueDate = $("#dueDate" + id).text();
+            console.log(dueDate);
+            var sum = $("#sum" + id).text();
+            console.log(sum);
+            var fullName = $("#fullName" + id).text();
+            console.log(fullName);
+
+            console.log(moment(issueDate, 'DD-MM-YYYY').format('YYYY-MM-DD'));
+            console.log(moment(dueDate, 'DD-MM-YYYY').format('YYYY-MM-DD'));
+            $("#input_invoice_id").text(id);
+            $("#input_issue_date").val(moment(issueDate, 'DD-MM-YYYY').format('YYYY-MM-DD'));
+            $("#input_due_date").val(moment(dueDate, 'DD-MM-YYYY').format('YYYY-MM-DD'));
+            $("#input_sum").val(sum);
+            $("#input_full_name").text(fullName);
+
+            $("#editInvoiceDialog").modal();
+        }
+
+        function editAjax(data) {
+            $.ajax({
+                type: "POST",
+                url: "/restinvoice/editInvoice",
+                // The key needs to match your method's input parameter (case-sensitive).
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                success: function (response) {
+                    console.log(data);
+                    console.log("success");
+                    $("#dueDate" + data.id).text(moment(data.dueDate, 'YYYY-MM-DD').format('DD-MM-YYYY'));
+                    $("#sum" + data.id).text(data.sum);
+                    $("#editInvoiceDialog").modal('hide')
+                },
+                error: function (errMsg, a, b) {
+                    alert("Please call admins")
+                    console.log("fail")
+                    console.log(errMsg)
+                    console.log(a)
+                    console.log(b)
+                }
+            });
+        }
+
+        function editInvoiceButton() {
+            var id = $("#input_invoice_id").text();
+            var dueDate = $("#input_due_date").val();
+            var sum = $("#input_sum").val();
+            var data = {
+                sum: sum, dueDate: dueDate, id: id
+            };
+            editAjax(data);
+        }
+
+    </script>
 
 </head>
 
 <body>
 <div th:replace="fragments/header :: header"></div>
+
+<div class="modal fade" id="editInvoiceDialog" role="dialog">
+    <div class="modal-dialog modal-md">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Edit current Invoice</h4>
+            </div>
+            <form>
+                <div class="modal-body">
+
+                    <!--<label>User</label>-->
+                    <!--<p id="new_pass_username"></p>-->
+                    <!--<label>Password</label>-->
+                    <!--<input id="new_pass_input" type="password" class="form-control"/>-->
+                    <!--<label>Confirm Password</label>-->
+                    <!--<input id="new_pass_input_confirm" type="password" class="form-control"/>-->
+                    <!--<p class="error_pass_match" style="color: red"></p>-->
+
+                    <label>Invoice ID</label>
+                    <p id="input_invoice_id" class="form-control"></p>
+                    <label>Issue Date</label>
+                    <input id="input_issue_date" class="form-control" type="date">
+                    <label>Expire Date</label>
+                    <input id="input_due_date" class="form-control" type="date">
+                    <label>Sum</label>
+                    <input id="input_sum" class="form-control" type="number">
+                    <label>Full Name</label>
+                    <p id="input_full_name" class="form-control"></p>
+
+
+                </div>
+                <div class="modal-footer modal_btn">
+                    <button id="save_btn" onclick="editInvoiceButton()" type="button" class="btn btn-success">Save
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade" id="modalDeleteConfirm" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Are you sure?</h4>
+                <input id="delete_category_id" type="text" hidden="hidden"/>
+            </div>
+            <div class="modal-footer modal_btn">
+                <button type="button" style="display: none;" class="btn"></button>
+                <button id="delete_btn_category" type="button" class="btn btn-danger">Delete</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!--<div class="container">-->
 
 <div class="panel panel-primary filterable">
@@ -41,17 +164,28 @@
 
         <tr th:each="invoice: ${invoices}">
 
-            <td th:text="${#temporals.format(invoice.getIssueDate(), 'dd-MM-yyyy')} ">Issue Date</td>
-            <td th:text="${#temporals.format(invoice.getDueDate(), 'dd-MM-yyyy')}">Expire Date</td>
-            <td th:text="${invoice.getSum()}">Sum</td>
-            <td th:text="${invoice.getStatus()}" class="font-weight-bold">Status</td>
-            <td th:text="${invoice.getContract().getId()}">Contract_id</td>
-            <td th:text="${invoice.getContract().getCustomer().getFullName()}">Full Name</td>
+            <td th:id="${'issueDate'+invoice.getId()}"
+                th:text="${#temporals.format(invoice.getIssueDate(), 'dd-MM-yyyy')} ">Issue Date
+            </td>
+            <td th:id="${'dueDate'+invoice.getId()}" th:text="${#temporals.format(invoice.getDueDate(), 'dd-MM-yyyy')}">
+                Expire Date
+            </td>
+            <td th:id="${'sum'+invoice.getId()}" th:text="${invoice.getSum()}">Sum</td>
+            <td th:id="${'status'+invoice.getId()}" th:text="${invoice.getStatus()}"
+
+             th:class="${invoice.getStatus() == 'ACTIVE'} ? 'success' : (${invoice.getStatus() == 'ISSUED'} ? 'warning' : 'red')">
+
+                Status
+            </td>
+            <td th:id="${'contract_id'+invoice.getId()}" th:text="${invoice.getContract().getId()}">Contract_id</td>
+            <td th:id="${'fullName'+invoice.getId()}" th:text="${invoice.getContract().getCustomer().getFullName()}">
+                Full Name
+            </td>
             <td>
                 <a th:href="@{/invoice/deleteInvoice?(id=${invoice.id})}" class="btn btn-danger">DELETE</a>
             </td>
             <td>
-                <a th:href="@{/invoice/updateInvoice?(id=${invoice.id})}" class="btn">UPDATE</a>
+                <a th:id="${invoice.id}" onclick="editInvoice(this)" class="btn">UPDATE</a>
             </td>
         </tr>
     </table>
@@ -62,17 +196,17 @@
 <form class="col-md-3 input-group pull-right" th:action="@{/invoice/filterByActiveStatus}" method="get">
 
     <label for="status" class="control-label">Invoice Status</label>
-        <select class="form-control" id="status" name="status">
-            <option value="">-Select-</option>
-            <option value="ISSUED" th:text="ISSUED"></option>
-            <option value="SENT" th:text="SENT"></option>
-            <option value="PAID" th:text="PAID"></option>
-            <option value="ACTIVE" th:text="ACTIVE"></option>
-            <option value="IN_PROGRESS" th:text="IN_PROGRESS"></option>
-            <option value="OVERDUE" th:text="OVERDUE"></option>
-        </select>
+    <select class="form-control" id="status" name="status">
+        <option value="">-Select-</option>
+        <option value="ISSUED" th:text="ISSUED"></option>
+        <option value="SENT" th:text="SENT"></option>
+        <option value="PAID" th:text="PAID"></option>
+        <option value="ACTIVE" th:text="ACTIVE"></option>
+        <option value="IN_PROGRESS" th:text="IN_PROGRESS"></option>
+        <option value="OVERDUE" th:text="OVERDUE"></option>
+    </select>
 
-        <button type="submit" class="btn pull-right btn-success ">Check</button>
+    <button type="submit" class="btn pull-right btn-success ">Check</button>
 
 </form>
 
