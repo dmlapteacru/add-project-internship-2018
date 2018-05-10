@@ -2,6 +2,7 @@ package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.UserDao;
 import com.endava.addprojectinternship2018.model.*;
+import com.endava.addprojectinternship2018.model.dto.UserBankAccountDto;
 import com.endava.addprojectinternship2018.model.dto.UserDto;
 import com.endava.addprojectinternship2018.model.dto.UserEmailDto;
 import com.endava.addprojectinternship2018.model.dto.UserWithProfileDto;
@@ -84,5 +85,9 @@ public class UserService {
 
     public UserEmailDto getUserEmailByUsername(String username){
        return userDao.findUsersEmailByUsername(username);
+    }
+
+    public UserBankAccountDto getUserBankAccountByUsername(String username){
+       return userDao.findUserBankAccountByUsername(username);
     }
 }

@@ -1,8 +1,10 @@
 package com.endava.addprojectinternship2018.dao;
 
 import com.endava.addprojectinternship2018.model.User;
+import com.endava.addprojectinternship2018.model.dto.UserBankAccountDto;
 import com.endava.addprojectinternship2018.model.dto.UserWithProfileDto;
 import com.endava.addprojectinternship2018.model.dto.UserEmailDto;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,4 +33,13 @@ public interface UserDao extends JpaRepository<User, Integer> {
             "left join Company co on a.id = co.user " +
             "left join Customer cu on a.id=cu.user where a.username=:username")
     public UserEmailDto findUsersEmailByUsername(@Param("username") String username);
+
+    @Query("select new com.endava.addprojectinternship2018.model.dto.UserBankAccountDto(" +
+            "case when co.id is not null then co.countNumber when cu.id is not null then cu.countNumber else null end," +
+            " case when co.id is not null then co.accessKey when cu.id is not null then cu.accessKey else null end) " +
+            "from User a " +
+            "left join Company co on a.id=co.user " +
+            "left join Customer cu on a.id=cu.user " +
+            "where a.username=:username")
+    public UserBankAccountDto findUserBankAccountByUsername(@Param("username") String username);
 }

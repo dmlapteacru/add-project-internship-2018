@@ -16,8 +16,6 @@ public interface CustomerDao extends JpaRepository <Customer, Integer> {
 
     Optional<Customer> findByFirstNameAndLastName(String firstName, String lastName);
 
-    Optional<Customer> findByBankAccount(String bankAccount);
-
     Optional<Customer> findByEmail(String email);
 
     Optional<Customer> findByUserId(int id);

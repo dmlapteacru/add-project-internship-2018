@@ -4,26 +4,22 @@ import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.model.dto.*;
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.service.*;
+import com.endava.addprojectinternship2018.util.UserUtil;
 import com.endava.addprojectinternship2018.validation.ErrorMessage;
 import com.endava.addprojectinternship2018.validation.ValidationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -32,10 +28,17 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class RestController {
 
     @Autowired
+    @Qualifier("bank_ip")
+    private String bankIP;
+
+    @Autowired
     private RestTemplate restTemplate;
 
     @Autowired
-    private UserAccountDtoService userAccountDtoService;
+    private UserUtil userUtil;
+
+    @Autowired
+    private UserBankAccountService userBankAccountService;
 
     @Autowired
     private CompanyService companyService;
@@ -199,15 +202,68 @@ public class RestController {
         return "OK";
     }
 
-    @RequestMapping(value = "/test/newAccount", method = POST)
-    @ResponseBody
-    public String newAccount(){
+
+    @RequestMapping(value = "/bankAccount/create", method = POST)
+    public ResponseEntity<UserBankAccountDto> newAccount(){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
-        ResponseEntity response = restTemplate.postForEntity( "http://172.17.100.255:82/api/bankAccount/create", request , UserAccountDto.class );
-        userAccountDtoService.save((UserAccountDto)response.getBody());
-        return "OK";
+        HttpEntity<String> request = new HttpEntity<>("param", headers);
+        UserBankAccountDto response = restTemplate.postForObject( bankIP +"/bankaccount/create", request , UserBankAccountDto.class );
+        userBankAccountService.save(response);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/bankAccount/balance", method = POST)
+    public String getBalance(){
+        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
+        headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
+        HttpEntity<String> request = new HttpEntity<>("param", headers);
+        String response = restTemplate.postForObject( bankIP +"/bankaccount/balance", request , String.class );
+        return response;
+    }
+
+    @RequestMapping(value = "/bankAccount/addmoney", method = POST)
+    public String addMoney(@RequestParam Double sum){
+        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
+        headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
+        Map<String, Double> body = new HashMap<>();
+        body.put("sum", sum);
+        HttpEntity<Map> request = new HttpEntity<>(body, headers);
+        String response = restTemplate.postForObject( bankIP +"/bankaccount/addmoney", request , String.class );
+        return response;
+    }
+
+    @RequestMapping(value = "/bankAccount/payinvoice", method = POST)
+    public String payInvoice(@RequestBody PaymentDto paymentDto){
+        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
+        headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
+        paymentDto.setCorrespondentCount(companyService.getCompanyByInvoiceId(paymentDto.getCorrespondentCount().intValue()).getCountNumber());
+        HttpEntity<PaymentDto> request = new HttpEntity<>(paymentDto, headers);
+        String response = restTemplate.postForObject( bankIP +"/sendmoney", request , String.class );
+        return response;
+    }
+
+    @RequestMapping(value = "/bankAccount/statement", method = POST)
+    public String getStatement(){
+        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
+        headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
+        Map<String, String> dates = new HashMap<>();
+        dates.put("Date", "2018-01-01");
+        dates.put("DateTo", "2018-05-12");
+        HttpEntity<Map> request = new HttpEntity<>(dates, headers);
+        String response = restTemplate.postForObject( bankIP +"/statement/statement", request , String.class );
+        return response;
     }
 }

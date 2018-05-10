@@ -122,4 +122,10 @@ public class CompanyController {
         return "redirect:/company";
     }
 
+    @GetMapping(value = "bank")
+    public String getBankPage(Model model) {
+        model.addAttribute("company", userUtil.getCurrentCompany());
+        return "company/bankPage";
+    }
+
 }

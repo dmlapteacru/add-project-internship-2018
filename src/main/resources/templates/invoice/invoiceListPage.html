@@ -37,15 +37,16 @@
         </tr>
         </thead>
 
-        <tr th:each="invoice: ${invoices}">
-
+        <tr th:each="invoice: ${invoices}" th:id="'row' + ${invoice.getId()}">
             <td th:text="${#temporals.format(invoice.getIssueDate(), 'dd-MM-yyyy')} ">Issue Date</td>
             <td th:text="${#temporals.format(invoice.getDueDate(), 'dd-MM-yyyy')}">Expire Date</td>
-            <td th:text="${invoice.getSum()}">Sum</td>
+            <td id="sum_to_pay" th:text="${invoice.getSum()}">Sum</td>
             <td th:text="${invoice.getStatus()}" class="font-weight-bold">Status</td>
             <td th:text="${invoice.getContract().getId()}">Contract_id</td>
             <td th:text="${invoice.getContract().getCustomer().getFullName()}">Full Name</td>
-
+            <td>
+                <button th:id="${invoice.getId()}" class="btn btn-danger" onclick="payInvoice(this)">PAY</button>
+            </td>
         </tr>
     </table>
 </div>
@@ -70,5 +71,25 @@
 
 
 </div>
+<script>
+    function payInvoice(btn) {
+        var object = {
+            "correspondentCount" : $(btn).attr("id"),
+            "sum" : $("#row" + $(btn).attr("id")).find("#sum_to_pay").text(),
+            "description" : "Invoice ID = " + $(btn).attr("id") + " paid."
+        }
+        $.ajax(
+            {
+                url: "/bankAccount/payinvoice",
+                type : "POST",
+                contentType: "application/json",
+                data: JSON.stringify(object),
+                success: function () {
+                    alert("Invoice paid");
+                }
+            }
+        )
+    }
+</script>
 </body>
 </html>

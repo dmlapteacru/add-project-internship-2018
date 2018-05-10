@@ -141,7 +141,7 @@ public class CustomerController {
 
     @GetMapping(value = "bank")
     public String getBankPage(Model model) {
-
+        model.addAttribute("customer", userUtil.getCurrentCustomer());
         return "customer/bankPage";
     }
 

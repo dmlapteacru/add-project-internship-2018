@@ -39,10 +39,6 @@ public class CustomerService {
         return customerDao.findByEmail(email);
     }
 
-    public Optional<Customer> getCustomerByBankAccount(String bankAccount) {
-        return customerDao.findByBankAccount(bankAccount);
-    }
-
     public Optional<Customer> getCustomerByUserId(int id) {
         return customerDao.findByUserId(id);
     }
@@ -52,13 +48,18 @@ public class CustomerService {
         customerDao.save(convertCustomerDtoToCustomer(customerDto));
     }
 
+    public void save(Customer customer){
+        customerDao.save(customer);
+    }
+
     public CustomerDto convertCustomerToCustomerDto(Customer customer) {
         CustomerDto customerDto = new CustomerDto();
         customerDto.setFirstName(customer.getFirstName());
         customerDto.setLastName(customer.getLastName());
         customerDto.setCustomerId(customer.getId());
         customerDto.setEmail(customer.getEmail());
-        customerDto.setBankAccount(customer.getBankAccount());
+        customerDto.setCountNumber(customer.getCountNumber());
+        customerDto.setAccessKey(customer.getAccessKey());
         customerDto.setUserDto(userService.convertUserToUserDto(customer.getUser()));
         return customerDto;
     }
@@ -69,7 +70,8 @@ public class CustomerService {
         customer.setFirstName(customerDto.getFirstName());
         customer.setLastName(customerDto.getLastName());
         customer.setEmail(customerDto.getEmail());
-        customer.setBankAccount(customerDto.getBankAccount());
+        customer.setCountNumber(customerDto.getCountNumber());
+        customer.setAccessKey(customerDto.getAccessKey());
         customer.setUser(userService.convertUserDtoToUser(customerDto.getUserDto()));
         return customer;
     }

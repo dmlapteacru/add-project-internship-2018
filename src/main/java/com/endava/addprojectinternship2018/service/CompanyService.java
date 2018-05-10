@@ -44,12 +44,17 @@ public class CompanyService {
         return companyDao.save(convertCompanyDtoToCompany(companyDto));
     }
 
+    public void save(Company company){
+        companyDao.save(company);
+    }
+
     public CompanyDto convertCompanyToCompanyDto(Company company) {
         CompanyDto companyDto = new CompanyDto();
         companyDto.setName(company.getName());
         companyDto.setCompanyId(company.getId());
         companyDto.setEmail(company.getEmail());
-        companyDto.setAccountNumber(company.getAccountNumber());
+        companyDto.setCountNumber(company.getCountNumber());
+        companyDto.setAccessKey(company.getAccessKey());
         companyDto.setUserDto(userService.convertUserToUserDto(company.getUser()));
         return companyDto;
     }
@@ -59,8 +64,13 @@ public class CompanyService {
                 .orElseGet(Company::new);
         company.setName(companyDto.getName());
         company.setEmail(companyDto.getEmail());
-        company.setAccountNumber(companyDto.getAccountNumber());
+        company.setAccessKey(companyDto.getAccessKey());
+        company.setCountNumber(companyDto.getCountNumber());
         company.setUser(userService.convertUserDtoToUser(companyDto.getUserDto()));
         return company;
+    }
+
+    public Company getCompanyByInvoiceId(int id){
+      return companyDao.findByInvoiceId(id);
     }
 }

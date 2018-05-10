@@ -26,7 +26,8 @@ public class CustomerDto {
     @ValidEmail
     private String email;
 
-    private String bankAccount;
+    private Long countNumber = null;
+    private Long accessKey = null;
 
     @Valid
     private UserDto userDto;

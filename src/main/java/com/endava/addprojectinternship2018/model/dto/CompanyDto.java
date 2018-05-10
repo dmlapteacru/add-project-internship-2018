@@ -22,8 +22,8 @@ public class CompanyDto {
     @ValidEmail
     private String email;
 
-    private String accountNumber;
-
+    private Long countNumber = null;
+    private Long accessKey = null;
     @Valid
     private UserDto userDto;
 
