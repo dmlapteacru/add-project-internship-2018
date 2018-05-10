@@ -5,17 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/header.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <title>New Invoice</title>
 </head>
 <body>
+<div th:replace="fragments/header :: header"></div>
+
 <div class="container">
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
 
-            <h1>new invoice </h1>
+            <h1>Create new invoice </h1>
 
             <form th:action="@{/invoice/createNew}" th:object="${invoice}" method="post">
 
@@ -30,17 +33,15 @@
                                 th:text="${contr.getCustomer().getFullName()+ ' '  +contr.getId()}">
                         </option>
                     </select>
+
+
                     <label for="status" class="control-label">Invoice Status</label>
-                    <select class="form-control" id="status" th:field="*{status}">
-                        <option th:value="ACTIVE" th:text="ACTIVE"></option>
-                        <option th:value="IN_PROGRESS" th:text="IN_PROGRESS"></option>
-                        <option th:value="OVERDUE" th:text="OVERDUE"></option>
-                    </select>
-                    <label>Issue Date</label><br>
+                    <input class="form-control" id="status" th:field="*{status}" readonly>
+
 
                     <div class="form-group" th:classappend="${#fields.hasErrors('issueDate')}? 'has-error':''">
-                        <label for="issueDate" class="control-label">Issue date and time</label>
-                        <input type="datetime-local" id="issueDate"
+                        <label for="issueDate" class="control-label">Issue date</label>
+                        <input type="date" id="issueDate"
                                class="form-control"
                                th:field="*{issueDate}"/>
                         <p class="error-message"
@@ -50,7 +51,7 @@
 
                     <div class="form-group" th:classappend="${#fields.hasErrors('dueDate')}? 'has-error':''">
                         <label for="dueDate" class="control-label">Expire date and time</label>
-                        <input type="datetime-local" id="dueDate"
+                        <input type="date" id="dueDate"
                                class="form-control"
                                th:field="*{dueDate}"/>
                         <p class="error-message"
@@ -58,20 +59,13 @@
                            th:text="${error}">Validation error</p>
                     </div>
 
-                    <!--<div class="alert alert-danger" th:each="error: ${#fields.errors('issueDate')}" th:text="${error}">-->
-                    <!--<input class="form-control" id="issueDate" type="datetime-local" th:field="*{issueDate}"/>-->
-                    <!--</div>-->
-
-                    <!--<label>Due Date</label><br>-->
-                    <!--<div class="alert alert-danger" th:each="error: ${#fields.errors('dueDate')}" th:text="${error}">-->
-                    <!--<input class="form-control" type="datetime-local" th:field="*{dueDate}"/>-->
-                    <!--</div>-->
-
-                    <label>Sum of invoice</label>
-                    <div class="alert alert-danger" th:if="${#fields.hasErrors('sum')}" th:errors="*{sum}">Sum error
-                        <input class="form-control" th:field="*{sum}" type="number" step="0.01"/>
+                    <div class="form-group" th:classappend="${#fields.hasErrors('sum')}? 'has-error':''">
+                        <label for="sum" class="control-label">Sum of invoice</label>
+                        <input class="form-control" id="sum" th:field="*{sum}" type="number" step="0.01"/>
                     </div>
-
+                    <p class="error-message"
+                       th:each="error: ${#fields.errors('sum')}"
+                       th:text="${error}">Sum error</p>
                 </div>
 
                 <div class="form-group">

@@ -67,7 +67,7 @@ public class InvoiceService {
 
     public void saveDto(InvoiceDto invoiceDto){
         Invoice invoice = new Invoice(invoiceDto.getSum(), invoiceDto.getIssueDate()
-                , invoiceDto.getDueDate(), ACTIVE, invoiceDto.getContract());
+                , invoiceDto.getDueDate(), invoiceDto.getStatus(), invoiceDto.getContract());
         invoiceDao.save(invoice);
     }
 

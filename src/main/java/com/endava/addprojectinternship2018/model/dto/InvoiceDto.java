@@ -18,9 +18,11 @@ public class InvoiceDto {
 
     private int invoiceId;
 
+    @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate issueDate;
 
+    @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dueDate;
 
@@ -36,9 +38,18 @@ public class InvoiceDto {
         return contract;
     }
 
-    public InvoiceDto(LocalDate issueDate,LocalDate dueDate, @DecimalMin("0.0") double sum) {
+    public InvoiceDto(LocalDate issueDate,LocalDate dueDate, /*@DecimalMin("0.0")*/ double sum) {
         this.issueDate = issueDate;
         this.dueDate = dueDate;
         this.sum = sum;
+    }
+
+    public InvoiceDto(LocalDate issueDate) {
+        this.issueDate = issueDate;
+    }
+
+    public InvoiceDto(@NotNull LocalDate issueDate, InvoiceStatus status) {
+        this.issueDate = issueDate;
+        this.status = status;
     }
 }

@@ -105,6 +105,7 @@ public class RestController {
     public List<AdminMessage> showMessages(){
         return adminMessageService.getAllMessages();
     }
+
     @RequestMapping(value = "/admin/messages/unread", method = RequestMethod.GET)
     public List<AdminMessage> showMessagesByStatusUnread(){
         return adminMessageService.getAllMessagesByStatusUnread();
@@ -116,8 +117,12 @@ public class RestController {
 
     @RequestMapping(value = "/message/send", method = RequestMethod.POST)
     public String addNewMessage(@RequestBody AdminMessage adminMessage){
-        System.out.println("con " + adminMessage);
         adminMessageService.save(adminMessage);
+        return "OK";
+    }
+    @RequestMapping(value = "/admin/message/changeStatus/{id}", method = RequestMethod.PUT)
+    public String changeMessageStatus(@PathVariable int id){
+        adminMessageService.changeMessageStatus(id);
         return "OK";
     }
 }
