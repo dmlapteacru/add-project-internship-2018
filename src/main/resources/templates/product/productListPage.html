@@ -211,6 +211,9 @@
     });
 
     function getCategories() {
+        $("#new_service_name").val("");
+        $("#new_service_desc").val("");
+        $("#new_service_price").val("0.0");
         $.ajax(
             {
                 url: "/categories",
@@ -233,24 +236,28 @@
     }
 
     $("#save_btn_service").click(function () {
-        var newServiceData = {
-            "name" : $("#new_service_name").val(),
-            "price" : $("#new_service_price").val(),
-            "company_id" : $("#company_id").text(),
-            "category_id" : $("#select_category").children(":selected").attr("id"),
-            "description" : $("#new_service_desc").val()
+        if ($("#new_service_name").val() != "" && $("#new_service_desc").val() != "" && $("#new_service_price").val() != "0.0") {
+            var newServiceData = {
+                "name" : $("#new_service_name").val(),
+                "price" : $("#new_service_price").val(),
+                "company_id" : $("#company_id").text(),
+                "category_id" : $("#select_category").children(":selected").attr("id"),
+                "description" : $("#new_service_desc").val()
+            }
+
+            $.ajax(
+                {
+                    url: "/company/newService",
+                    type: "post",
+                    contentType: "application/json",
+                    data: JSON.stringify(newServiceData),
+                    success: function () {
+                        $("#modalService").modal("hide");
+                    }
+                }
+            )
         }
 
-        $.ajax(
-            {
-                url: "/company/newService",
-                type: "post",
-                contentType: "application/json",
-                data: JSON.stringify(newServiceData),
-                success: function () {
-                }
-            }
-        )
     });
 </script>
 

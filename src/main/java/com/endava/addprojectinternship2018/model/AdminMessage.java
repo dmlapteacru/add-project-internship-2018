@@ -4,8 +4,13 @@ import com.endava.addprojectinternship2018.model.enums.AdminMessagesStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import java.util.Date;
 
 @Entity
 @Table(name = "ADMIN_MESSAGES")
@@ -19,17 +24,29 @@ public class AdminMessage {
     private int id;
 
     @Column
+    @NotNull
     private String message;
 
     @Column
+    @NotNull
+    @Pattern(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,3}$")
     private String user_email;
+
+    @Column
+    @NotNull
+    private String subject;
+
+    @Column
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    private Date date;
 
     @Column
     @Enumerated(value = EnumType.STRING)
     private AdminMessagesStatus status = AdminMessagesStatus.UNREAD;
 
-    public AdminMessage(String message, String user_email) {
+    public AdminMessage(String message, String user_email, String subject) {
         this.message = message;
         this.user_email = user_email;
+        this.subject = subject;
     }
 }
