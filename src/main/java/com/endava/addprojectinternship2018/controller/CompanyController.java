@@ -72,19 +72,16 @@ public class CompanyController {
 
         int currentCompanyId = userUtil.getCurrentCompany().getId();
         List<Invoice> invoices = invoiceService.getInvoicesByCompanyId(currentCompanyId);
-        model.addAttribute("customerInvoices", invoices);
+        model.addAttribute("companyId", currentCompanyId);
+        model.addAttribute("invoices", invoices);
 
-        return "company/invoicesByCompany";
+        return "invoice/invoicesByCompany";
     }
 
     @GetMapping(value = "services")
     public String showProductsByContractId(Model model) {
         Company company = userUtil.getCurrentCompany();
         List<Product> products = productService.getAllByCompanyId(company.getId());
-        List<ProductDto> productDtoList = new ArrayList<>();
-        for (Product product : products) {
-            productDtoList.add(productService.convertProductToProductDto(product));
-        }
         List<Category> categoryList = categoryService.getAllCategory();
         model.addAttribute("contractDto", new ContractDto());
         model.addAttribute("categoryList", categoryList);

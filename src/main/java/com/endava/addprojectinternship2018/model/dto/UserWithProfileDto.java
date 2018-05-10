@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserWithProfileDto {
-
     private Role role;
     private String name;
     private String username;

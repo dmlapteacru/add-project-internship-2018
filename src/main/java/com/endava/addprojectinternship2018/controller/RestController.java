@@ -1,17 +1,41 @@
 package com.endava.addprojectinternship2018.controller;
 
 import com.endava.addprojectinternship2018.model.*;
-import com.endava.addprojectinternship2018.model.dto.ProductDtoTest;
-import com.endava.addprojectinternship2018.model.dto.UserDto;
+import com.endava.addprojectinternship2018.model.dto.*;
+import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.service.*;
+import com.endava.addprojectinternship2018.validation.ErrorMessage;
+import com.endava.addprojectinternship2018.validation.ValidationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @org.springframework.web.bind.annotation.RestController
 public class RestController {
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private UserAccountDtoService userAccountDtoService;
 
     @Autowired
     private CompanyService companyService;
@@ -21,6 +45,9 @@ public class RestController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private ContractService contractService;
 
     @Autowired
     private UserService userService;
@@ -33,6 +60,7 @@ public class RestController {
 
     @Autowired
     private AdminMessageService adminMessageService;
+    private ObjectError error;
 
 
     @GetMapping("/rest/getAllCompanies")
@@ -57,7 +85,7 @@ public class RestController {
         return companyService.getCompanyByName(companyName).get();
     }
 
-    @RequestMapping(value = "/admin/services", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin/services", method = GET)
     public List<Product> getAllProducts(){
         return productService.getAllProducts();
     }
@@ -68,12 +96,12 @@ public class RestController {
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/categories", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin/categories", method = GET)
     public List<Category> getAllCategory(){
         return categoryService.getAllCategory();
     }
 
-    @RequestMapping(value = "/categories", method = RequestMethod.GET)
+    @RequestMapping(value = "/categories", method = GET)
     public List<Category> getAllCategories(){
         return categoryService.getAllCategory();
     }
@@ -90,6 +118,46 @@ public class RestController {
         return "OK";
     }
 
+    @RequestMapping(value = "/contract/newContract", method = RequestMethod.POST)
+    public @ResponseBody ValidationResponse saveNewContract(@Valid @RequestBody ContractDtoTest contractDtoTest,
+                                                            BindingResult bindingResult) {
+
+        ValidationResponse response = new ValidationResponse();
+        response.setStatus("SUCCESS");
+        final List<ErrorMessage> errorMessageList = new ArrayList<>();
+
+        if (bindingResult.hasErrors()) {
+            response.setStatus("FAIL");
+            bindingResult.getFieldErrors().stream()
+                    .map(fieldError -> new ErrorMessage(fieldError.getField(), fieldError.getDefaultMessage()))
+                    .forEach(errorMessageList::add);
+        } else if (contractDtoTest.getExpireDate().isBefore(contractDtoTest.getIssueDate())) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("expireDate", "can not be more than issue date"));
+        }
+
+        response.setErrorMessageList(errorMessageList);
+
+        if (response.getStatus().equals("SUCCESS")) {
+            ContractDto contractDto = new ContractDto();
+            contractDto.setSelectedProduct(productService.getById(contractDtoTest.getProductId()));
+            contractDto.setSelectedCustomer(customerService.getCustomerById(contractDtoTest.getCustomerId()).get());
+            contractDto.setSelectedCompany(companyService.getCompanyById(contractDtoTest.getCompanyId()).get());
+            contractDto.setSum(contractDtoTest.getSum());
+            contractDto.setIssueDate(contractDtoTest.getIssueDate());
+            contractDto.setExpireDate(contractDtoTest.getExpireDate());
+            contractDto.setStatus(ContractStatus.valueOf(contractDtoTest.getStatus()));
+            contractService.saveContract(contractDto);
+        }
+
+        return response;
+    }
+
+    @RequestMapping(value = "/contract/deleteContract", method = RequestMethod.POST)
+    public String deleteContract(@RequestParam(name = "contractId") int contractId) {
+        return contractService.deleteContract(contractId);
+    }
+
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
     public String resetPassword(@RequestBody PasswordToken passwordToken){
         passwordTokenService.save(passwordToken);
@@ -101,16 +169,16 @@ public class RestController {
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/messages", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin/messages", method = GET)
     public List<AdminMessage> showMessages(){
         return adminMessageService.getAllMessages();
     }
 
-    @RequestMapping(value = "/admin/messages/unread", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin/messages/unread", method = GET)
     public List<AdminMessage> showMessagesByStatusUnread(){
         return adminMessageService.getAllMessagesByStatusUnread();
     }
-    @RequestMapping(value = "/admin/messages/read", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin/messages/read", method = GET)
     public List<AdminMessage> showMessagesByStatusRead(){
         return adminMessageService.getAllMessagesByStatusRead();
     }
@@ -128,6 +196,18 @@ public class RestController {
     @RequestMapping(value = "/admin/message/delete/{id}", method = RequestMethod.DELETE)
     public String deleteMessage(@PathVariable int id){
         adminMessageService.deleteById(id);
+        return "OK";
+    }
+
+    @RequestMapping(value = "/test/newAccount", method = POST)
+    @ResponseBody
+    public String newAccount(){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+        ResponseEntity response = restTemplate.postForEntity( "http://172.17.100.255:82/api/bankAccount/create", request , UserAccountDto.class );
+        userAccountDtoService.save((UserAccountDto)response.getBody());
         return "OK";
     }
 }

@@ -104,10 +104,17 @@ public class InvoiceController {
     }
 
     @GetMapping(value = "filterByActiveStatus")
-    public String showInvoicesByStatus(Model model,@RequestParam InvoiceStatus status){
+    public String showInvoicesByStatus(Model model,@RequestParam(required = false) InvoiceStatus status){
         Company company = userUtil.getCurrentCompany();
-        model.addAttribute("invoices", invoiceService
-                .getInvoicesByStatus(status));
+        
+        //TODO Limit shown invoices ,show just companies invoices
+        if(status==null){
+            model.addAttribute("invoices", invoiceService
+                    .getAllInvoices());
+        }else {
+            model.addAttribute("invoices", invoiceService
+                    .getInvoicesByStatus(status));
+        }
         return "invoice/invoicesByCompany";
     }
 

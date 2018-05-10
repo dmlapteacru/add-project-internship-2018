@@ -71,7 +71,10 @@
                             <td th:text="${user.name}" valign="center"></td>
                             <td th:text="${user.username}" valign="center"></td>
                             <td th:text="${user.email}" valign="center"></td>
-                            <td class="filter_status" th:text="${user.userStatus}" valign="center"></td>
+                            <td class="filter_status" th:switch="${user.userStatus}" valign="center">
+                                <span th:case="${user.userStatus.ACTIVE}" style="color: #78ab46;"> ACTIVE </span>
+                                <span th:case="${user.userStatus.INACTIVE}" style="color: #FF1C19;"> INACTIVE </span>
+                            </td>
                             <td th:switch="${user.userStatus}">
                                 <a th:case="${user.userStatus.INACTIVE}"
                                    th:href="@{admin/status?(username=${user.username})}" class="btn-status-change btn_activate">ACTIVATE</a>

@@ -100,13 +100,14 @@ public class CustomerController {
     @GetMapping(value = "services")
     public String getProductsPage(Model model) {
 
-        int currentCustomerId = userUtil.getCurrentCustomer().getId();
+        Customer currentCustomer = userUtil.getCurrentCustomer();
         List<Product> productList = productService.getAllProducts();
         List<Category> categoryList = categoryService.getAllCategory();
         model.addAttribute("contractDto", new ContractDto());
         model.addAttribute("categoryList", categoryList);
         model.addAttribute("products", productList);
-        model.addAttribute("customerId", currentCustomerId);
+        model.addAttribute("customerId", currentCustomer.getId());
+        model.addAttribute("customerName", currentCustomer.getFullName());
 
         return "product/productListPage";
     }
@@ -133,7 +134,7 @@ public class CustomerController {
 
         int currentCustomerId = userUtil.getCurrentCustomer().getId();
         List<Invoice> invoices = invoiceService.getInvoicesByCustomerId(currentCustomerId);
-        model.addAttribute("customerInvoices", invoices);
+        model.addAttribute("invoices", invoices);
 
         return "invoice/invoiceListPage";
     }

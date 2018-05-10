@@ -18,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 
 @Controller
@@ -50,7 +51,7 @@ public class ContractController {
         return "contract/contractPage";
     }
 
-    @GetMapping(value = "deleteContract")
+    @GetMapping(value = "deleteContractOld")
     public String deleteContract(@RequestParam(name = "contractId") int contractId,
                                  Model model) {
         Role currentUserRole = userUtil.getCurrentUser().getRole();
@@ -65,7 +66,7 @@ public class ContractController {
     }
 
     @PostMapping(value = "saveContract")
-    public String saveContract(@ModelAttribute(name = "contractDto") ContractDto contractDto,
+    public String saveContract(@ModelAttribute(name = "contractDto") @Valid ContractDto contractDto,
                                BindingResult result, Model model) {
 
         String resultString;
@@ -76,15 +77,15 @@ public class ContractController {
             model.addAttribute("update", true);
             resultString = "redirect:/contract/updateContract?contractId=" + contractDto.getContractId() + "&success";
         }
+
         if (result.hasErrors()) {
+            model.addAttribute("contractDto", contractDto);
             return "contract/contractPage";
         }
+
         if (contractDto.getIssueDate().isAfter(contractDto.getExpireDate())) {
+            model.addAttribute("contractDto", contractDto);
             result.rejectValue("expireDate", "Issue date can not be more then Expire date!");
-            return "contract/contractPage";
-        }
-        if (contractDto.getSum() < 0) {
-            result.rejectValue("sum", "The sum can not be negative!");
             return "contract/contractPage";
         }
 

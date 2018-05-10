@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Customer bank operations</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/header.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/bank.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+<div th:replace="fragments/header :: header">
+
+</div>
+<div class="container">
+    <div class="account_info">
+        <label>Name:</label>
+        <span th:text="${company.getName()}"></span>
+        <label>Account Number:</label>
+        <span th:if="${company.countNumber != null}" th:text="${company.countNumber}"></span>
+        <span th:if="${company.countNumber == null}">NO ACCOUNT</span>
+        <button id="create_account" th:if="${company.countNumber == null}" class="btn btn-warning">CREATE ACCOUNT</button>
+        <label>Balance:</label>
+        <span class="balance_info"></span>
+        <div th:if="${company.countNumber != null}" class="add_money">
+            <form>
+                <label>Add money</label>
+                <input id="money_sum" pattern="[0-9].{0,}" title="Must be numbers"/>
+                <br/>
+                <button id="add_money_btn" class="btn btn-success" type="submit">ADD MONEY</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="/js/loadbalance.js"></script>
+<script>
+    $("#create_account").click(function () {
+        $.ajax(
+            {
+                url : "/bankAccount/create",
+                type : "POST",
+                success: function () {
+                    alert("Account created.");
+                }
+            }
+        )
+    });
+    $("#add_money_btn").click(function () {
+        $.ajax(
+            {
+                url : "/bankAccount/addmoney?sum=" + $("#money_sum").val(),
+                type : "POST",
+                success: function () {
+                    alert("Money added.");
+                }
+            }
+        )
+    });
+</script>
+</body>
+</html>

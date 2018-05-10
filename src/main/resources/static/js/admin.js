@@ -197,6 +197,10 @@ function changeMessageStatus(circle) {
 }
 function showMessage(col) {
     $("#mess"+$(col).parent().attr("id")).slideToggle("slow");
+
+    if ($(col).parent().hasClass("unread_message_bold")) {
+        changeMessageStatus($(col).parent().find("td > span.circle"));
+    }
 }
 
 function parseDate(date) {

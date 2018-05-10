@@ -18,6 +18,7 @@ import java.util.List;
 
 @Repository
 public class InvoiceTransactionDao {
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -63,15 +64,20 @@ public class InvoiceTransactionDao {
         return result;
     }
 
-    public List<Object[]> findByCompanyCategoryStatus(Integer co_id, Integer categ_id, InvoiceStatus invoiceStatus){
+    public List<Object[]> findByCompanyCategoryStatus(Integer co_id, Integer categ_id, InvoiceStatus invoiceStatus) {
 
         Query query = entityManager.createQuery(hqlInvoiceDtoExtByAllParametersWtihBuilder(co_id, categ_id, invoiceStatus));
-        if (categ_id != null){query.setParameter("categ_id" ,categ_id);}
-        if (categ_id != null){query.setParameter("inv_status" ,invoiceStatus);}
+        if (categ_id != null) {
+            query.setParameter("categ_id", categ_id);
+        }
+        if (categ_id != null) {
+            query.setParameter("inv_status", invoiceStatus);
+        }
         List<Object[]> list = query.getResultList();
 
         return list;
     }
+
 
 }
 

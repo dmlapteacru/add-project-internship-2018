@@ -22,7 +22,7 @@ public interface UserDao extends JpaRepository<User, Integer> {
             "case when co.id is not null then co.email when cu.id is not null then cu.email else null end, a.userStatus)" +
             "from User a " +
             "left join Company co on a.id = co.user " +
-            "left join Customer cu on a.id = cu.user")
+            "left join Customer cu on a.id = cu.user order by a.id desc")
     List<UserWithProfileDto> findAllUsersWithProfile();
 
     @Query("select new com.endava.addprojectinternship2018.model.dto.UserEmailDto(" +
