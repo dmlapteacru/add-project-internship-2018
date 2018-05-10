@@ -145,7 +145,7 @@ public class RestController {
         return contractService.deleteContract(contractId);
     }
 
-    @RequestMapping(value = "/admin/resetPassword", method = RequestMethod.POST)
+    @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
     public String resetPassword(@RequestBody PasswordToken passwordToken){
         passwordTokenService.save(passwordToken);
         return "OK";
@@ -178,6 +178,11 @@ public class RestController {
     @RequestMapping(value = "/admin/message/changeStatus/{id}", method = RequestMethod.PUT)
     public String changeMessageStatus(@PathVariable int id){
         adminMessageService.changeMessageStatus(id);
+        return "OK";
+    }
+    @RequestMapping(value = "/admin/message/delete/{id}", method = RequestMethod.DELETE)
+    public String deleteMessage(@PathVariable int id){
+        adminMessageService.deleteById(id);
         return "OK";
     }
 }

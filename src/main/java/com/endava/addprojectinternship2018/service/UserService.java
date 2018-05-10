@@ -3,8 +3,8 @@ package com.endava.addprojectinternship2018.service;
 import com.endava.addprojectinternship2018.dao.UserDao;
 import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.model.dto.UserDto;
+import com.endava.addprojectinternship2018.model.dto.UserEmailDto;
 import com.endava.addprojectinternship2018.model.dto.UserWithProfileDto;
-import com.endava.addprojectinternship2018.model.dto.UsersEmailDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -76,12 +76,13 @@ public class UserService {
 
     public void changeUserPassword(UserDto user){
         User oldUser = getUserByUsername(user.getUsername()).get();
+        changeUserStatus(oldUser.getUsername());
         oldUser.setPassword(passwordEncoder.encode(user.getPassword()));
         userDao.save(oldUser);
         passwordTokenService.deleteToken(user.getUsername());
     }
 
-//    public UsersEmailDto getUsersEmailByUsername(String username){
-//       return userDao.findUsersEmailByUsername(username);
-//    }
+    public UserEmailDto getUserEmailByUsername(String username){
+       return userDao.findUsersEmailByUsername(username);
+    }
 }

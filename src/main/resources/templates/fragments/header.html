@@ -34,10 +34,12 @@
                 <li><a th:href="@{/company/bank}" class="menu_item"> Bank operations </a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right" sec:authorize="hasAuthority('CUSTOMER')">
+                <li><a th:href="@{/contact/admin}" class="menu_item"> Contact Admin </a></li>
                 <li><a th:href="@{/customer/profile}" class="menu_item"> Personal cabinet </a></li>
                 <li><a th:href="@{/logout}" class="menu_item"> LOGOUT </a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right" sec:authorize="hasAuthority('COMPANY')">
+                <li><a th:href="@{/contact/admin}" class="menu_item"> Contact Admin </a></li>
                 <li><a th:href="@{/company/profile}" class="menu_item"> Personal cabinet </a></li>
                 <li><a th:href="@{/logout}" class="menu_item"> LOGOUT </a></li>
             </ul>

@@ -55,7 +55,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.authorizeRequests()
-                .antMatchers("/login", "/registration/**", "/", "/reset/password", "/newUserPassword", "/email", "/message/send").permitAll()
+                .antMatchers("/login", "/registration/**", "/", "/resetPassword","/reset/password", "/newUserPassword", "/email", "/message/send").permitAll()
                 .antMatchers("/admin/**").access("hasAuthority('ADMIN')")
                 .antMatchers("/customer/**").access("hasAuthority('CUSTOMER')")
                 .antMatchers("/company/**").access("hasAuthority('COMPANY')")
@@ -87,6 +87,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web
                 .ignoring()
-                .antMatchers("/resources/**", "/static/**", "/css/**", "/js/**", "/images/**");
+                .antMatchers("/resources/**", "/static/**", "/js/**", "/css/**", "/images/**");
     }
 }

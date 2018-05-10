@@ -1,4 +1,4 @@
-function openPage(pageName, elmnt) {
+function openPage(pageName,elmnt) {
     var i, tabcontent, tablinks;
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
@@ -197,10 +197,6 @@ function changeMessageStatus(circle) {
 }
 function showMessage(col) {
     $("#mess"+$(col).parent().attr("id")).slideToggle("slow");
-
-    if ($(col).parent().hasClass("unread_message_bold")) {
-        changeMessageStatus($(col).parent().find("td > span.circle"));
-    }
 }
 
 function parseDate(date) {

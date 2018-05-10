@@ -9,12 +9,14 @@ import java.util.List;
 
 @Repository
 public interface AdminMessageDao extends JpaRepository<AdminMessage, Integer>{
+
+    List<AdminMessage> findAllByOrderByDateDesc();
     void deleteById(int id);
-    List<AdminMessage> getAllByStatus(AdminMessagesStatus adminMessagesStatus);
+    List<AdminMessage> getAllByStatusOrderByDateDesc(AdminMessagesStatus adminMessagesStatus);
     default List<AdminMessage> getAllByStatus_Unread(){
-        return getAllByStatus(AdminMessagesStatus.UNREAD);
+        return getAllByStatusOrderByDateDesc(AdminMessagesStatus.UNREAD);
     }
     default List<AdminMessage> getAllByStatus_Read(){
-        return getAllByStatus(AdminMessagesStatus.READ);
+        return getAllByStatusOrderByDateDesc(AdminMessagesStatus.READ);
     }
 }

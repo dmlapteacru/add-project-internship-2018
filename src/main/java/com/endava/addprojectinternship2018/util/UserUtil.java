@@ -3,6 +3,7 @@ package com.endava.addprojectinternship2018.util;
 import com.endava.addprojectinternship2018.model.Company;
 import com.endava.addprojectinternship2018.model.Customer;
 import com.endava.addprojectinternship2018.model.User;
+import com.endava.addprojectinternship2018.model.dto.UserEmailDto;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.CustomerService;
 import com.endava.addprojectinternship2018.service.UserService;
@@ -57,6 +58,10 @@ public class UserUtil {
             throw new UsernameNotFoundException("No user with username: " + userName);
         }
         return userOptional.get();
+    }
+
+    public UserEmailDto getCurrentUserEmail() {
+        return userService.getUserEmailByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
     }
 
 }
