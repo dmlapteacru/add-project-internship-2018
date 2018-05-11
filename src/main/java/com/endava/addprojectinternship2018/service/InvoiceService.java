@@ -18,6 +18,7 @@ import java.util.List;
 
 import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.ACTIVE;
 import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.IN_PROGRESS;
+import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.PAID;
 
 @Service
 @Transactional
@@ -106,6 +107,12 @@ public class InvoiceService {
 
     public List<Invoice> getInvoicesByStatus(InvoiceStatus invoiceStatus){
         return invoiceDao.findAllByStatus(invoiceStatus);
+    }
+
+    public void setInvoiceAsPaid(int id){
+        Invoice invoice = invoiceDao.findById(id).get();
+        invoice.setStatus(PAID);
+        invoiceDao.save(invoice);
     }
 
 }

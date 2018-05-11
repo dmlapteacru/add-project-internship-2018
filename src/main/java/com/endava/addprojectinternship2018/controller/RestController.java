@@ -33,6 +33,8 @@ public class RestController {
 
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private InvoiceService invoiceService;
 
     @Autowired
     private UserUtil userUtil;
@@ -246,6 +248,7 @@ public class RestController {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
         headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
+        invoiceService.setInvoiceAsPaid(paymentDto.getCorrespondentCount().intValue());
         paymentDto.setCorrespondentCount(companyService.getCompanyByInvoiceId(paymentDto.getCorrespondentCount().intValue()).getCountNumber());
         HttpEntity<PaymentDto> request = new HttpEntity<>(paymentDto, headers);
         String response = restTemplate.postForObject( bankIP +"/sendmoney", request , String.class );

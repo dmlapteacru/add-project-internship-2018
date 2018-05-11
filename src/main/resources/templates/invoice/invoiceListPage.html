@@ -44,7 +44,7 @@
             <td th:text="${invoice.getStatus()}" class="font-weight-bold">Status</td>
             <td th:text="${invoice.getContract().getId()}">Contract_id</td>
             <td th:text="${invoice.getContract().getCustomer().getFullName()}">Full Name</td>
-            <td>
+            <td th:if="${invoice.getStatus() == 'SENT'}">
                 <button th:id="${invoice.getId()}" class="btn btn-danger" onclick="payInvoice(this)">PAY</button>
             </td>
         </tr>
