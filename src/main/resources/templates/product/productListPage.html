@@ -20,7 +20,7 @@
 </div>
 
 <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalService"
-   class="btn btn-info" role="button" onclick="getCategories()">Create new service</a>
+   class="btn btn-info btn-sm" role="button" onclick="getCategories()">Create new service</a>
 
 <div class="panel panel-primary filterable">
     <div class="panel-heading">
@@ -67,7 +67,7 @@
                 th:text="${product.getCompany().getName()}">company
             </td>
             <td class="currency money" th:id="sum" th:value="${product.getPrice()}"
-                th:text="${product.getPrice()}">price
+                th:text="${#numbers.formatDecimal(product.getPrice(),1,2)}+' MDL'">price
             </td>
             <td th:id="description" th:value="${product.getDescription()}"
                 th:text="${product.getDescription()}">description
@@ -171,7 +171,7 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Sum</label>
                         <div class="col-sm-6">
-                            <input type="text" class="form-control" id="sumA" readonly/>
+                            <input type="number" class="form-control" id="sumA" readonly/>
                         </div>
                     </div>
 
@@ -257,7 +257,7 @@
 
             $.ajax(
                 {
-                    url: "/company/newService",
+                    url: "/companyRest/newService",
                     type: "post",
                     contentType: "application/json",
                     data: JSON.stringify(newServiceData),
@@ -283,8 +283,8 @@
         $('#companyIdA').val(row.find("#companyId").attr('value'));
         $('#productA').val(row.find("#productId").text());
         $('#productIdA').val(row.find("#productId").attr('value'));
-        $('#sumA').val(row.find("#sum").text());
-    }
+        $('#sumA').val(row.find("#sum").attr('value'));
+    };
 
     $("#btn_save_contract").click(function (event) {
 
@@ -303,7 +303,7 @@
 
         $.ajax(
             {
-                url: "/contract/newContract",
+                url: "/contractRest/newContract",
                 type: "POST",
                 contentType: "application/json",
                 data: JSON.stringify(newContractData),

@@ -18,21 +18,10 @@
 <div th:replace="fragments/header :: header">
 
 </div>
-<a sec:authorize="hasAuthority('COMPANY')"
-   th:href="@{/contract/createContract(customerId=${customerId},companyId=${companyId},productId=${productId})}"
-   class="btn btn-info" role="button">Create new contract</a>
 
-<div th:if="${param.successDelete}">
-    <div class="alert alert-info">
-        <span>Contract was deleted successfully</span>
-    </div>
-</div>
-
-<div th:if="${param.error}">
-    <div class="alert alert-warning">
-        <span th:text="${errorMessage}">error</span>
-    </div>
-</div>
+<a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalContract"
+   class="btn btn-info btn-sm" role="button" th:id="${companyId}"
+   onclick="createNewContract(this)">Create new contract</a>
 
 <div class="panel panel-primary filterable">
     <div class="panel-heading">
@@ -58,7 +47,7 @@
 
         </thead>
         <tbody>
-        <tr th:each="contract : ${contractList}">
+        <tr th:each="contract : ${contractList}" th:id="'row'+${contract.getId()}">
 
             <td sec:authorize="hasAuthority('CUSTOMER')" th:text="${contract.getCompany().getName()}">company name</td>
             <td sec:authorize="hasAuthority('COMPANY')" th:text="${contract.getCustomer().getFullName()}">customer
@@ -68,14 +57,25 @@
             <td th:text="${#temporals.format(contract.getExpireDate(),'dd MMM yyyy')}">expire date</td>
             <td th:text="${contract.getProduct().getName()}">service name</td>
             <td th:text="${#numbers.formatDecimal(contract.getSum(),1,2)}+' MDL'">sum</td>
-            <td th:text="${contract.getStatus()}"></td>
-            <td sec:authorize="hasAuthority('COMPANY')">
+            <td th:text="${contract.getStatus()}" id="status"
+                th:value="${contract.getStatus().name()}"></td>
+            <td>
                 <button type="button" class="btn btn-info btn-sm" role="button"
-                        th:id="${contract.getId()}" onclick="createNewInvoice(this)">Create invoice</button>
+                        th:id="${contract.getId()}"
+                        onclick="signContract(this)">Sign
+                </button>
+            </td>
+            <td>
+                <button type="button" class="btn btn-info btn-sm" role="button"
+                        th:id="${contract.getId()}"
+                        sec:authorize="hasAuthority('COMPANY')"
+                        onclick="createNewInvoice(this)">Create invoice
+                </button>
             </td>
             <td>
                 <button type="button" class="btn btn-warning btn-sm" role="button"
-                        th:id="${contract.getId()}" onclick="deleteContract(this)">Delete</button>
+                        th:id="${contract.getId()}" onclick="deleteContract(this)">Delete
+                </button>
             </td>
         </tr>
         </tbody>
@@ -99,6 +99,134 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalSignConfirm" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Do you want to sign this contract?</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-control">
+                    <label class="col-sm-3 control-label">Current status:</label>
+                    <div class="col-sm-6">
+                        <p id="currentContractStatus"></p>
+                        <input id="signContractId" value="" type="hidden"/>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer modal_btn">
+                <button id="btn_sign_contract" type="button" class="btn btn-primary">Sign</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalContract" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Contract details</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Issue date</label>
+                        <div class="col-sm-6">
+                            <input type="date" class="form-control" id="issueDate" required="required"/>
+                            <p class="error-message" id="issueDateError" style="display: none"> validation error</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Expire date</label>
+                        <div class="col-sm-6">
+                            <input type="date" class="form-control" id="expireDate" required="required"/>
+                            <p class="error-message" id="expireDateError" style="display: none">validation error</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Company</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="companyA" readonly/>
+                            <input type="hidden" class="form-control" id="companyIdA"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Customer</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="customerSelect" required="required">
+                                <option value="0">--select--</option>
+                            </select>
+                            <p class="error-message" id="customerSelectError" style="display: none">validation
+                                error</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Service</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="productSelect" required="required">
+                                <option value="0">--select--</option>
+                            </select>
+                            <p class="error-message" id="productSelectError" style="display: none">validation
+                                error</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Sum</label>
+                        <div class="col-sm-6">
+                            <input type="number" class="form-control" id="sumA" readonly/>
+                            <p class="error-message" id="sumAError" style="display: none">validation error</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Signature</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="statusA">
+                                <option selected>Signed</option>
+                                <option>Unsigned</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-6 col-xs-offset-3">
+                            <button type="submit" id="btn_save_contract" class="btn btn-info">Save</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalAlert" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 id="alertMessage"></h4>
+            </div>
+            <div class="modal-footer modal_btn">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 
 <script>
@@ -113,9 +241,9 @@
     $('#btn_delete_contract').click(function () {
         $.ajax(
             {
-                url: "/contract/deleteContract",
+                url: "/contractRest/deleteContract",
                 type: "POST",
-                data: {"contractId" : $('#deleteContractId').val()},
+                data: {"contractId": $('#deleteContractId').val()},
                 success: function () {
                     $("#modalDeleteConfirm").modal("hide");
                     location.reload();
@@ -128,6 +256,185 @@
 
     }
 
+    function loadAllCustomers() {
+        $('#customerSelect').find('option').each(function () {
+            if ($(this).text() != '--select--') {
+                $(this).remove();
+            }
+        })
+        $.ajax(
+            {
+                url: "/customerRest/getAllFullNames",
+                type: "GET",
+                success: function (result) {
+                    $.each(result, function (id, fullName) {
+                        $("#customerSelect").append("<option value='" + id + "'>" + fullName + "</option>")
+                    });
+                }
+            }
+        )
+    }
+
+    function loadProducts(companyId) {
+        $('#productSelect').find('option').each(function () {
+            if ($(this).text() != '--select--') {
+                $(this).remove();
+            }
+        })
+        $.ajax(
+            {
+                url: "/productRest/getAllByCompanyId",
+                type: "GET",
+                data: {"companyId": companyId},
+                success: function (result) {
+                    $.each(result, function (id, name) {
+                        $("#productSelect").append("<option value='" + id + "'>" + name + "</option>")
+                    });
+                }
+            }
+        )
+    }
+
+    function loadCompanyName(companyId) {
+        $.ajax(
+            {
+                url: "/companyRest/getNameById",
+                type: "GET",
+                data: {"companyId": companyId},
+                success: function (result) {
+                    $('#companyA').val(result);
+                }
+            }
+        )
+    }
+
+    $('#productSelect').change(function () {
+        var productId = $(this).val();
+        $.ajax(
+            {
+                url: "/productRest/getPriceById",
+                type: "GET",
+                data: {"productId": productId},
+                success: function (result) {
+                    $('#sumA').val(result);
+                }
+            }
+        )
+    })
+
+
+    function createNewContract(btn) {
+        clearErrors();
+        var companyId = btn.id;
+        var now = new Date();
+        var day = ("0" + now.getDate()).slice(-2);
+        var month = ("0" + (now.getMonth() + 1)).slice(-2);
+        var today = now.getFullYear() + "-" + (month) + "-" + (day);
+        $('#issueDate').val(today);
+        $('#expireDate').val(null);
+        $('#companyIdA').val(companyId);
+        $('#sumA').val('0.0');
+        loadCompanyName(companyId);
+        loadAllCustomers();
+        loadProducts(companyId);
+    };
+
+    $("#btn_save_contract").click(function (event) {
+
+        event.preventDefault();
+        $('#alertMessage').text('');
+
+        var newContractData = {
+            "issueDate": $("#issueDate").val(),
+            "expireDate": $("#expireDate").val(),
+            "sum": $("#sumA").val(),
+            "status": ($("#statusA").val() === 'Signed' ? "SIGNED_BY_COMPANY" : "UNSIGNED"),
+            "companyId": $("#companyIdA").val(),
+            "customerId": $("#customerSelect").val(),
+            "productId": $("#productSelect").val()
+        }
+
+        $.ajax(
+            {
+                url: "/contractRest/newContract",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(newContractData),
+                success: function (response) {
+
+                    if (response.status === 'FAIL') {
+                        var allErrors = response.errorMessageList;
+                        for (i = 0; i < allErrors.length; i++) {
+                            var currFieldName = allErrors[i].fieldName;
+                            var currErrorMessage = allErrors[i].message;
+                            $('#' + currFieldName).parent().addClass('has-error');
+                            $('#' + currFieldName + 'Error').text(currErrorMessage);
+                            $('#' + currFieldName + 'Error').show();
+                        }
+                    } else {
+                        $('#modalContract').modal('hide');
+                        $('#alertMessage').text('New contract was added successful');
+                        location.reload();
+                        $('#modalAlert').modal('show');
+                    }
+                },
+
+                error: function (exception) {
+                    alert('Error: ' + exception);
+
+                }
+            }
+        )
+    })
+
+    function clearErrors() {
+        $('#issueDate').focus(function () {
+            $('#issueDate').parent().removeClass('has-error');
+            $('#issueDateError').hide();
+        })
+        $('#expireDate').focus(function () {
+            $('#expireDateError').hide();
+            $('#expireDate').parent().removeClass('has-error');
+        })
+        $('#customerSelect').focus(function () {
+            $('#customerSelectError').hide();
+            $('#customerSelect').parent().removeClass('has-error');
+        })
+        $('#productSelect').focus(function () {
+            $('#productSelectError').hide();
+            $('#productSelect').parent().removeClass('has-error');
+        })
+        $('#sumA').focus(function () {
+            $('#sumAError').hide();
+            $('#sumA').parent().removeClass('has-error');
+        })
+    }
+
+    function signContract(btn) {
+
+        var row = $("#row" + btn.id);
+        $('#modalSignConfirm').modal('show');
+        $('#signContractId').val(btn.id);
+        $('#currentContractStatus').text(row.find('#status').text());
+
+    }
+
+    $('#btn_sign_contract').click(function () {
+        $.ajax(
+            {
+                url: "/contractRest/signContract",
+                type: "POST",
+                data: {
+                    "contractId": $('#signContractId').val()
+                },
+                success: function (result) {
+                    $("#modalSignConfirm").modal("hide");
+                    var row = $("#row" + $("#signContractId").val());
+                    row.find('#status').text(result);
+                }
+            }
+        )
+    })
 
 </script>
 

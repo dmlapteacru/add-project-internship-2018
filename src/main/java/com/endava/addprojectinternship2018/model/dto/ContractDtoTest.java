@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -25,7 +26,7 @@ public class ContractDtoTest {
     @DecimalMin("0.0")
     private double sum;
 
-    @NotNull
+    @NotEmpty
     private String status;
 
     @NotNull

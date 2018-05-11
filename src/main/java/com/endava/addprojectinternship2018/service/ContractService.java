@@ -17,6 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.endava.addprojectinternship2018.model.enums.ContractStatus.SIGNED_BY_CUSTOMER;
+import static com.endava.addprojectinternship2018.model.enums.ContractStatus.UNSIGNED;
+import static com.endava.addprojectinternship2018.model.enums.ContractStatus.SIGNED_BY_COMPANY;
+import static com.endava.addprojectinternship2018.model.enums.ContractStatus.ACTIVE;
+
 @Service
 public class ContractService {
 
@@ -69,7 +74,7 @@ public class ContractService {
         Optional<Contract> contractOptional = contractDao.findById(contractId);
         User currentUser = userUtil.getCurrentUser();
         if (contractOptional.isPresent()) {
-            if (currentUser.getRole() == Role.CUSTOMER && contractOptional.get().getStatus() != ContractStatus.SIGNED_BY_CUSTOMER) {
+            if (currentUser.getRole() == Role.CUSTOMER && contractOptional.get().getStatus() != SIGNED_BY_CUSTOMER) {
                 return contractOptional.get().getStatus() + " contract can not be deleted";
             }
             contractDao.delete(contractOptional.get());
@@ -164,6 +169,40 @@ public class ContractService {
         contractDto.setStatus(ContractStatus.UNSIGNED);
 
         return contractDto;
+    }
+
+    @Transactional
+    public String signContract(int contractId) {
+
+        Contract currentContract = contractDao.findById(contractId).get();
+        ContractStatus currentStatus = currentContract.getStatus();
+        ContractStatus newStatus = currentStatus;
+        User currentUser = userUtil.getCurrentUser();
+
+        switch (currentUser.getRole()) {
+            case CUSTOMER:
+                if (currentStatus == UNSIGNED) {
+                    newStatus = SIGNED_BY_CUSTOMER;
+                } else if (currentStatus == SIGNED_BY_COMPANY) {
+                    newStatus = ACTIVE;
+                }
+                break;
+            case COMPANY:
+                if (currentStatus == UNSIGNED) {
+                    newStatus = SIGNED_BY_COMPANY;
+                } else if (currentStatus == SIGNED_BY_CUSTOMER) {
+                    newStatus = ACTIVE;
+                }
+                break;
+        }
+
+        if (newStatus != currentStatus) {
+            currentContract.setStatus(newStatus);
+            contractDao.save(currentContract);
+        }
+
+        return newStatus.toString();
+
     }
 
 }

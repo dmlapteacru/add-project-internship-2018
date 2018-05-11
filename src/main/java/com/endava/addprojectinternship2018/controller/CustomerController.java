@@ -79,7 +79,7 @@ public class CustomerController {
         }
 
         customerService.saveCustomer(customerDto);
-        return "redirect:/customer";
+        return "redirect:/customer/home";
     }
 
     @GetMapping(value = "contracts")
