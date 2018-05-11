@@ -3,6 +3,8 @@ package com.endava.addprojectinternship2018.controller;
 import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.model.dto.CompanyDto;
 import com.endava.addprojectinternship2018.model.dto.ContractDto;
+import com.endava.addprojectinternship2018.model.dto.ProductDto;
+import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.service.*;
 import com.endava.addprojectinternship2018.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,12 +55,15 @@ public class CompanyController {
     public String showCompanyContracts(@ModelAttribute(name = "errorMessage") String errorMessage, Model model) {
 
         int currentCompanyId = userUtil.getCurrentCompany().getId();
+        String currentCompanyName = userUtil.getCurrentCompany().getName();
         List<Contract> contractList = contractService.getAllByCompanyId(currentCompanyId);
 
         model.addAttribute("contractList", contractList);
         model.addAttribute("customerId", 0);
         model.addAttribute("companyId", currentCompanyId);
+        model.addAttribute("companyName", currentCompanyName);
         model.addAttribute("productId", 0);
+        model.addAttribute("status", InvoiceStatus.ISSUED);
 
         return "contract/contractListPage";
     }
