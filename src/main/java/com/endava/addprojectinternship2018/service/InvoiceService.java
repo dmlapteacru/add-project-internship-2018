@@ -54,8 +54,7 @@ public class InvoiceService {
     }
 
     public List<Invoice> getInvoicesByCompanyId(int id){
-
-        return invoiceDao.findByContractId(id);
+        return invoiceDao.findAllByContract_Company_IdOrderById(id);
     }
 
     public List<Invoice> getInvoicesByCompany(String name){

@@ -39,6 +39,7 @@
                                                                 placeholder="Company name" disabled></th>
             <th sec:authorize="hasAuthority('COMPANY')"><input type="text" class="form-control"
                                                                placeholder="Customer name" disabled></th>
+            <!--<th><input type="text" class="form-control" placeholder="Contract ID" disabled></th>-->
             <th><input type="text" class="form-control" placeholder="Issue date" disabled></th>
             <th><input type="text" class="form-control" placeholder="Expire date" disabled></th>
             <th><input type="text" class="form-control" placeholder="Service name" disabled></th>
@@ -49,18 +50,17 @@
         </thead>
         <tbody>
         <tr th:each="contract : ${contractList}" th:id="${'row'+contract.getId()}">
-
+            <!--style="display:none;"-->
             <td sec:authorize="hasAuthority('CUSTOMER')" th:text="${contract.getCompany().getName()}">company name</td>
             <td sec:authorize="hasAuthority('COMPANY')" th:id="customer" th:text="${contract.getCustomer().getFullName()}">customer
                 name
             </td>
-            <td th:id="${'issueDate'+contract.getId()}" th:text="${#temporals.format(contract.getIssueDate(),'dd MMM yyyy')}">issue date</td>
-            <td th:id="${'issueDateOriginal'+contract.getId()}" th:text="${contract.getIssueDate()}">Original issue date</td>
-
+            <td th:id="contractId" th:text="${contract.getId()}" th:value="${contract.getId()}"  style="display: none"></td>
+            <td th:id="issueDate" th:text="${#temporals.format(contract.getIssueDate(),'dd MMM yyyy')}">issue date</td>
             <td th:id="${'dueDate'+contract.getId()}" th:text="${#temporals.format(contract.getExpireDate(),'dd MMM yyyy')}">expire date</td>
-            <td th:id="${'serviceName'+contract.getId()}" th:if="${contract.getProduct()!=null}" th:text="${contract.getProduct().getName()}">service name</td>
+            <td th:id="productName" th:if="${contract.getProduct()!=null}" th:text="${contract.getProduct().getName()}">service name</td>
             <td  th:if="${contract.getProduct()==null}" >There is no product</td>
-            <td th:id="sum" th:text="${#numbers.formatDecimal(contract.getSum(),1,2)}+' MDL'">sum</td>
+            <td th:id="sum" th:text="${#numbers.formatDecimal(contract.getSum(),1,2)+' MDL'}">sum</td>
             <td th:id="status" th:text="${contract.getStatus()}"
                 th:value="${contract.getStatus().name()}">Status</td>
             <td sec:authorize="hasAuthority('COMPANY')">
@@ -100,16 +100,17 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Company</label>
                         <div class="col-sm-6">
-                            <input type="hidden" id="companyNameTr" th:value="${companyName}">
-                            <input type="text" class="form-control" id="companyA" readonly/>
-                            <input type="hidden" class="form-control" id="companyIdA"/>
+                            <input type="hidden" id="company_inv_in" th:value="${companyName}">
+                            <input type="text" class="form-control" id="company_inv_out" readonly/>
+                            <input type="text" class="form-control" id="contract_inv_ID" style="display: none"/>
+                            <!--<input type="hidden" class="form-control" id="companyIdA"/>-->
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Customer</label>
                         <div class="col-sm-6">
-                            <input type="text" class="form-control" id="customerName" value="" readonly/>
+                            <input type="text" class="form-control" id="customer_inv_name" value="" readonly/>
                             <!--<input type="hidden" class="form-control" id="customerIdA"/>-->
                         </div>
                     </div>
@@ -117,16 +118,16 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Issue date</label>
                         <div class="col-sm-6">
-                            <input type="date" class="form-control" id="issueDate" required="required"/>
-                            <p class="error-message" id="issueDateError" style="display: none"> validation error</p>
+                            <input type="date" class="form-control" id="issue_inv_date" required="required"/>
+                            <!--<p class="error-message" id="issueDateError" style="display: none"> validation error</p>-->
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Expire date</label>
                         <div class="col-sm-6">
-                            <input type="date" class="form-control" id="expireDate" required="required"/>
-                            <p class="error-message" id="expireDateError" style="display: none">validation error</p>
+                            <input type="date" class="form-control" id="expire_inv_date" required="required"/>
+                            <!--<p class="error-message" id="expireDateError" style="display: none">validation error</p>-->
                         </div>
                     </div>
 
@@ -134,23 +135,23 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Service</label>
                         <div class="col-sm-6">
-                            <input type="text" class="form-control" id="productA" value="" readonly/>
-                            <input type="hidden" class="form-control" id="productIdA"/>
+                            <input type="text" class="form-control" id="product_inv" value="" readonly/>
+                            <!--<input type="hidden" class="form-control" id="productIdA"/>-->
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Sum</label>
                         <div class="col-sm-6">
-                            <input type="text" class="form-control" id="sumA" readonly/>
+                            <input type="number" class="form-control" id="sum_inv" />
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Status</label>
                         <div class="col-sm-6">
-                            <input type="hidden" id="statusA" th:value="${status}">
-                            <input type="text" class="form-control" id="statusB" readonly/>
+                            <input type="hidden" id="status_inv_in" th:value="${status}">
+                            <input type="text" class="form-control" id="status_inv_out" readonly/>
 
 
                             <!--<select class="form-control" id="statusA">-->
@@ -345,30 +346,78 @@
     })
 
     function createNewInvoice(btn) {
+
         var row = $("#row" + btn.id);
-        var id = btn.id;
-
-        // var issueDate = new Date();
-        // console.log(issueDate);
-        // var now = new Date();
-        // var day = ("0" + now.getDate()).slice(-2);
-        // var month = ("0" + (now.getMonth() + 1)).slice(-2);
-        // var today = now.getFullYear() + "-" + (month) + "-" + (day);
-        // console.log(today);
-
-        var serviceName = $("#serviceName"+id);
         var issueDate= new Date();
 
-        $('#issueDate').val(moment(issueDate).format('YYYY-MM-DD'));
-        $('#companyA').val($('#companyNameTr').val());
-        $('#statusB').val($('#statusA').val());
-        $('#customerName').val(row.find("#customer").text());
-        $('#productA').val(serviceName.text());
-        $('#sumA').val(row.find("#sum").text());
+        // console.log(row.find("#contractId").text());
+
+        $('#issue_inv_date').val(moment(issueDate).format('YYYY-MM-DD'));
+        $('#company_inv_out').val($('#company_inv_in').val());
+        $('#status_inv_out').val($('#status_inv_in').val());
+        $('#customer_inv_name').val(row.find("#customer").text());
+        $('#product_inv').val(row.find("#productName").text());
+        $('#sum_inv').val(parseFloat(row.find("#sum").text()));
+        $('#contract_inv_ID').val(row.find("#contractId").text());
+
+        console.log('Contract ID: '+$("#contract_inv_ID").val());
+        console.log($('#customer_inv_name').val());
+        console.log($('#product_inv').val());
+        console.log($('#sum_inv').val());
+        console.log($('#status_inv_out').val());
+        console.log($('#issue_inv_date').val());
+        console.log($('#expire_inv_date').val());
+
 
         $("#createInvoiceDialog").modal();
 
     }
+
+    function saveInvoiceButton() {
+
+        var issueDate = $("#issue_inv_date").val();
+        var expireDate = $("#expire_inv_date").val();
+        var contractID = $("#contract_inv_ID").val();
+        var sum = $("#sum_inv").val();
+        var status = $("#status_inv_out").val();
+
+        var data = {
+            issueDate: issueDate,
+            dueDate: expireDate,
+            contractId: contractID,
+            status: status,
+            sum: sum
+        };
+        editAjax(data);
+    }
+
+    function editAjax(data) {
+        $.ajax({
+            type: "POST",
+            url: "/restinvoice/createInvoice",
+            // The key needs to match your method's input parameter (case-sensitive).
+            data: JSON.stringify(data),
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                console.log(data);
+                console.log("success");
+                // $("#dueDate" + data.id).text(moment(data.dueDate, 'YYYY-MM-DD').format('DD-MM-YYYY'));
+                // $("#sum" + data.id).text(data.sum);
+                $("#createInvoiceDialog").modal('hide')
+                $('#alertMessage').text('New contract was added successful');
+                $('#modalAlert').modal('show');
+            },
+            error: function (errMsg, a, b) {
+                alert("Please call admins")
+                console.log("fail")
+                console.log(errMsg)
+                console.log(a)
+                console.log(b)
+
+            }
+        });
+    }
+
 
     function loadAllCustomers() {
         $('#customerSelect').find('option').each(function () {
@@ -549,16 +598,6 @@
             }
         )
     })
-
-    function saveInvoiceButton() {
-        var id = $("#input_invoice_id").text();
-        var dueDate = $("#input_due_date").val();
-        var sum = $("#input_sum").val();
-        var data = {
-            sum: sum, dueDate: dueDate, id: id
-        };
-        editAjax(data);
-    }
 
 </script>
 
