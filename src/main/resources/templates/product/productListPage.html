@@ -77,7 +77,7 @@
                 <a sec:authorize="hasAuthority('CUSTOMER')" data-toggle="modal" data-target="#modalContract"
                    class="btn btn-info btn-sm" role="button" th:id="${product.getId()}"
                    onclick="createNewContract(this)">create new contract</a>
-             </td>
+            </td>
 
         </tr>
         </tbody>
@@ -100,12 +100,15 @@
                     <label>Category name</label>
                     <select id="select_category"></select>
                     <label>Name</label>
-                    <input id="new_service_name" type="text" required/>
+                    <input id="new_service_name" type="text" required="required"/>
+                    <p id="new_service_nameError" style="color: red; display: none"> validation error</p>
                     <label>Price</label>
-                    <input id="new_service_price" type="number" min="0" step="0.01" value="0.0" required/>
+                    <input id="new_service_price" type="number" min="0" step="0.01" value="0.0" required="required"/>
+                    <p id="new_service_priceError" style="color: red;display: none"> validation error</p>
                     <label>Description</label>
-                    <input id="new_service_desc" type="text" required/>
-                    <p id="error_service" style="color: #FF1C19"></p>
+                    <input id="new_service_desc" type="text" required="required"/>
+                    <p id="new_service_descError" style="color: red; display: none"> validation error</p>
+                    <p id="error_service" style="color: red"></p>
                 </div>
                 <div class="modal-footer modal_btn">
                     <button type="button" style="display: none;" class="btn"></button>
@@ -221,6 +224,7 @@
 <script>
 
     function getCategories() {
+        clearErrors();
         $("#new_service_name").val("");
         $("#new_service_desc").val("");
         $("#new_service_price").val("0.0");
@@ -235,23 +239,31 @@
     }
 
     function loadCategories(data) {
+        $('#select_category').find('option').each(function () {
+            $(this).remove();
+        });
         $.each(data, function (id, object) {
             var categoryID = object.id;
             $.each(object, function (key, value) {
-                if (key == "name"){
+                if (key == "name") {
                     $("#select_category").append("<option id='" + categoryID + "'>" + value + "</option>")
                 }
             });
         });
     }
 
-    $("#save_btn_service").click(function () {
-        if ($("#new_service_name").val() != "" && $("#new_service_desc").val() != "" && $("#new_service_price").val() != "0.0") {
+    $("#save_btn_service").click(function (event) {
+
+        event.preventDefault();
+
+        if ($("#new_service_name").val() !== "" &&
+            $("#new_service_desc").val() !== "" &&
+            $("#new_service_price").val() !== "0.0") {
             var newServiceData = {
                 "name": $("#new_service_name").val(),
                 "price": $("#new_service_price").val(),
-                "company_id": $("#company_id").text(),
-                "category_id": $("#select_category").children(":selected").attr("id"),
+                "companyId": $("#company_id").text(),
+                "categoryId": $("#select_category").children(":selected").attr("id"),
                 "description": $("#new_service_desc").val()
             }
 
@@ -261,7 +273,21 @@
                     type: "post",
                     contentType: "application/json",
                     data: JSON.stringify(newServiceData),
-                    success: function () {
+                    success: function (response) {
+                        if (response.status === 'FAIL') {
+                            var allErrors = response.errorMessageList;
+                            for (i = 0; i < allErrors.length; i++) {
+                                var currFieldName = allErrors[i].fieldName;
+                                $('#' + currFieldName + 'Error').text(allErrors[i].message);
+                                $('#' + currFieldName + 'Error').show();
+                            }
+                        } else {
+                            $('#modalService').modal('hide');
+                            location.reload();
+                        }
+                    },
+                    error: function (exception) {
+                        alert('Error: ' + exception);
                     }
                 }
             )
@@ -314,9 +340,9 @@
                         for (i = 0; i < allErrors.length; i++) {
                             var currFieldName = allErrors[i].fieldName;
                             var currErrorMessage = allErrors[i].message;
-                            $('#'+currFieldName).parent().addClass('has-error');
-                            $('#'+currFieldName+'Error').text(currErrorMessage);
-                            $('#'+currFieldName+'Error').show();
+                            $('#' + currFieldName).parent().addClass('has-error');
+                            $('#' + currFieldName + 'Error').text(currErrorMessage);
+                            $('#' + currFieldName + 'Error').show();
                         }
                     } else {
                         $('#modalContract').modal('hide');
@@ -332,7 +358,7 @@
             }
         )
     });
-    
+
     function clearErrors() {
         $('#issueDate').focus(function () {
             $('#issueDate').parent().removeClass('has-error');
@@ -341,6 +367,12 @@
         $('#expireDate').focus(function () {
             $('#expireDateError').hide();
             $('#expireDate').parent().removeClass('has-error');
+        })
+        $('#new_service_name').focus(function () {
+            $('#new_service_nameError').hide();
+        })
+        $('#new_service_price').focus(function () {
+            $('#new_service_priceError').hide();
         })
     }
 

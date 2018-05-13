@@ -16,10 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -210,9 +207,42 @@ public class RestController {
     }
 
     @RequestMapping(value = "/companyRest/newService", method = POST)
-    public String addNewService(@RequestBody ProductDtoTest product) {
-        productService.save(product);
-        return "OK";
+    public @ResponseBody
+    ValidationResponse addNewService(@RequestBody @Valid ProductDtoTest productDtoTest,
+                                BindingResult bindingResult) {
+
+        ValidationResponse response = new ValidationResponse();
+        response.setStatus("SUCCESS");
+        final List<ErrorMessage> errorMessageList = new ArrayList<>();
+
+        if (bindingResult.hasErrors()) {
+            response.setStatus("FAIL");
+            bindingResult.getFieldErrors().stream()
+                    .map(fieldError -> new ErrorMessage(fieldError.getField(), fieldError.getDefaultMessage()))
+                    .forEach(errorMessageList::add);
+        }
+
+        if (productDtoTest.getPrice() < 0) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_service_price", "Price cannot be negative"));
+        }
+
+        Optional<Product> optionalProduct = productService.getByNameAndCategoryIdAndCompanyId(
+                productDtoTest.getName(),
+                productDtoTest.getCategoryId(),
+                productDtoTest.getCompanyId());
+        if (optionalProduct.isPresent()) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_service_name", "Service name exists"));
+        }
+
+        response.setErrorMessageList(errorMessageList);
+
+        if (response.getStatus().equals("SUCCESS")) {
+            productService.save(productDtoTest);
+        }
+
+        return response;
     }
 
     @RequestMapping(value = "/admin/messages", method = RequestMethod.GET)

@@ -44,6 +44,10 @@ public class ProductService {
         return productDao.findByNameAndCompanyId(name, companyId);
     }
 
+    public Optional<Product> getByNameAndCategoryIdAndCompanyId(String name, int categoryId, int companyId) {
+        return productDao.findByNameAndCategoryIdAndCompanyId(name, categoryId, companyId);
+    }
+
     public Optional<Product> getByNameAndCategoryId(String name, int categoryId) {
         return productDao.findByNameAndCategoryId(name, categoryId);
     }
@@ -90,8 +94,8 @@ public class ProductService {
         product.setName(productDtoTest.getName());
         product.setDescription(productDtoTest.getDescription());
         product.setPrice(productDtoTest.getPrice());
-        product.setCategory(categoryService.getCategoryById(productDtoTest.getCategory_id()));
-        product.setCompany(companyService.getCompanyById(productDtoTest.getCompany_id()).get());
+        product.setCategory(categoryService.getCategoryById(productDtoTest.getCategoryId()));
+        product.setCompany(companyService.getCompanyById(productDtoTest.getCompanyId()).get());
         return product;
     }
 
