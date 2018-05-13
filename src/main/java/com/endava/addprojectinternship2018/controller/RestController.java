@@ -130,7 +130,8 @@ public class RestController {
             bindingResult.getFieldErrors().stream()
                     .map(fieldError -> new ErrorMessage(fieldError.getField(), fieldError.getDefaultMessage()))
                     .forEach(errorMessageList::add);
-        } else if (contractDtoTest.getExpireDate().isBefore(contractDtoTest.getIssueDate())) {
+        }
+        if (contractDtoTest.getExpireDate().isBefore(contractDtoTest.getIssueDate())) {
             response.setStatus("FAIL");
             errorMessageList.add(new ErrorMessage("expireDate", "can not be more than issue date"));
         }

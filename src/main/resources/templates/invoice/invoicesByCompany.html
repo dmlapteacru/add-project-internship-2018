@@ -15,6 +15,54 @@
     <script th:src="@{/js/moment.js}"></script>
 
     <script>
+
+        $(document).ready(function(){
+            console.log("document ready")
+            $("table.table tbody input[type=checkbox]").change(function(){
+                console.log(" onCHanged")
+                calculateTotalSum();
+            })
+        })
+
+        function selectAllCheckBoxes() {
+            var selectedRows = $('table.table tbody input[type=checkbox]');
+            console.log($("#check_all"));
+            if ($("#check_all").prop("checked")) {
+
+                for (var i = 0; i < selectedRows.length; i++) {
+                    selectedRows[i].checked = true;
+                    //selectedRows[i].attr('checked', true);
+                }
+                calculateTotalSum();
+            } else {
+                for (var i = 0; i < selectedRows.length; i++) {
+                    selectedRows[i].checked = false;
+                    calculateTotalSum();
+                    //selectedRows[i].attr('checked', true);
+                }
+            }
+
+
+        }
+
+        function calculateTotalSum() {
+            var selectedRows = $( 'table.table tbody input[type=checkbox]:checked');
+            console.log( 'selectedRows:', selectedRows );
+            var ids=[];
+            for(var i=0;i<selectedRows.length;i++){
+                ids.push(selectedRows[i].id);
+            }
+
+            var totalSum=0;
+            ids.forEach(function(id){
+               totalSum+=parseFloat($("#sum"+id).text());
+            });
+
+            console.log(ids)
+            $('#total_sum').text(totalSum);
+
+        }
+
         function editInvoice(elementFromView) {
             console.log(elementFromView);
             var id = elementFromView.id;
@@ -165,6 +213,7 @@
     <table class="table">
         <thead>
         <tr class="filters">
+            <th> <input type="checkbox" onclick="selectAllCheckBoxes()" th:id="check_all" name="sel" /></th>
             <th><input type="text" class="form-control" placeholder="Issue Date" disabled></th>
             <th><input type="text" class="form-control" placeholder="Expire Date" disabled></th>
             <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
@@ -173,11 +222,11 @@
             <th><input type="text" class="form-control" placeholder="Full Name" disabled></th>
         </tr>
         </thead>
-
+        <tbody>
         <tr th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">
-
+            <td><input type="checkbox" th:id="${invoice.getId()}" name="sel" /></td>
             <td th:id="${'issueDate'+invoice.getId()}"
-                th:text="${#temporals.format(invoice.getIssueDate(), 'dd-MM-yyyy')} ">Issue Date
+                th:text="${#temporals.format(invoice.getIssueDate(), 'dd-MM-yyyy')} "> Issue Date
             </td>
             <td th:id="${'dueDate'+invoice.getId()}" th:text="${#temporals.format(invoice.getDueDate(), 'dd-MM-yyyy')}">
                 Expire Date
@@ -202,10 +251,25 @@
             <td>
                 <a th:id="${invoice.id}" onclick="editInvoice(this)" class="btn">UPDATE</a>
             </td>
+        </tr><br>
+        <tr>
+            <!--<td><a onclick="calculateTotalSum()" class="btn btn-danger">Choose All</a></td>-->
+            <!--<button id="save_btn" onclick="editInvoiceButton()" type="button" class="btn btn-success">-->
+            <td></td>
+            <td></td>
+            <td>Total Sum</td>
+            <td><p id="total_sum" class="form-control" type="text" step="0.01"></p></td>
         </tr>
+        </tbody>
     </table>
+
 </div>
+
 <br>
+
+<script type="text/javascript">
+
+</script>
 
 </body>
 </html>
