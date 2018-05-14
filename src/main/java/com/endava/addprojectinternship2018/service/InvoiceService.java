@@ -4,6 +4,7 @@ import com.endava.addprojectinternship2018.dao.CompanyDao;
 import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
 import com.endava.addprojectinternship2018.model.Product;
+import com.endava.addprojectinternship2018.model.dto.InvoiceDescriptionPaymentDto;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
 import com.endava.addprojectinternship2018.model.User;
@@ -96,7 +97,6 @@ public class InvoiceService {
         return invoiceDto;
     }
 
-
     public void changeInvoiceStatus(int invoiceId) {
         Invoice invoice = invoiceDao.findById(invoiceId).get();
         if (invoice.getStatus() == InvoiceStatus.ACTIVE) {
@@ -114,4 +114,7 @@ public class InvoiceService {
         invoiceDao.save(invoice);
     }
 
+    public InvoiceDescriptionPaymentDto setInvoiceDescription(int id){
+       return invoiceDao.setInvoiceDescriptionPayment(id);
+    }
 }

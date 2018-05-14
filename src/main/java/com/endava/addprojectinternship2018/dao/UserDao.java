@@ -32,7 +32,7 @@ public interface UserDao extends JpaRepository<User, Integer> {
             "from User a " +
             "left join Company co on a.id = co.user " +
             "left join Customer cu on a.id=cu.user where a.username=:username")
-    public UserEmailDto findUsersEmailByUsername(@Param("username") String username);
+    UserEmailDto findUsersEmailByUsername(@Param("username") String username);
 
     @Query("select new com.endava.addprojectinternship2018.model.dto.UserBankAccountDto(" +
             "case when co.id is not null then co.countNumber when cu.id is not null then cu.countNumber else null end," +
@@ -41,5 +41,5 @@ public interface UserDao extends JpaRepository<User, Integer> {
             "left join Company co on a.id=co.user " +
             "left join Customer cu on a.id=cu.user " +
             "where a.username=:username")
-    public UserBankAccountDto findUserBankAccountByUsername(@Param("username") String username);
+    UserBankAccountDto findUserBankAccountByUsername(@Param("username") String username);
 }

@@ -5,6 +5,8 @@ import com.endava.addprojectinternship2018.model.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,13 +21,7 @@ public class CategoryService {
     }
 
     public void saveCategory(Category category){
-        Optional<Category> oldCategory = categoryDao.findById(category.getId());
-        if (oldCategory.isPresent()){
-            oldCategory.get().setDescription(category.getDescription());
-            categoryDao.save(oldCategory.get());
-        } else {
-            categoryDao.save(category);
-        }
+        categoryDao.save(category);
     }
 
     public void deleteCategory(int id){
@@ -34,5 +30,9 @@ public class CategoryService {
 
     public Category getCategoryById(int id){
         return categoryDao.getOne(id);
+    }
+
+    public Optional<Category> getCategoryByName(String name) {
+       return categoryDao.findByName(name);
     }
 }

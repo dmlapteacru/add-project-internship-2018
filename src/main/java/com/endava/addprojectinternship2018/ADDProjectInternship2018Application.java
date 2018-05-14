@@ -36,6 +36,7 @@ public class ADDProjectInternship2018Application {
 	@Bean
 	@Qualifier("bank_ip")
 	public String bankIP(){
-		return "http://172.17.100.255:82/api";
+		return "http://localhost:64509/api";
 	}
+
 }

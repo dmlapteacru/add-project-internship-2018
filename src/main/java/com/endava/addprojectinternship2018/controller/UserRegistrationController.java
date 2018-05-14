@@ -44,11 +44,21 @@ public class UserRegistrationController {
         return "redirect:/login";
     }
 
+    @PostMapping(value = "")
+    public String choiceRegistrationForm(@ModelAttribute(name = "choice") String choice){
+        if (choice.equals("CUSTOMER")){
+            return "redirect:/registration/customer";
+        }
+        if (choice.equals("COMPANY")){
+            return "redirect:/registration/company";
+        }
+        return "redirect:/login";
+    }
     @GetMapping(value = "customer")
     public String showCustomerRegistrationForm(Model model) {
         UserDto userDto = new UserDto();
         userDto.setRole(Role.CUSTOMER);
-        userDto.setStatus(UserStatus.INACTIVE);
+        userDto.setStatus(UserStatus.ACTIVE);
         CustomerDto customerDto = new CustomerDto();
         customerDto.setUserDto(userDto);
         model.addAttribute("customerDto", customerDto);
@@ -120,7 +130,7 @@ public class UserRegistrationController {
         }
 
         customerService.saveCustomer(customerDto);
-        return "redirect:/login";
+        return "redirect:/login?error=reg_approval";
     }
 
 }

@@ -13,14 +13,12 @@ body {
     width: 80px;
     height: 25px;
 }
-.logo_wrapper > img {
-
-}
 .menu_wrapper {
     display: flex;
     justify-content: space-between;
     width: 100%;
     padding: 0 10px 0 10px;
+
 }
 .menu_company, .menu_customer {
     display: flex;
