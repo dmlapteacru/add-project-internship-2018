@@ -81,7 +81,7 @@
     <button type="submit" class="btn pull-right btn-success ">Check</button>
 
 </form>
-<div class="alert alert-success alert-dismissible fade in">
+<div id="alert_success" class="alert alert-success alert-dismissible fade in">
     <div id="approval_info">
         <strong id="confirm_alert_message"></strong>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -89,7 +89,7 @@
         </button>
     </div>
 </div>
-<div class="alert alert-danger alert-dismissible fade in">
+<div id="alert_error" class="alert alert-danger alert-dismissible fade in">
     <div id="alert_error_info">
         <strong id="error_alert_message"></strong>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -116,16 +116,16 @@
                 },
                 success: function () {
                     $("#confirm_alert_message").text("Invoice paid.");
-                    $(".alert-success").slideToggle("slow");
+                    $("#alert_success").slideToggle("slow");
                     setTimeout(function () {
-                        $(".alert-success").slideToggle("slow");
+                        $("#alert_success").slideToggle("slow");
                     },5000);
                 },
                 error : function (response) {
                     $("#error_alert_message").text(response.responseText);
-                    $(".alert-danger").slideToggle("slow");
+                    $("#alert_error").slideToggle("slow");
                     setTimeout(function () {
-                        $(".alert-danger").slideToggle("slow");
+                        $("#alert_error").slideToggle("slow");
                     },5000);
                 }
             }
@@ -140,9 +140,9 @@
         if (sum > parseInt($(".balance").text())){
             $("#bulk_pay_sum").css("color", "red");
             $("#error_alert_message").text("Not enough money.");
-            $(".alert-danger").slideToggle("slow");
+            $("#alert_error").slideToggle("slow");
             setTimeout(function () {
-                $(".alert-danger").slideToggle("slow");
+                $("#alert_error").slideToggle("slow");
             },3000);
         } else {
             $("#bulk_pay_sum").css("color", "green");
@@ -190,7 +190,7 @@
             $("#error_alert_message").text("Not enough money.");
             $(".alert-danger").slideToggle("slow");
             setTimeout(function () {
-                $(".alert-danger").slideToggle("slow");
+                $("#alert_error").slideToggle("slow");
             },3000);
         } else {
             var invoiceList = [];
@@ -217,9 +217,9 @@
                     },
                     error: function (response) {
                         $("#error_alert_message").text(response.responseText);
-                        $(".alert-danger").slideToggle("slow");
+                        $("#alert_error").slideToggle("slow");
                         setTimeout(function () {
-                            $(".alert-danger").slideToggle("slow");
+                            $("#alert_error").slideToggle("slow");
                         },5000);
                     }
                 }

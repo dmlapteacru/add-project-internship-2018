@@ -57,9 +57,9 @@ $("#delete_btn_confirm").click(function () {
                     $("#modalDeleteConfirm").modal("hide");
                     $("#categories_btn_req").click();
                     $("#confirm_alert_message").text("Category deleted.")
-                    $(".alert").slideToggle("slow");
+                    $("#alert_success").slideToggle("slow");
                     setTimeout(function () {
-                        $(".alert").slideToggle("slow");
+                        $("#alert_success").slideToggle("slow");
                     },5000);
                 }
             }
@@ -73,9 +73,9 @@ $("#delete_btn_confirm").click(function () {
                 $("#modalDeleteConfirm").modal("hide");
                 $("#messages_read_all_req").click();
                 $("#confirm_alert_message").text("Message deleted.")
-                $(".alert").slideToggle("slow");
+                $("#alert_success").slideToggle("slow");
                 setTimeout(function () {
-                    $(".alert").slideToggle("slow");
+                    $("#alert_success").slideToggle("slow");
                 },5000);
             }
         }
@@ -107,9 +107,9 @@ $("#reset_pass_btn_confirm").click(function () {
             success: function () {
                 $("#modalResetPassConfirm").modal("hide");
                 $("#confirm_alert_message").text("Password reset success.");
-                $(".alert-success").slideToggle("slow");
+                $("#alert_success").slideToggle("slow");
                 setTimeout(function () {
-                    $(".alert-success").slideToggle("slow");
+                    $("#alert_success").slideToggle("slow");
                 },5000);
             }
         }
@@ -141,9 +141,9 @@ $("#save_btn_category").click(function () {
             },
             error: function (request) {
                 $("#error_alert_message").text(request.responseText);
-                $(".alert-danger").slideToggle("slow");
+                $("#alert_error").slideToggle("slow");
                 setTimeout(function () {
-                    $(".alert-danger").slideToggle("slow");
+                    $("#alert_error").slideToggle("slow");
                 },5000);
             }
         }
