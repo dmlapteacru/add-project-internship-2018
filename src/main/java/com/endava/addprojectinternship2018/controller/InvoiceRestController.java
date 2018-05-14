@@ -1,5 +1,6 @@
 package com.endava.addprojectinternship2018.controller;
 
+import com.endava.addprojectinternship2018.dao.InvoiceTransactionDao;
 import com.endava.addprojectinternship2018.model.Contract;
 import com.endava.addprojectinternship2018.model.Invoice;
 import com.endava.addprojectinternship2018.model.dto.InvoiceEditDto;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "restinvoice")
@@ -28,15 +30,15 @@ public class InvoiceRestController {
     private ContractService contractService;
 
     @PostMapping(value = "/editInvoice")
-    public ResponseEntity editNewInvoiceFrom(@RequestBody @Valid InvoiceEditDto dto, BindingResult result){
-    //TODO check if this invoice is of that company
+    public ResponseEntity editNewInvoiceFrom(@RequestBody @Valid InvoiceEditDto dto, BindingResult result) {
+        //TODO check if this invoice is of that company
         //TODO get invoice by id ,change data that comes from modal dialog
         //TODO persist this entity
 
 
-        if (result.hasErrors()){
+        if (result.hasErrors()) {
             new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }else{
+        } else {
             Invoice invoice = invoiceService.getInvoiceById(dto.getId());
             invoice.setDueDate(dto.getDueDate());
             invoice.setSum(dto.getSum());
@@ -46,7 +48,7 @@ public class InvoiceRestController {
     }
 
     @PostMapping(value = "/createInvoice")
-    public ResponseEntity createNewInvoiceFrom(@RequestBody @Valid InvoiceSaveNewDto dto, BindingResult result){
+    public ResponseEntity createNewInvoiceFrom(@RequestBody @Valid InvoiceSaveNewDto dto, BindingResult result) {
         //TODO check if this invoice is of that company
         //TODO get invoice by id ,change data that comes from modal dialog
         //TODO persist this entity
@@ -54,23 +56,33 @@ public class InvoiceRestController {
 
         System.out.println(dto);
 
-        if (result.hasErrors()){
-            new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }else{
+        boolean success = true;
+        Invoice invoice = new Invoice();
 
-            Invoice invoice = new Invoice();
+        if (result.hasErrors()) {
+            success = false;
+        }
 
+        List<Invoice> list = invoiceService.getInvoicesByPeriodAndCompanyAndStatus(dto.getIssueDate().toString(),
+                dto.getContractId(),
+                dto.getStatus().toString());
+
+        if (!list.isEmpty()){
+            success = false;
+        }
+
+        if (success) {
             invoice.setIssueDate(dto.getIssueDate());
             invoice.setDueDate(dto.getDueDate());
             invoice.setStatus(dto.getStatus());
             invoice.setContract(contractService.getById(dto.getContractId()));
-
             System.out.println(contractService.getById(dto.getContractId()));
             invoice.setSum(dto.getSum());
             invoiceService.save(invoice);
-
+            return new ResponseEntity(HttpStatus.OK);
         }
-        return new ResponseEntity(HttpStatus.OK);
+
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
 }

@@ -67,7 +67,7 @@ public class InvoiceController {
             return "invoice/newInvoice";
         }
 
-        invoiceService.saveDto(invoiceDto);
+        invoiceService.saveInvoiceDto(invoiceDto);
         return "redirect:/company/invoices";
 
 

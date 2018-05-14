@@ -3,6 +3,7 @@ package com.endava.addprojectinternship2018.service;
 import com.endava.addprojectinternship2018.dao.CompanyDao;
 import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
+import com.endava.addprojectinternship2018.dao.InvoiceTransactionDao;
 import com.endava.addprojectinternship2018.model.Product;
 import com.endava.addprojectinternship2018.model.dto.InvoiceCustomerViewDto;
 import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
@@ -33,7 +34,10 @@ public class InvoiceService {
     @Autowired
     private InvoiceDao invoiceDao;
 
-    public List<Invoice> getAllInvoices() {
+    @Autowired
+    private InvoiceTransactionDao invoiceTransactionDao;
+
+    public List<Invoice> getAllInvoices(){
         return invoiceDao.findAll();
     }
 
@@ -73,11 +77,15 @@ public class InvoiceService {
         return invoiceDao.findAllByContract_Company_Name(name);
     }
 
-    public void save(Invoice invoice) {
+    public List<Invoice> getInvoicesByPeriodAndCompanyAndStatus(String date, int contract_id, String status){
+        return invoiceTransactionDao.getInvoiceByPeriodContractStatus(date, contract_id, status);
+    }
+
+    public void save(Invoice invoice){
         invoiceDao.save(invoice);
     }
 
-    public void saveDto(InvoiceDto invoiceDto) {
+    public void saveInvoiceDto(InvoiceDto invoiceDto){
         Invoice invoice = new Invoice(invoiceDto.getSum(), invoiceDto.getIssueDate()
                 , invoiceDto.getDueDate(), invoiceDto.getStatus(), invoiceDto.getContract());
         invoiceDao.save(invoice);

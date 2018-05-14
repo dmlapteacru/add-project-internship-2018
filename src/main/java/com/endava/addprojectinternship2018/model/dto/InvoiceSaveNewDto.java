@@ -19,7 +19,7 @@ public class InvoiceSaveNewDto {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate issueDate;
 
-    @NotNull
+    @NotNull(message = "must have a value")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dueDate;
 

@@ -48,7 +48,7 @@ public class InvoiceTransactionDao {
                 "left join contr.customer cust " +
                 "left join contr.company co " +
                 "left join prod.category categ " +
-                "where co.id=co_id ";
+                "where co.id=:co_id ";
 
         StringBuilder builder = new StringBuilder(query);
 
@@ -74,6 +74,28 @@ public class InvoiceTransactionDao {
             query.setParameter("inv_status", invoiceStatus);
         }
         List<Object[]> list = query.getResultList();
+
+        return list;
+    }
+
+    public String checkInvoiceByPeriod(String set_date, int contract_id, String status){
+        String query  = "select inv.id" +
+                "from Invoice inv" +
+                "where set_date >= inv.issueDate " +
+                "and set_date<=inv.dueDate " +
+                "and inv.staus=:status " +
+                "and inv.contract_id=:contract_id";
+        return query;
+    }
+
+    public List<Invoice> getInvoiceByPeriodContractStatus(String date, int contract_id, String status){
+
+        Query query = entityManager.createQuery(checkInvoiceByPeriod(date, contract_id, status));
+        query.setParameter("set_date", date);
+        query.setParameter("contract_id", contract_id);
+        query.setParameter("status", status);
+
+        List<Invoice> list = query.getResultList();
 
         return list;
     }
