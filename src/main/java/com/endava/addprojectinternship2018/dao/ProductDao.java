@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProductDao extends JpaRepository<Product, Integer>{
+public interface ProductDao extends JpaRepository<Product, Integer> {
 
     List<Product> findAll();
 
@@ -27,4 +27,5 @@ public interface ProductDao extends JpaRepository<Product, Integer>{
     void deleteById(int id);
 
     Optional<Product> findByNameAndCategoryId(String name, int categoryId);
+
 }

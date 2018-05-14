@@ -4,6 +4,7 @@ import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.model.dto.ContractDto;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
 import com.endava.addprojectinternship2018.model.dto.ProductDto;
+import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.service.*;
 import com.endava.addprojectinternship2018.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +51,12 @@ public class CustomerController {
             return "error";
         }
         model.addAttribute("customer", currentCustomer);
+        int activeContracts = contractService.countByCustomerAndStatus(currentCustomer.getId(), ContractStatus.ACTIVE);
+        int signedContracts = contractService.countByCustomerAndStatus(currentCustomer.getId(), ContractStatus.SIGNED_BY_CUSTOMER);
+        int unsignedContracts = contractService.countByCustomerAndStatus(currentCustomer.getId(), ContractStatus.UNSIGNED);
+        model.addAttribute("activeContracts", activeContracts);
+        model.addAttribute("signedContracts", signedContracts);
+        model.addAttribute("unsignedContracts", unsignedContracts);
         return "customer/homePage";
     }
 
@@ -83,16 +91,18 @@ public class CustomerController {
     }
 
     @GetMapping(value = "contracts")
-    public String getContractsPage(@ModelAttribute(name = "errorMessage") String errorMessage, Model model) {
+    public String getContractsPage(Model model) {
 
         int currentCustomerId = userUtil.getCurrentCustomer().getId();
         List<Contract> contractList = contractService.getAllByCustomerId(currentCustomerId);
+        List<ContractStatus> contractStatusList = Arrays.asList(ContractStatus.values());
 
         model.addAttribute("contractList", contractList);
-        model.addAttribute("errorMessage", errorMessage);
         model.addAttribute("customerId", currentCustomerId);
         model.addAttribute("companyId", 0);
         model.addAttribute("productId", 0);
+        model.addAttribute("statusListForFilter", contractStatusList);
+
         return "contract/contractListPage";
 
     }
@@ -114,9 +124,9 @@ public class CustomerController {
 
     @GetMapping(value = "services/newcontract")
     public String getProductsPageSignContract(@RequestParam(name = "customerId") int customerId,
-                                           @RequestParam(name = "companyId") int companyId,
-                                           @RequestParam(name = "productId") int productId,
-                                           Model model) {
+                                              @RequestParam(name = "companyId") int companyId,
+                                              @RequestParam(name = "productId") int productId,
+                                              Model model) {
         ContractDto contractDto = contractService.createNewContractDto(customerId, companyId, productId);
         int currentCustomerId = userUtil.getCurrentCustomer().getId();
         List<Product> productList = productService.getAllProducts();

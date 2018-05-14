@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -113,7 +114,7 @@ public class RestController {
         return "OK";
     }
 
-    @RequestMapping(value = "/contractRest/newContract", method = POST)
+    @PostMapping(value = "/contractRest/newContract")
     public @ResponseBody
     ValidationResponse saveNewContract(@Valid @RequestBody ContractDtoTest contractDtoTest,
                                        BindingResult bindingResult) {
@@ -122,30 +123,54 @@ public class RestController {
         response.setStatus("SUCCESS");
         final List<ErrorMessage> errorMessageList = new ArrayList<>();
 
+        if (contractDtoTest.getIssueDate() == null) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_issueDate", "cannot be null"));
+            return response;
+        }
+
+        if (contractDtoTest.getExpireDate() == null) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_expireDate", "cannot be null"));
+            return response;
+        }
+
+        if (contractDtoTest.getExpireDate().isBefore(contractDtoTest.getIssueDate())) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_expireDate", "cannot be more than issue date"));
+        }
+
+        if (contractDtoTest.getProductId() == 0) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_productSelect", "product must be selected"));
+        }
+
+        if (contractDtoTest.getCustomerId() == 0) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_customerSelect", "customer must be selected"));
+        }
+
+        if (contractDtoTest.getSum() == 0) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_sum", "cannot be null"));
+        }
+
         if (bindingResult.hasErrors()) {
             response.setStatus("FAIL");
             bindingResult.getFieldErrors().stream()
                     .map(fieldError -> new ErrorMessage(fieldError.getField(), fieldError.getDefaultMessage()))
                     .forEach(errorMessageList::add);
         }
-        if (contractDtoTest.getExpireDate().isBefore(contractDtoTest.getIssueDate())) {
-            response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("expireDate", "can not be more than issue date"));
-        }
 
-        if (contractDtoTest.getProductId() == 0) {
-            response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("productSelect", "product must be selected"));
-        }
-
-        if (contractDtoTest.getCustomerId() == 0) {
-            response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("customerSelect", "customer must be selected"));
-        }
-
-        if (contractDtoTest.getSum() == 0) {
-            response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("sumA", "must not be null"));
+        Optional<Contract> optionalContract = contractService.getByCustomerIdCompanyIdProductId(
+                contractDtoTest.getCustomerId(),
+                contractDtoTest.getCompanyId(),
+                contractDtoTest.getProductId());
+        if (optionalContract.isPresent()) {
+            if (optionalContract.get().getExpireDate().isAfter(LocalDate.now())) {
+                response.setStatus("FAIL");
+                errorMessageList.add(new ErrorMessage("new_contract", "Duplicate contract exists!"));
+            }
         }
 
         response.setErrorMessageList(errorMessageList);
@@ -209,7 +234,7 @@ public class RestController {
     @RequestMapping(value = "/companyRest/newService", method = POST)
     public @ResponseBody
     ValidationResponse addNewService(@RequestBody @Valid ProductDtoTest productDtoTest,
-                                BindingResult bindingResult) {
+                                     BindingResult bindingResult) {
 
         ValidationResponse response = new ValidationResponse();
         response.setStatus("SUCCESS");
@@ -271,37 +296,38 @@ public class RestController {
         adminMessageService.changeMessageStatus(id);
         return "OK";
     }
+
     @RequestMapping(value = "/admin/message/delete/{id}", method = RequestMethod.DELETE)
-    public String deleteMessage(@PathVariable int id){
+    public String deleteMessage(@PathVariable int id) {
         adminMessageService.deleteById(id);
         return "OK";
     }
 
 
     @RequestMapping(value = "/bankAccount/create", method = POST)
-    public ResponseEntity<UserBankAccountDto> newAccount(){
+    public ResponseEntity<UserBankAccountDto> newAccount() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<>("param", headers);
-        UserBankAccountDto response = restTemplate.postForObject( bankIP +"/bankaccount/create", request , UserBankAccountDto.class );
+        UserBankAccountDto response = restTemplate.postForObject(bankIP + "/bankaccount/create", request, UserBankAccountDto.class);
         userBankAccountService.save(response);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/bankAccount/balance", method = POST)
-    public String getBalance(){
+    public String getBalance() {
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
         headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
         HttpEntity<String> request = new HttpEntity<>("param", headers);
-        String response = restTemplate.postForObject( bankIP +"/bankaccount/balance", request , String.class );
+        String response = restTemplate.postForObject(bankIP + "/bankaccount/balance", request, String.class);
         return response;
     }
 
     @RequestMapping(value = "/bankAccount/addmoney", method = POST)
-    public String addMoney(@RequestParam Double sum){
+    public String addMoney(@RequestParam Double sum) {
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -310,12 +336,12 @@ public class RestController {
         Map<String, Double> body = new HashMap<>();
         body.put("sum", sum);
         HttpEntity<Map> request = new HttpEntity<>(body, headers);
-        String response = restTemplate.postForObject( bankIP +"/bankaccount/addmoney", request , String.class );
+        String response = restTemplate.postForObject(bankIP + "/bankaccount/addmoney", request, String.class);
         return response;
     }
 
     @RequestMapping(value = "/bankAccount/payinvoice", method = POST)
-    public String payInvoice(@RequestBody PaymentDto paymentDto){
+    public String payInvoice(@RequestBody PaymentDto paymentDto) {
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -324,12 +350,12 @@ public class RestController {
         invoiceService.setInvoiceAsPaid(paymentDto.getCorrespondentCount().intValue());
         paymentDto.setCorrespondentCount(companyService.getCompanyByInvoiceId(paymentDto.getCorrespondentCount().intValue()).getCountNumber());
         HttpEntity<PaymentDto> request = new HttpEntity<>(paymentDto, headers);
-        String response = restTemplate.postForObject( bankIP +"/sendmoney", request , String.class );
+        String response = restTemplate.postForObject(bankIP + "/sendmoney", request, String.class);
         return response;
     }
 
     @RequestMapping(value = "/bankAccount/statement", method = POST)
-    public String getStatement(){
+    public String getStatement() {
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -339,7 +365,7 @@ public class RestController {
         dates.put("Date", "2018-01-01");
         dates.put("DateTo", "2018-05-12");
         HttpEntity<Map> request = new HttpEntity<>(dates, headers);
-        String response = restTemplate.postForObject( bankIP +"/statement/statement", request , String.class );
+        String response = restTemplate.postForObject(bankIP + "/statement/statement", request, String.class);
         return response;
     }
 }

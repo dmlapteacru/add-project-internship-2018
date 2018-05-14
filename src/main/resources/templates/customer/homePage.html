@@ -22,6 +22,25 @@
 
     <h2 th:text="'Welcome, '+${customer.getFullName()}"></h2>
 
+    <div class="container">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>Contracts</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td> <a href="#" th:text="'Active ('+${activeContracts}+')'">Active</a></td>
+                <td> <a href="#" th:text="'Signed only by you ('+${signedContracts}+')'">Signed</a></td>
+                <td> <a href="#" th:text="'Unsigned ('+${unsignedContracts}+')'">Unsigned</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 <div th:replace="fragments/footer :: footer"></div>

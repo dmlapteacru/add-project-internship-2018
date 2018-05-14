@@ -134,58 +134,62 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Issue date</label>
                         <div class="col-sm-6">
-                            <input type="date" class="form-control" id="issueDate" required="required"/>
-                            <p class="error-message" id="issueDateError" style="display: none"> validation error</p>
+                            <input type="date" class="form-control" id="new_issueDate" required="required"/>
+                            <p class="error-message" id="new_issueDateError" style="display: none"> validation error</p>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Expire date</label>
                         <div class="col-sm-6">
-                            <input type="date" class="form-control" id="expireDate" required="required"/>
-                            <p class="error-message" id="expireDateError" style="display: none">validation error</p>
+                            <input type="date" class="form-control" id="new_expireDate" required="required"/>
+                            <p class="error-message" id="new_expireDateError" style="display: none">validation error</p>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Customer</label>
                         <div class="col-sm-6">
-                            <input type="text" class="form-control" id="customerA" value="" readonly/>
-                            <input type="hidden" class="form-control" id="customerIdA"/>
+                            <input type="text" class="form-control" id="new_customer" value="" readonly/>
+                            <input type="hidden" class="form-control" id="new_customerId"/>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Company</label>
                         <div class="col-sm-6">
-                            <input type="text" class="form-control" id="companyA" readonly/>
-                            <input type="hidden" class="form-control" id="companyIdA"/>
+                            <input type="text" class="form-control" id="new_company" readonly/>
+                            <input type="hidden" class="form-control" id="new_companyId"/>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Service</label>
                         <div class="col-sm-6">
-                            <input type="text" class="form-control" id="productA" value="" readonly/>
-                            <input type="hidden" class="form-control" id="productIdA"/>
+                            <input type="text" class="form-control" id="new_product" value="" readonly/>
+                            <input type="hidden" class="form-control" id="new_productId"/>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Sum</label>
                         <div class="col-sm-6">
-                            <input type="number" class="form-control" id="sumA" readonly/>
+                            <input type="number" class="form-control" id="new_sum" readonly/>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Signature</label>
                         <div class="col-sm-6">
-                            <select class="form-control" id="statusA">
+                            <select class="form-control" id="new_status">
                                 <option selected>Signed</option>
                                 <option>Unsigned</option>
                             </select>
                         </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <span id="new_contractError" style="display: none">validation error</span>
                     </div>
 
                     <div class="form-group">
@@ -301,15 +305,15 @@
         var day = ("0" + now.getDate()).slice(-2);
         var month = ("0" + (now.getMonth() + 1)).slice(-2);
         var today = now.getFullYear() + "-" + (month) + "-" + (day);
-        $('#issueDate').val(today);
-        $('#expireDate').val(null);
-        $('#customerA').val($('#customerName').val());
-        $('#customerIdA').val($("#customerId").val());
-        $('#companyA').val(row.find("#companyId").text());
-        $('#companyIdA').val(row.find("#companyId").attr('value'));
-        $('#productA').val(row.find("#productId").text());
-        $('#productIdA').val(row.find("#productId").attr('value'));
-        $('#sumA').val(row.find("#sum").attr('value'));
+        $('#new_issueDate').val(today);
+        $('#new_expireDate').val(null);
+        $('#new_customer').val($('#customerName').val());
+        $('#new_customerId').val($("#customerId").val());
+        $('#new_company').val(row.find("#companyId").text());
+        $('#new_companyId').val(row.find("#companyId").attr('value'));
+        $('#new_product').val(row.find("#productId").text());
+        $('#new_productId').val(row.find("#productId").attr('value'));
+        $('#new_sum').val(row.find("#sum").attr('value'));
     };
 
     $("#btn_save_contract").click(function (event) {
@@ -318,13 +322,13 @@
         $('#alertMessage').text('');
 
         var newContractData = {
-            "issueDate": $("#issueDate").val(),
-            "expireDate": $("#expireDate").val(),
-            "sum": $("#sumA").val(),
-            "status": ($("#statusA").val() === 'Signed' ? "SIGNED_BY_CUSTOMER" : "UNSIGNED"),
-            "companyId": $("#companyIdA").val(),
-            "customerId": $("#customerIdA").val(),
-            "productId": $("#productIdA").val()
+            "issueDate": $("#new_issueDate").val(),
+            "expireDate": $("#new_expireDate").val(),
+            "sum": $("#new_sum").val(),
+            "status": ($("#new_status").val() === 'Signed' ? "SIGNED_BY_CUSTOMER" : "UNSIGNED"),
+            "companyId": $("#new_companyId").val(),
+            "customerId": $("#new_customerId").val(),
+            "productId": $("#new_productId").val()
         }
 
         $.ajax(
@@ -360,13 +364,13 @@
     });
 
     function clearErrors() {
-        $('#issueDate').focus(function () {
-            $('#issueDate').parent().removeClass('has-error');
-            $('#issueDateError').hide();
+        $('#new_issueDate').focus(function () {
+            $('#new_issueDate').parent().removeClass('has-error');
+            $('#new_issueDateError').hide();
         })
-        $('#expireDate').focus(function () {
-            $('#expireDateError').hide();
-            $('#expireDate').parent().removeClass('has-error');
+        $('#new_expireDate').focus(function () {
+            $('#new_expireDateError').hide();
+            $('#new_expireDate').parent().removeClass('has-error');
         })
         $('#new_service_name').focus(function () {
             $('#new_service_nameError').hide();
