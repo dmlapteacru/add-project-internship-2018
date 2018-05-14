@@ -2,8 +2,8 @@ package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.*;
 import com.endava.addprojectinternship2018.model.*;
+import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
 import com.endava.addprojectinternship2018.model.dto.ContractDto;
-import com.endava.addprojectinternship2018.model.dto.ContractDtoTest;
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.model.enums.Role;
 import com.endava.addprojectinternship2018.util.UserUtil;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -217,4 +216,29 @@ public class ContractService {
 
     }
 
+    public List<Contract> getAllByCompanyIdFiltered(int currentCompanyId, AdvancedFilter filter) {
+        double sumFrom = (filter.getSumFrom() == 0 ? Double.MIN_VALUE : filter.getSumFrom());
+        double sumTo = (filter.getSumTo() == 0 ? Double.MAX_VALUE : filter.getSumTo());
+        LocalDate dateFrom = (filter.getDateFrom() == null ? LocalDate.of(1,1,1) : filter.getDateFrom());
+        LocalDate dateTo = (filter.getDateTo() == null ? LocalDate.of(4999,12,31) : filter.getDateTo());
+
+        if (filter.getContractStatus() != null) {
+            return contractDao.findAllByCompanyIdAndStatusAndSumBetweenAndIssueDateBetween(currentCompanyId, filter.getContractStatus(), sumFrom, sumTo, dateFrom, dateTo);
+        } else {
+            return contractDao.findAllByCompanyIdAndSumBetweenAndIssueDateBetween(currentCompanyId, sumFrom, sumTo, dateFrom, dateTo);
+        }
+    }
+
+    public List<Contract> getAllByCustomerIdFiltered(int currentCustomerId, AdvancedFilter filter) {
+        double sumFrom = (filter.getSumFrom() == 0 ? Double.MIN_VALUE : filter.getSumFrom());
+        double sumTo = (filter.getSumTo() == 0 ? Double.MAX_VALUE : filter.getSumTo());
+        LocalDate dateFrom = (filter.getDateFrom() == null ? LocalDate.of(1,1,1) : filter.getDateFrom());
+        LocalDate dateTo = (filter.getDateTo() == null ? LocalDate.of(4999,12,31) : filter.getDateTo());
+
+        if (filter.getContractStatus() != null) {
+            return contractDao.findAllByCustomerIdAndStatusAndSumBetweenAndIssueDateBetween(currentCustomerId, filter.getContractStatus(), sumFrom, sumTo, dateFrom, dateTo);
+        } else {
+            return contractDao.findAllByCustomerIdAndSumBetweenAndIssueDateBetween(currentCustomerId, sumFrom, sumTo, dateFrom, dateTo);
+        }
+    }
 }

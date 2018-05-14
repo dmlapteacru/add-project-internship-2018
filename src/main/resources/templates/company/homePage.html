@@ -21,7 +21,34 @@
 
 <div class="container">
 
-    <h2 th:text="'Welcome, ' +  ${company.getName()}+' !'"></h2>
+    <h2 th:text="'Welcome, '+${companyName}+' !'"></h2>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Contracts</div>
+        <div class="panel-body">
+            <form th:action="@{/company/contracts/filtered}"
+                  th:object="${filterActiveContracts}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{contractStatus}">
+                <button type="submit" class="btn btn-primary"> Active
+                    <span class="badge" th:text="${activeContracts}"></span>
+                </button>
+            </form>
+            <form th:action="@{/company/contracts/filtered}"
+                  th:object="${filterSignedContracts}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{contractStatus}">
+                <button type="submit" class="btn btn-info"> Signed only by you
+                    <span class="badge" th:text="${signedContracts}"></span>
+                </button>
+            </form>
+            <form th:action="@{/company/contracts/filtered}"
+                  th:object="${filterUnsignedContracts}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{contractStatus}">
+                <button type="submit" class="btn"> Unsigned
+                    <span class="badge" th:text="${unsignedContracts}"></span>
+                </button>
+            </form>
+        </div>
+    </div>
 
 </div>
 <script src="/js/loadbalance.js"></script>

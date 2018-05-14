@@ -1,9 +1,9 @@
 package com.endava.addprojectinternship2018.controller;
 
 import com.endava.addprojectinternship2018.model.*;
+import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
 import com.endava.addprojectinternship2018.model.dto.ContractDto;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
-import com.endava.addprojectinternship2018.model.dto.ProductDto;
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.service.*;
 import com.endava.addprojectinternship2018.util.UserUtil;
@@ -14,7 +14,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -46,17 +45,19 @@ public class CustomerController {
 
     @GetMapping(value = "home")
     public String getHomePage(Model model) {
+
         Customer currentCustomer = userUtil.getCurrentCustomer();
-        if (currentCustomer == null) {
-            return "error";
-        }
-        model.addAttribute("customer", currentCustomer);
-        int activeContracts = contractService.countByCustomerAndStatus(currentCustomer.getId(), ContractStatus.ACTIVE);
-        int signedContracts = contractService.countByCustomerAndStatus(currentCustomer.getId(), ContractStatus.SIGNED_BY_CUSTOMER);
-        int unsignedContracts = contractService.countByCustomerAndStatus(currentCustomer.getId(), ContractStatus.UNSIGNED);
-        model.addAttribute("activeContracts", activeContracts);
-        model.addAttribute("signedContracts", signedContracts);
-        model.addAttribute("unsignedContracts", unsignedContracts);
+        model.addAttribute("customerName", currentCustomer.getFullName());
+        model.addAttribute("activeContracts",
+                contractService.countByCustomerAndStatus(currentCustomer.getId(), ContractStatus.ACTIVE));
+        model.addAttribute("signedContracts",
+                contractService.countByCustomerAndStatus(currentCustomer.getId(), ContractStatus.SIGNED_BY_CUSTOMER));
+        model.addAttribute("unsignedContracts",
+                contractService.countByCustomerAndStatus(currentCustomer.getId(), ContractStatus.UNSIGNED));
+        model.addAttribute("filterActiveContracts", new AdvancedFilter(ContractStatus.ACTIVE));
+        model.addAttribute("filterSignedContracts", new AdvancedFilter(ContractStatus.SIGNED_BY_CUSTOMER));
+        model.addAttribute("filterUnsignedContracts", new AdvancedFilter(ContractStatus.UNSIGNED));
+
         return "customer/homePage";
     }
 
@@ -94,30 +95,55 @@ public class CustomerController {
     public String getContractsPage(Model model) {
 
         int currentCustomerId = userUtil.getCurrentCustomer().getId();
-        List<Contract> contractList = contractService.getAllByCustomerId(currentCustomerId);
-        List<ContractStatus> contractStatusList = Arrays.asList(ContractStatus.values());
-
-        model.addAttribute("contractList", contractList);
+        model.addAttribute("contractList", contractService.getAllByCustomerId(currentCustomerId));
         model.addAttribute("customerId", currentCustomerId);
         model.addAttribute("companyId", 0);
         model.addAttribute("productId", 0);
-        model.addAttribute("statusListForFilter", contractStatusList);
+        model.addAttribute("statusListForFilter", Arrays.asList(ContractStatus.values()));
+        model.addAttribute("filter", new AdvancedFilter());
 
         return "contract/contractListPage";
 
     }
 
+    @PostMapping(value = "contracts/filtered")
+    public String getCustomerContractsFiltered(@ModelAttribute(name = "filter") AdvancedFilter filter, Model model) {
+
+        int currentCustomerId = userUtil.getCurrentCustomer().getId();
+        model.addAttribute("contractList", contractService.getAllByCustomerIdFiltered(currentCustomerId, filter));
+        model.addAttribute("customerId", currentCustomerId);
+        model.addAttribute("companyId", 0);
+        model.addAttribute("productId", 0);
+        model.addAttribute("statusListForFilter", Arrays.asList(ContractStatus.values()));
+        model.addAttribute("filter", filter);
+
+        return "contract/contractListPage";
+    }
+
     @GetMapping(value = "services")
-    public String getProductsPage(Model model) {
+    public String getProductList(Model model) {
 
         Customer currentCustomer = userUtil.getCurrentCustomer();
-        List<Product> productList = productService.getAllProducts();
-        List<Category> categoryList = categoryService.getAllCategory();
-        model.addAttribute("contractDto", new ContractDto());
-        model.addAttribute("categoryList", categoryList);
-        model.addAttribute("products", productList);
+        model.addAttribute("categoryList", categoryService.getAllCategory());
+        model.addAttribute("products", productService.getAllProducts());
         model.addAttribute("customerId", currentCustomer.getId());
         model.addAttribute("customerName", currentCustomer.getFullName());
+        model.addAttribute("ownerType", "customer");
+        model.addAttribute("filter", new AdvancedFilter());
+
+        return "product/productListPage";
+    }
+
+    @PostMapping(value = "services/filtered")
+    public String getProductListFiltered(@ModelAttribute(name = "filter") AdvancedFilter filter, Model model) {
+
+        Customer currentCustomer = userUtil.getCurrentCustomer();
+        model.addAttribute("categoryList", categoryService.getAllCategory());
+        model.addAttribute("products", productService.getAllFiltered(filter));
+        model.addAttribute("customerId", currentCustomer.getId());
+        model.addAttribute("customerName", currentCustomer.getFullName());
+        model.addAttribute("ownerType", "customer");
+        model.addAttribute("filter", filter);
 
         return "product/productListPage";
     }

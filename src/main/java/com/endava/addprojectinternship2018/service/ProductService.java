@@ -2,6 +2,7 @@ package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.ProductDao;
 import com.endava.addprojectinternship2018.model.Product;
+import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
 import com.endava.addprojectinternship2018.model.dto.ProductDto;
 import com.endava.addprojectinternship2018.model.dto.ProductDtoTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +30,7 @@ public class ProductService {
         return productDao.findAllByCompanyId(id);
     }
 
-    public List<Product> getAllProducts(){
+    public List<Product> getAllProducts() {
         return productDao.findAll();
     }
 
@@ -53,7 +55,7 @@ public class ProductService {
     }
 
     @Transactional
-    public void saveProduct(ProductDto productDto){
+    public void saveProduct(ProductDto productDto) {
         productDao.save(convertProductDtoToProduct(productDto));
     }
 
@@ -85,11 +87,11 @@ public class ProductService {
     }
 
     @Transactional
-    public void save(ProductDtoTest product){
+    public void save(ProductDtoTest product) {
         productDao.save(convertDTOToProduct(product));
     }
 
-    public Product convertDTOToProduct(ProductDtoTest productDtoTest){
+    public Product convertDTOToProduct(ProductDtoTest productDtoTest) {
         Product product = new Product();
         product.setName(productDtoTest.getName());
         product.setDescription(productDtoTest.getDescription());
@@ -102,4 +104,17 @@ public class ProductService {
     public Product getById(int productId) {
         return productDao.findById(productId).get();
     }
+
+    public List<Product> getAllByCompanyIdFiltered(int companyId, AdvancedFilter filter) {
+        double priceFrom = (filter.getSumFrom() == 0 ? Double.MIN_VALUE : filter.getSumFrom());
+        double priceTo = (filter.getSumTo() == 0 ? Double.MAX_VALUE : filter.getSumTo());
+        return productDao.findAllByCompanyIdAndPriceBetween(companyId, priceFrom, priceTo);
+    }
+
+    public List<Product> getAllFiltered(AdvancedFilter filter) {
+        double priceFrom = (filter.getSumFrom() == 0 ? Double.MIN_VALUE : filter.getSumFrom());
+        double priceTo = (filter.getSumTo() == 0 ? Double.MAX_VALUE : filter.getSumTo());
+        return productDao.findAllByPriceBetween(priceFrom, priceTo);
+    }
+
 }

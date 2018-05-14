@@ -1,9 +1,9 @@
 package com.endava.addprojectinternship2018.controller;
 
 import com.endava.addprojectinternship2018.model.*;
+import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
 import com.endava.addprojectinternship2018.model.dto.CompanyDto;
 import com.endava.addprojectinternship2018.model.dto.ContractDto;
-import com.endava.addprojectinternship2018.model.dto.ProductDto;
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.service.*;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,16 +49,45 @@ public class CompanyController {
 
     @GetMapping(value = "home")
     public String showCompanyPage(Model model) {
-        model.addAttribute("company", userUtil.getCurrentCompany());
+        Company currentCompany = userUtil.getCurrentCompany();
+        model.addAttribute("companyName", currentCompany.getName());
+        model.addAttribute("activeContracts",
+                contractService.countByCompanyAndStatus(currentCompany.getId(), ContractStatus.ACTIVE));
+        model.addAttribute("signedContracts",
+                contractService.countByCompanyAndStatus(currentCompany.getId(), ContractStatus.SIGNED_BY_COMPANY));
+        model.addAttribute("unsignedContracts",
+                contractService.countByCompanyAndStatus(currentCompany.getId(), ContractStatus.UNSIGNED));
+        model.addAttribute("filterActiveContracts", new AdvancedFilter(ContractStatus.ACTIVE));
+        model.addAttribute("filterSignedContracts", new AdvancedFilter(ContractStatus.SIGNED_BY_CUSTOMER));
+        model.addAttribute("filterUnsignedContracts", new AdvancedFilter(ContractStatus.UNSIGNED));
         return "company/homePage";
     }
 
     @GetMapping(value = "contracts")
-    public String showCompanyContracts(@ModelAttribute(name = "errorMessage") String errorMessage, Model model) {
+    public String getCompanyContracts(Model model) {
 
         int currentCompanyId = userUtil.getCurrentCompany().getId();
         String currentCompanyName = userUtil.getCurrentCompany().getName();
-        List<Contract> contractList = contractService.getAllByCompanyId(currentCompanyId);
+
+        model.addAttribute("contractList", contractService.getAllByCompanyId(currentCompanyId));
+        model.addAttribute("customerId", 0);
+        model.addAttribute("companyId", currentCompanyId);
+        model.addAttribute("companyName", currentCompanyName);
+        model.addAttribute("productId", 0);
+        model.addAttribute("status", InvoiceStatus.ISSUED);
+        model.addAttribute("statusListForFilter", Arrays.asList(ContractStatus.values()));
+        model.addAttribute("filter", new AdvancedFilter());
+
+        return "contract/contractListPage";
+    }
+
+    @PostMapping(value = "contracts/filtered")
+    public String getCompanyContractsFiltered(@ModelAttribute(name = "filter") AdvancedFilter filter, Model model) {
+
+        int currentCompanyId = userUtil.getCurrentCompany().getId();
+        String currentCompanyName = userUtil.getCurrentCompany().getName();
+        List<Contract> contractList = contractService.getAllByCompanyIdFiltered(currentCompanyId, filter);
+        List<ContractStatus> contractStatusList = Arrays.asList(ContractStatus.values());
 
         model.addAttribute("contractList", contractList);
         model.addAttribute("customerId", 0);
@@ -66,10 +95,11 @@ public class CompanyController {
         model.addAttribute("companyName", currentCompanyName);
         model.addAttribute("productId", 0);
         model.addAttribute("status", InvoiceStatus.ISSUED);
-
-        model.addAttribute("statusListForFilter", new ArrayList<ContractStatus>());
+        model.addAttribute("statusListForFilter", contractStatusList);
+        model.addAttribute("filter", filter);
 
         return "contract/contractListPage";
+
     }
 
     @GetMapping(value = "invoices")
@@ -84,14 +114,28 @@ public class CompanyController {
     }
 
     @GetMapping(value = "services")
-    public String showProductsByContractId(Model model) {
+    public String getProductsByCompany(Model model) {
+
         Company company = userUtil.getCurrentCompany();
-        List<Product> products = productService.getAllByCompanyId(company.getId());
-        List<Category> categoryList = categoryService.getAllCategory();
-        model.addAttribute("contractDto", new ContractDto());
-        model.addAttribute("categoryList", categoryList);
-        model.addAttribute("products", products);
-        model.addAttribute("company", company);
+        model.addAttribute("ownerType", "company");
+        model.addAttribute("companyId", company.getId());
+        model.addAttribute("products", productService.getAllByCompanyId(company.getId()));
+        model.addAttribute("categoryList", categoryService.getAllCategory());
+        model.addAttribute("filter" , new AdvancedFilter());
+
+        return "product/productListPage";
+    }
+
+    @PostMapping(value = "services/filtered")
+    public String getProductsByCompanyFiltered(@ModelAttribute(name = "filter") AdvancedFilter filter, Model model) {
+
+        Company company = userUtil.getCurrentCompany();
+        model.addAttribute("ownerType", "company");
+        model.addAttribute("companyId", company.getId());
+        model.addAttribute("products", productService.getAllByCompanyIdFiltered(company.getId(), filter));
+        model.addAttribute("categoryList", categoryService.getAllCategory());
+        model.addAttribute("filter" , filter);
+
         return "product/productListPage";
     }
 

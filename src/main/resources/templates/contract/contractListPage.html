@@ -25,24 +25,37 @@
         <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalContract"
            class="btn btn-info btn-sm" role="button" th:id="${companyId}"
            onclick="createNewContract(this)">Create new contract</a>
-        <form class="form-inline">
-            <!--<div class="form-group">-->
-                <!--<label>Advanced filter</label>-->
-            <!--</div>-->
+        <form class="form-inline pull-right"
+              th:object="${filter}"
+              th:action="${companyId==0} ? @{/customer/contracts/filtered} : @{/company/contracts/filtered}"
+              method="post">
             <div class="form-group">
-                <label for="adv_filter_status">status</label>
-                <select id="adv_filter_status" class="form-control">
-                    <option th:each="status : ${statusListForFilter}"
-                            th:value="${status.name()}"
-                            th:text="${status.toString()}">
+                <select id="adv_filter_status" class="form-control input-sm" th:field="*{contractStatus}">
+                    <option value="">--all--</option>
+                    <option th:each="currStatus : ${statusListForFilter}"
+                            th:value="${currStatus.name()}"
+                            th:text="${currStatus.toString()}">
                     </option>
                 </select>
             </div>
             <div class="form-group">
-                <label></label>
-                <input type="text" class="form-control">
+                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumFrom}"
+                       placeholder="sum from"/>
+                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumTo}"
+                       placeholder="sum to"/>
             </div>
-            <button type="submit" class="btn btn-default">Apply</button>
+            <div class="form-group">
+                <input type="date" id="adv_filter_date_from" class="form-control input-sm col-sm-2"
+                       th:field="*{dateFrom}"/>
+                <input type="date" id="adv_filter_date_to" class="form-control input-sm col-sm-2"
+                       th:field="*{dateTo}"/>
+            </div>
+
+            <button type="submit" class="btn btn-info btn-sm">apply
+                <span class="glyphicon glyphicon-filter"></span>
+            </button>
+            <a th:href="${companyId==0} ? @{/customer/contracts} : @{/company/contracts}"
+               class="btn btn-default btn-sm">clear</a>
         </form>
     </div>
 </div>
@@ -51,7 +64,8 @@
     <div class="panel-heading">
         <h3 class="panel-title">Contracts</h3>
         <div class="pull-right">
-            <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter
+            <button class="btn btn-default btn-xs btn-filter">
+                <span class="glyphicon glyphicon-filter"></span> quick filter
             </button>
         </div>
     </div>

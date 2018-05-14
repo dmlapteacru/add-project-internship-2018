@@ -20,8 +20,28 @@
 
 </div>
 
-<a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalService"
-   class="btn btn-info btn-sm" role="button" onclick="getCategories()">Create new service</a>
+<div class="panel panel-default panel-no-border">
+    <div class="panel-body">
+        <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalService"
+           class="btn btn-info btn-sm" role="button" onclick="getCategories()">Create new service</a>
+        <form class="form-inline pull-right"
+              th:object="${filter}"
+              th:action="${ownerType=='customer'} ? @{/customer/services/filtered} : @{/company/services/filtered}"
+              method="post">
+            <div class="form-group">
+                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumFrom}"
+                       placeholder="sum from"/>
+                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumTo}"
+                       placeholder="sum to"/>
+            </div>
+            <button type="submit" class="btn btn-info btn-sm">apply
+                <span class="glyphicon glyphicon-filter"></span>
+            </button>
+            <a th:href="${ownerType=='customer'} ? @{/customer/services} : @{/company/services}"
+               class="btn btn-default btn-sm">clear</a>
+        </form>
+    </div>
+</div>
 
 <div class="panel panel-primary filterable">
     <div class="panel-heading">
@@ -95,7 +115,7 @@
             <form>
                 <div class="modal-body modal_body_category">
                     <p id="company_id" sec:authorize="hasAuthority('COMPANY')"
-                       th:text="${company.getId()}" style="display: none"></p>
+                       th:text="${companyId}" style="display: none"></p>
                     <input id="new_category_id" type="text" hidden="hidden"/>
                     <label>Category name</label>
                     <select id="select_category"></select>

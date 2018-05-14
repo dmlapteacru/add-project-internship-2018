@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.swing.text.html.Option;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +25,10 @@ public interface ContractDao extends JpaRepository<Contract, Integer> {
 
     List<Contract> findAllByCompanyId(int id);
 
+    List<Contract> findAllByCompanyIdAndStatusAndSumBetweenAndIssueDateBetween(int id, ContractStatus status,
+                                                                               double sumFrom, double sumTo,
+                                                                               LocalDate dateFrom, LocalDate dateTo);
+
     List<Contract> findAllByCustomerId(int id);
 
     List<Contract> findAllByProductId(int productId);
@@ -31,5 +36,17 @@ public interface ContractDao extends JpaRepository<Contract, Integer> {
     int countByCompanyIdAndStatus(int companyId, ContractStatus status);
 
     int countByCustomerIdAndStatus(int customerId, ContractStatus status);
+
+    List<Contract> findAllByCompanyIdAndSumBetweenAndIssueDateBetween(int id,
+                                                                      double sumFrom, double sumTo,
+                                                                      LocalDate dateFrom, LocalDate dateTo);
+
+    List<Contract> findAllByCustomerIdAndStatusAndSumBetweenAndIssueDateBetween(int id, ContractStatus status,
+                                                                                double sumFrom, double sumTo,
+                                                                                LocalDate dateFrom, LocalDate dateTo);
+
+    List<Contract> findAllByCustomerIdAndSumBetweenAndIssueDateBetween(int id,
+                                                                       double sumFrom, double sumTo,
+                                                                       LocalDate dateFrom, LocalDate dateTo);
 }
 
