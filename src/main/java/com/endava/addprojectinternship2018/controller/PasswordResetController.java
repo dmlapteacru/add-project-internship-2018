@@ -15,7 +15,7 @@ public class PasswordResetController {
     private PasswordTokenService passwordTokenService;
 
     @RequestMapping(value = "/reset/password", method = RequestMethod.GET)
-    public String resetPassword(@RequestParam String username, @RequestParam String token){
+    public String resetPassword(@RequestParam String username, @RequestParam String token) throws Exception{
         if (passwordTokenService.isTokenActive(username, token)){
             return "admin/resetPassword";
         }

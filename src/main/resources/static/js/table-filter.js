@@ -1,13 +1,12 @@
 $(document).ready(function(){
     $('.filterable .btn-filter').click(function(){
         var $panel = $(this).parents('.filterable'),
-            $filters = $panel.find('.filters input'),
+            $filters = $panel.find('.filters input[type="text"]'),
             $selectors = $panel.find('.filters select'),
             $tbody = $panel.find('.table tbody');
         if ($filters.prop('disabled') == true || $selectors.prop('disabled') == true) {
             $filters.prop('disabled', false);
             $selectors.prop('disabled', false);
-            $filters.first().focus();
         } else {
             $(".filter_body").append($rows);
             $selectors.val('Roles').prop('disabled', true);

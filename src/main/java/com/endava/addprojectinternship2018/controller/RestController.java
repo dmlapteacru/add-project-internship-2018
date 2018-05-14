@@ -7,8 +7,10 @@ import com.endava.addprojectinternship2018.service.*;
 import com.endava.addprojectinternship2018.util.UserUtil;
 import com.endava.addprojectinternship2018.validation.ErrorMessage;
 import com.endava.addprojectinternship2018.validation.ValidationResponse;
+import com.endava.addprojectinternship2018.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -64,6 +66,9 @@ public class RestController {
     @Autowired
     private AdminMessageService adminMessageService;
 
+    @Autowired
+    private Validator validator;
+
     //  -----   REST Company
     @GetMapping("/rest/getCompanyByEmail/{name}")
     public Company getCompanyByEmail(@PathVariable String name) {
@@ -103,9 +108,13 @@ public class RestController {
     }
 
     @RequestMapping(value = "/admin/newCategory", method = RequestMethod.PUT)
-    public String saveNewCategory(@RequestBody Category category) {
+    public ResponseEntity<?> saveNewCategory(@RequestBody Category category, BindingResult error) {
+        validator.validate(category, error);
+        if (error.hasErrors()){
+            return new ResponseEntity<>(error.getFieldError().getCode(), HttpStatus.BAD_REQUEST);
+        }
         categoryService.saveCategory(category);
-        return "OK";
+        return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/admin/deleteCategory/{id}", method = RequestMethod.DELETE)
@@ -296,14 +305,38 @@ public class RestController {
         adminMessageService.changeMessageStatus(id);
         return "OK";
     }
+    @RequestMapping(value = "/admin/message/changeStatus/read", method = RequestMethod.PUT)
+    public String changeMessageStatusOnRead(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList) {
+        adminMessageService.changeMessageStatusOnRead(changeMessageStatusDtoList);
+        return "OK";
+    }
+    @RequestMapping(value = "/admin/message/changeStatus/unread", method = RequestMethod.PUT)
+    public String changeMessageStatusOnUnRead(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList) {
+        adminMessageService.changeMessageStatusOnUnRead(changeMessageStatusDtoList);
+        return "OK";
+    }
 
     @RequestMapping(value = "/admin/message/delete/{id}", method = RequestMethod.DELETE)
     public String deleteMessage(@PathVariable int id) {
         adminMessageService.deleteById(id);
         return "OK";
     }
+    @RequestMapping(value = "/admin/message/bulkDelete", method = RequestMethod.DELETE)
+    public String deleteMessage(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList){
+        adminMessageService.deleteMessages(changeMessageStatusDtoList);
+        return "OK";
+    }
 
-
+    @RequestMapping(value = "/admin/changeUserStatus/active", method = POST)
+    public String changeUserStatusOnActive(@RequestBody List<ChangeUserStatusDto> changeUserStatusDto){
+        userService.changeUserStatusOnActive(changeUserStatusDto);
+        return "OK";
+    }
+    @RequestMapping(value = "/admin/changeUserStatus/inactive", method = POST)
+    public String changeUserStatusOnInactive(@RequestBody List<ChangeUserStatusDto> changeUserStatusDto){
+        userService.changeUserStatusOnInactive(changeUserStatusDto);
+        return "OK";
+    }
     @RequestMapping(value = "/bankAccount/create", method = POST)
     public ResponseEntity<UserBankAccountDto> newAccount() {
         HttpHeaders headers = new HttpHeaders();
@@ -327,7 +360,10 @@ public class RestController {
     }
 
     @RequestMapping(value = "/bankAccount/addmoney", method = POST)
-    public String addMoney(@RequestParam Double sum) {
+    public ResponseEntity<?> addMoney(@RequestParam Double sum){
+        if (sum < 1){
+            return new ResponseEntity<>("Must be greater than 0.", HttpStatus.BAD_REQUEST);
+        }
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -336,36 +372,59 @@ public class RestController {
         Map<String, Double> body = new HashMap<>();
         body.put("sum", sum);
         HttpEntity<Map> request = new HttpEntity<>(body, headers);
-        String response = restTemplate.postForObject(bankIP + "/bankaccount/addmoney", request, String.class);
-        return response;
+        restTemplate.postForObject( bankIP +"/bankaccount/addmoney", request , String.class );
+        return new ResponseEntity<>("Money added.", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/bankAccount/payinvoice", method = POST)
-    public String payInvoice(@RequestBody PaymentDto paymentDto) {
+    public ResponseEntity<?> payInvoice(@RequestParam(name = "bal") Double balance, @RequestBody PaymentDto paymentDto, BindingResult error){
+        validator.validateInvoicePayment(balance, paymentDto, error);
+        if (error.hasErrors()){
+            return new ResponseEntity<>(error.getFieldError().getCode(), HttpStatus.BAD_REQUEST);
+        }
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
         headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
         invoiceService.setInvoiceAsPaid(paymentDto.getCorrespondentCount().intValue());
+        paymentDto.setDescription(paymentDto.getDescription() + invoiceService.setInvoiceDescription(paymentDto.getCorrespondentCount().intValue()).getFullDescription());
         paymentDto.setCorrespondentCount(companyService.getCompanyByInvoiceId(paymentDto.getCorrespondentCount().intValue()).getCountNumber());
         HttpEntity<PaymentDto> request = new HttpEntity<>(paymentDto, headers);
-        String response = restTemplate.postForObject(bankIP + "/sendmoney", request, String.class);
-        return response;
+        restTemplate.postForObject( bankIP +"/sendmoney", request , String.class );
+        return new ResponseEntity<>(HttpStatus.OK);
     }
-
+//    @RequestMapping(value = "/bankAccount/payinvoice/bulk", method = POST)
+//    public ResponseEntity<?> payInvoice(@RequestParam(name = "bal") Double balance, @RequestBody List<PaymentDto> paymentDtoList, BindingResult error){
+//        validator.validateBulkInvoicePayment(balance, paymentDtoList, error);
+//        if (error.hasErrors()){
+//            return new ResponseEntity<>(error.getFieldError().getCode(), HttpStatus.BAD_REQUEST);
+//        }
+//        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+//        headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
+//        headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
+//        invoiceService.setInvoiceAsPaid(paymentDto.getCorrespondentCount().intValue());
+//        paymentDto.setDescription(paymentDto.getDescription() + invoiceService.setInvoiceDescription(paymentDto.getCorrespondentCount().intValue()).getFullDescription());
+//        paymentDto.setCorrespondentCount(companyService.getCompanyByInvoiceId(paymentDto.getCorrespondentCount().intValue()).getCountNumber());
+//        HttpEntity<PaymentDto> request = new HttpEntity<>(paymentDto, headers);
+//        restTemplate.postForObject( bankIP +"/sendmoney", request , String.class );
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
     @RequestMapping(value = "/bankAccount/statement", method = POST)
-    public String getStatement() {
+    public ResponseEntity<?> getStatement(@RequestBody StatementDateReqDto dateReqDto, BindingResult error){
+        validator.validateStatementDates(dateReqDto, error);
+        if (error.hasErrors()){
+            return new ResponseEntity<>(error.getFieldError().getCode(), HttpStatus.BAD_REQUEST);
+        }
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
         headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
-        Map<String, String> dates = new HashMap<>();
-        dates.put("Date", "2018-01-01");
-        dates.put("DateTo", "2018-05-12");
-        HttpEntity<Map> request = new HttpEntity<>(dates, headers);
-        String response = restTemplate.postForObject(bankIP + "/statement/statement", request, String.class);
-        return response;
+        HttpEntity<StatementDateReqDto> request = new HttpEntity<>(dateReqDto, headers);
+        ResponseEntity<List<StatementDto>> response = restTemplate.exchange( bankIP +"/statement/statement",HttpMethod.POST, request , new ParameterizedTypeReference<List<StatementDto>>(){});
+        return new ResponseEntity<>(response.getBody(), HttpStatus.OK);
     }
 }

@@ -14,40 +14,67 @@
 <div class="main_wrapper">
 
     <div style="display: flex; flex-direction: column;" class="wrapper">
-
-        <form class="login_form" th:action="@{/login}" th:object="${loginForm_}" method="POST">
-            <h3 class="form-signin-heading heading"  th:text="Welcome"></h3>
-            <br/>
-            <input type="text" name="email" th:field="*{username}" th:placeholder="Username"
-                    class="form-control" />
-            <br/>
-            <div class="pass_wrapper">
-                <input type="password" th:field="*{password}" th:placeholder="Password"
-                       name="password" class="form-control"/>
-                <a class="show_pass_btn">SHOW</a>
+        <div class="alert alert-success" th:if="${#httpServletRequest.getParameter('error') == 'reg_approval'}">
+            <div style="display: none" class="approval_info">
+                <strong> Registration success! Wait for admin's approval.</strong>
             </div>
-            <div class="error" th:if="${#httpServletRequest.getParameter('error') == 'inactive_user'}">
-                <p style="font-size: 14px; color: #FF1C19;">Your status is INACTIVE</p>
+        </div>
+        <div class="alert alert-success alert-dismissible fade in">
+            <div id="approval_info">
+                <strong id="confirm_alert_message"></strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="error" th:if="${#httpServletRequest.getParameter('error') == 'no_user'}">
-                <p style="font-size: 14px; color: #FF1C19;">Username is incorrect</p>
-            </div>
-            <div class="error" th:if="${#httpServletRequest.getParameter('error') == 'wrong_password'}">
-                <p style="font-size: 14px; color: #FF1C19;">Password is incorrect</p>
-            </div>
-            <br/>
-            <button class="btn btn-lg btn-primary btn-block" name="Submit" value="Login" type="Submit" th:text="Login"></button>
-            <br/>
+        </div>
+        <div class="login_wrapper">
+            <form class="login_form" th:action="@{/login}" th:object="${loginForm_}" method="POST">
+                <h3 class="form-signin-heading heading"  th:text="Welcome"></h3>
+                <br/>
+                <input type="text" name="email" th:field="*{username}" th:placeholder="Username"
+                       class="form-control" />
+                <br/>
+                <div class="pass_wrapper">
+                    <input type="password" th:field="*{password}" th:placeholder="Password"
+                           name="password" class="form-control"/>
+                    <a class="show_pass_btn">SHOW</a>
+                </div>
+                <div class="error" th:if="${#httpServletRequest.getParameter('error') == 'inactive_user'}">
+                    <p style="font-size: 14px; color: #FF1C19;">Your status is INACTIVE</p>
+                </div>
+                <div class="error" th:if="${#httpServletRequest.getParameter('error') == 'no_user'}">
+                    <p style="font-size: 14px; color: #FF1C19;">Username is incorrect</p>
+                </div>
+                <div class="error" th:if="${#httpServletRequest.getParameter('error') == 'wrong_password'}">
+                    <p style="font-size: 14px; color: #FF1C19;">Password is incorrect</p>
+                </div>
+                <br/>
+                <button class="btn btn-lg btn-primary btn-block" name="Submit" value="Login" type="Submit" th:text="Login"></button>
+                <br/>
+            </form>
             <div class="reg_forms">
-                    <a class="btn btn-warning" th:href="@{/registration/company}">Company Registration</a>
-                    <a class="btn btn-warning" th:href="@{/registration/customer}">Customer Registration</a>
+                <form class="registration_form" th:action="@{/registration}" method="POST">
+                    <div class="registration_choice_btn">
+                        <button type="submit" class="btn btn-warning">Registration as</button>
+                    </div>
+                    <div class="registration_choice">
+                        <label class="control control--radio">Customer
+                            <input type="radio" name="choice" th:value="CUSTOMER" checked/>
+                            <div class="control__indicator"></div>
+                        </label>
+                        <label class="control control--radio">Company
+                            <input type="radio" name="choice" th:value="COMPANY"/>
+                            <div class="control__indicator"></div>
+                        </label>
+                    </div>
+                </form>
                 <br/>
                 <div class="modal_links">
-                    <a class="btn_contact_admin" data-target="#modalMessage" data-toggle="modal">Have a question?..</a>
+                    <a class="btn_contact_admin" data-target="#modalMessage" data-toggle="modal">Contact admin <span class="glyphicon glyphicon-envelope"></span></a>
                     <a class="btn_contact_admin" data-target="#modalResetPassword" data-toggle="modal">Forgot your password?</a>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 <!--MODALS-->
@@ -114,10 +141,15 @@
                 url: "/message/send",
                 type: "post",
                 contentType: "application/json",
-                data: JSON.stringify(message),
-                success: function () {
-                    $("#modalService").modal("hide");
-                }
+                data: JSON.stringify(message)
+//                success: function () {
+//                    $("#modalMessage").modal("hide");
+//                    $("#confirm_alert_message").text("Message sent.");
+//                    $(".alert").slideToggle("slow");
+//                    setTimeout(function () {
+//                        $(".alert").slideToggle("slow");
+//                    },5000);
+//                }
             }
         )
     });
@@ -144,6 +176,11 @@
             }
         )
     });
+
+
+    $(document).ready(function () {
+        $(".approval_info").slideToggle("slow");
+    })
 </script>
 </body>
 </html>

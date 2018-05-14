@@ -1,9 +1,12 @@
 package com.endava.addprojectinternship2018.dao;
 
+import com.endava.addprojectinternship2018.model.dto.InvoiceDescriptionPaymentDto;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -30,5 +33,13 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
     List<Invoice> findAllByContract_Company_Name(String name);
 
     List<Invoice> findAllByContract_Company_IdOrderById(int id);
+
+    @Query("select new com.endava.addprojectinternship2018.model.dto.InvoiceDescriptionPaymentDto(pr.name, pr.name) " +
+            "from Invoice i " +
+            "left join Contract co on i.contract=co.id " +
+//            "left join Company com on co.company=com.id " +
+            "left join Product pr on co.product=pr.id " +
+            "where i.id=:id")
+    InvoiceDescriptionPaymentDto setInvoiceDescriptionPayment(@Param("id") int id);
 
 }

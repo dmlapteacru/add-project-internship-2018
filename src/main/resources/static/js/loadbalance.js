@@ -1,16 +1,22 @@
-$( document ).ready(function() {
+$( document ).ready(function () {
+    loadBalance()
+});
+function loadBalance() {
     $.ajax(
         {
             url : "/bankAccount/balance",
             type : "POST",
             success : function (result) {
-                parseBalance(result);
+               return parseBalance(result);
             }
         }
     )
-});
+};
 
 function parseBalance(string) {
-    $(".balance").text(string.split(":")[1].substring(0, string.split(":")[1].length-1) + "MDL");
-    $(".balance_info").text(string.split(":")[1].substring(0, string.split(":")[1].length-1) + "MDL");
+    var balance = string.split(":")[1].substring(0, string.split(":")[1].length-1);
+    $(".balance").text(balance);
+    $(".balance_info").text(balance);
+    return balance;
 }
+

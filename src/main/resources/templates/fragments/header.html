@@ -35,7 +35,7 @@
             </ul>
             <ul class="nav navbar-nav navbar-right" sec:authorize="hasAuthority('CUSTOMER')">
                 <li style="display: flex; flex-direction: column; justify-content:center; color: #cccccc;">
-                    <span id="cus" style="padding: 15px 15px">Hello, <span sec:authentication="name"></span>    Balance: <span class="balance"></span></span>
+                    <span id="cus" style="padding: 15px 15px">Hello, <span sec:authentication="name" style="margin-right: 10px;"></span> Balance: <span class="balance"></span>MDL</span>
                 </li>
                 <li><a th:href="@{/contact/admin}" class="menu_item"> Contact Admin </a></li>
                 <li><a th:href="@{/customer/profile}" class="menu_item"> Personal cabinet </a></li>
@@ -43,7 +43,7 @@
             </ul>
             <ul class="nav navbar-nav navbar-right" sec:authorize="hasAuthority('COMPANY')">
                 <li style="display: flex; flex-direction: column; justify-content:center; color: #cccccc;">
-                    <span style="padding: 15px 15px">Hello, <span sec:authentication="name">  Balance: <span class="balance"></span></span></span>
+                    <span style="padding: 15px 15px">Hello, <span sec:authentication="name" style="margin-right: 10px;"></span> Balance: <span class="balance"></span>MDL</span>
                 </li>
                 <li><a th:href="@{/contact/admin}" class="menu_item"> Contact Admin </a></li>
                 <li><a th:href="@{/company/profile}" class="menu_item"> Personal cabinet </a></li>

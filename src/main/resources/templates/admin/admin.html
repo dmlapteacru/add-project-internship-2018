@@ -8,10 +8,14 @@
     <link rel="stylesheet" type="text/css" href="/css/admin.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js" integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe" crossorigin="anonymous"></script>
     <script src="/js/table-filter.js"></script>
 </head>
 <body>
 <div class="main_wrapper">
+    <div class="modal fade" id="load_icon_wrapper" data-backdrop="static" data-keyboard="false">
+        <img id="load" src="/img/load_icon.gif"/>
+    </div>
     <form th:action="@{/logout}" method="post" class="logout_form">
         <img src="/img/endava-logo.png"/>
         <div class="logout_btn_wrap">
@@ -23,7 +27,7 @@
     </form>
     <div class="body_wrapper">
         <div class="menu_wrapper">
-            <button class="tablink tablink_active" onclick="openPage('users', this)">Users</button>
+            <button id="users_btn_req" class="tablink tablink_active" onclick="openPage('users', this)">Users</button>
             <button id="categories_btn_req" class="tablink" onclick="openPage('categories', this)">Service Categories</button>
             <button id="messages_btn_req" class="tablink" onclick="openPage('messages', this)">Messages
                 <button id="messages_read_all_req" class="tablink sub_tablink" onclick="activateLink(this)">All</button>
@@ -36,7 +40,16 @@
                 <div class="filterable" style="margin-top: 0;">
                     <table class="table table-striped">
                         <thead>
+                        <div class="change_status_all_btn_wrapper">
+                            <a id="change_status_all_btn_active" class="btn btn-success btn-status-change btn_activate change_status_all_btn"><span>ACTIVATE</span><i class="fas fa-user"></i></a>
+                            <a id="change_status_all_btn_inactive" class="btn btn-danger btn-status-change btn_activate change_status_all_btn"><span>DEACTIVATE</span><i class="fas fa-user-slash"></i></a>
+                        </div>
                         <tr class="filters">
+                            <th>
+                                <div class="checkbox_users_wrapper">
+                                    <input type="checkbox" id="check_all_users"/>
+                                </div>
+                            </th>
                             <th>
                                 <select class="sel_roles" disabled>
                                     <option selected value="Roles">Roles</option>
@@ -67,6 +80,7 @@
                         </thead>
                         <tbody class="filter_body">
                         <tr th:each="user : ${users}">
+                            <td><input type="checkbox" th:value="${user.username}" class="checkbox_users_element"/></td>
                             <td class="filter_role" th:text="${user.role}" valign="center"></td>
                             <td th:text="${user.name}" valign="center"></td>
                             <td th:text="${user.username}" valign="center"></td>
@@ -82,7 +96,7 @@
                                    th:href="@{admin/status?(username=${user.username})}" class="btn-status-change btn_deactivate">DEACTIVATE</a>
                             </td>
                             <td class="change_pass_btn">
-                                <a class="btn-pass-reset" th:value="${user.username}">Reset Password</a>
+                                <a id="btn-pass-reset" th:value="${user.username}" data-target="#modalResetPassConfirm" data-toggle="modal" onclick="resetCM(this)">Reset Password</a>
                             </td>
                         </tr>
                         </tbody>
@@ -109,43 +123,25 @@
             <div id="messages" class="tabcontent">
                 <table id="table-messages" class="table">
                     <thead>
+                    <div class="change_status_all_btn_wrapper">
+                        <a id="change_status_all_btn_read" class="btn btn-success btn-status-change btn_activate change_status_all_btn_mess" title="Mark as READ"><span>Mark as read</span><i class="far fa-envelope-open"></i></a>
+                        <a id="change_status_all_btn_unread" class="btn btn-warning btn-status-change btn_activate change_status_all_btn_mess" title="Mark as UNREAD"><span>Mark as unread</span><i class="far fa-envelope"></i></a>
+                        <a id="messages_all_btn_delete" class="btn btn-danger btn-status-change btn_activate change_status_all_btn_mess" title="Delete"><span>Delete</span><i class="fas fa-trash-alt"></i></span></a>
+                    </div>
+                    <th>
+                        <div class="checkbox_users_wrapper">
+                            <input type="checkbox" id="check_all_messages"/>
+                        </div>
+                    </th>
                     <th></th>
-                    <th>Email</th>
+                    <th>From</th>
                     <th>Subject</th>
-                    <th>Date</th>
+                    <th>Date/Time</th>
                     </thead>
                     <tbody>
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
-    <div class="modal fade" id="modalPassword" role="dialog">
-        <div class="modal-dialog modal-sm">
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Set new Password</h4>
-                </div>
-                <form>
-                    <div class="modal-body">
-                        <label>User</label>
-                        <p id="new_pass_username"></p>
-                        <label>Password</label>
-                        <input id="new_pass_input" type="password" class="form-control"/>
-                        <label>Confirm Password</label>
-                        <input id="new_pass_input_confirm" type="password" class="form-control"/>
-                        <p class="error_pass_match" style="color: red"></p>
-                    </div>
-                    <div class="modal-footer modal_btn">
-                        <button type="button" style="display: none;" class="btn"></button>
-                        <button id="save_btn" type="button" class="btn btn-success">Save</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
-                </form>
-            </div>
-
         </div>
     </div>
     <div class="modal fade" id="modalCategory" role="dialog">
@@ -160,9 +156,9 @@
                     <div class="modal-body modal_body_category">
                         <input id="new_category_id" type="text" hidden="hidden"/>
                         <label>Category name</label>
-                        <input id="new_category_name" type="text"/>
+                        <input id="new_category_name" type="text" required/>
                         <label>Description</label>
-                        <input id="new_category_desc" type="text"/>
+                        <input id="new_category_desc" type="text" required/>
                         <p id="error_category" style="color: #FF1C19"></p>
                     </div>
                     <div class="modal-footer modal_btn">
@@ -189,6 +185,39 @@
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalResetPassConfirm" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Are you sure?</h4>
+                    <input id="reset_username_inpt" type="text" hidden="hidden"/>
+                </div>
+                <div class="modal-footer modal_btn">
+                    <button type="button" style="display: none;" class="btn"></button>
+                    <button id="reset_pass_btn_confirm" type="button" class="btn btn-danger" data-delete-info="">Reset</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="alert alert-success alert-dismissible fade in">
+        <div id="approval_info">
+            <strong id="confirm_alert_message"></strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade in">
+        <div id="alert_error_info">
+            <strong id="error_alert_message"></strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
     </div>
 </div>

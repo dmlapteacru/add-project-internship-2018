@@ -2,7 +2,9 @@ package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.PasswordTokenDao;
 import com.endava.addprojectinternship2018.model.PasswordToken;
+import com.endava.addprojectinternship2018.model.dto.UserEmailDto;
 import com.endava.addprojectinternship2018.model.dto.UserWithProfileDto;
+import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,6 @@ public class PasswordTokenService {
     public void save(PasswordToken passwordToken){
         Optional<PasswordToken> oldPasswordToken = getPasswordTokenByUsername(passwordToken.getUsername());
         if (userService.getUserByUsername(passwordToken.getUsername()).isPresent()){
-            userService.changeUserStatus(passwordToken.getUsername());
             if (oldPasswordToken.isPresent()){
                 oldPasswordToken.get().setUsername(passwordToken.getUsername());
                 oldPasswordToken.get().setToken(passwordEncoder.encode(passwordToken.getToken()));
@@ -40,15 +41,18 @@ public class PasswordTokenService {
             } else {
                 passwordToken.setToken(passwordEncoder.encode(passwordToken.getToken()));
                 passwordTokenDao.save(passwordToken);
-//            UserEmailDto usersEmailDto = userService.getUsersEmailByUsername(passwordToken.getUsername());
-                UserWithProfileDto userWithProfileDto = userService.getAllUsersWithProfile().stream().filter(u -> u.getUsername().equals(passwordToken.getUsername())).findFirst().get();
+                UserEmailDto userEmailDto = userService.getUserEmailByUsername(passwordToken.getUsername());
                 String RESET_PASS_LINK = "http://localhost:8080/reset/password?username=" + passwordToken.getUsername() + "&token=" + passwordToken.getToken();
-                emailService.sendSimpleMessage(userWithProfileDto.getEmail(), "Endava reset password!", RESET_PASS_LINK);
+                emailService.sendSimpleMessage(userEmailDto.getEmail(), "Endava reset password!", RESET_PASS_LINK);
             }
         }
     }
 
-    public boolean isTokenActive(String username, String token) {
+    public boolean isTokenActive(String username, String token){
+        try {
+            passwordTokenDao.deleteOverdueTokens();
+        } catch (Exception ex){
+        }
         Optional<PasswordToken> oldPasswordToken = passwordTokenDao.findByUsername(username);
         if (oldPasswordToken.isPresent()){
             if (oldPasswordToken.get().getUsername().equals(username) && token.equals(oldPasswordToken.get().getToken())){

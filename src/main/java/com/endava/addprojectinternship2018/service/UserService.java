@@ -2,10 +2,7 @@ package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.UserDao;
 import com.endava.addprojectinternship2018.model.*;
-import com.endava.addprojectinternship2018.model.dto.UserBankAccountDto;
-import com.endava.addprojectinternship2018.model.dto.UserDto;
-import com.endava.addprojectinternship2018.model.dto.UserEmailDto;
-import com.endava.addprojectinternship2018.model.dto.UserWithProfileDto;
+import com.endava.addprojectinternship2018.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -69,6 +66,25 @@ public class UserService {
             user.setUserStatus(INACTIVE);
         } else user.setUserStatus(ACTIVE);
         userDao.save(user);
+    }
+
+    public void changeUserStatusOnActive(List<ChangeUserStatusDto> changeUserStatusDtoList) {
+        User user;
+        for (ChangeUserStatusDto u:changeUserStatusDtoList
+             ) {
+            user = userDao.findUserByUsername(u.getUsername()).get();
+            user.setUserStatus(ACTIVE);
+            userDao.save(user);
+        }
+    }
+    public void changeUserStatusOnInactive(List<ChangeUserStatusDto> changeUserStatusDtoList) {
+        User user;
+        for (ChangeUserStatusDto u:changeUserStatusDtoList
+             ) {
+            user = userDao.findUserByUsername(u.getUsername()).get();
+            user.setUserStatus(INACTIVE);
+            userDao.save(user);
+        }
     }
 
     public List<UserWithProfileDto> getAllUsersWithProfile() {
