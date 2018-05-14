@@ -48,6 +48,14 @@ public class Validator implements org.springframework.validation.Validator {
     }
 
     public void validateBulkInvoicePayment(Double balance, List<PaymentDto> paymentDtoList, Errors errors) {
-
+        double sum = 0;
+        for (PaymentDto pdto:paymentDtoList
+             ) {
+            sum = sum + pdto.getSum();
+        }
+        if (balance < sum){
+//            errors.rejectValue("sum", "Not enough money.");
+            errors.reject("Not enough money.");
+        }
     }
 }

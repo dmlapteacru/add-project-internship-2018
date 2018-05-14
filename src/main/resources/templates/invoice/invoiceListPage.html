@@ -17,7 +17,9 @@
 
 <body>
 <div th:replace="fragments/header :: header"></div>
-
+<div class="modal fade" id="load_icon_wrapper" data-backdrop="static" data-keyboard="false">
+    <img id="load" src="/img/load_icon.gif"/>
+</div>
 <div class="panel panel-primary filterable">
     <div class="panel-heading">
         <h3 class="panel-title">Invoices</h3>
@@ -28,7 +30,16 @@
     </div>
     <table class="table">
         <thead>
+        <div class="bulk_btn_wrapper" style="display: none;">
+            <a id="bulk_pay_btn" class="btn btn-danger bulk_invoices_btn">PAY</a>
+            <span>Total: <span id="bulk_pay_sum" style="font-weight: bold;"></span> MDL</span>
+        </div>
         <tr class="filters">
+            <th>
+                <div class="checkbox_users_wrapper">
+                    <input type="checkbox" id="check_all_invoices"/>
+                </div>
+            </th>
             <th><input type="text" class="form-control" placeholder="Issue Date" disabled></th>
             <th><input type="text" class="form-control" placeholder="Expire Date" disabled></th>
             <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
@@ -40,6 +51,7 @@
         </thead>
 
         <tr th:each="invoice: ${invoices}" th:id="'row' + ${invoice.getId()}">
+            <td><input type="checkbox" th:value="${invoice.id}" class="checkbox_invoice_element"/></td>
             <td id="invoice_date" th:text="${#temporals.format(invoice.getIssueDate(), 'dd-MM-yyyy')} ">Issue Date</td>
             <td th:text="${#temporals.format(invoice.getDueDate(), 'dd-MM-yyyy')}">Expire Date</td>
             <td id="sum_to_pay" th:text="${invoice.getSum()}">Sum</td>
@@ -99,6 +111,9 @@
                 type : "POST",
                 contentType: "application/json",
                 data: JSON.stringify(object),
+                beforeSend: function () {
+                    $("#load_icon_wrapper").modal("show");
+                },
                 success: function () {
                     $("#confirm_alert_message").text("Invoice paid.");
                     $(".alert-success").slideToggle("slow");
@@ -115,7 +130,109 @@
                 }
             }
         )
+    };
+/*BULK PAYMENT*/
+    function getBulkSum() {
+        var sum = 0;
+        $.each($(".checkbox_invoice_element[checked='checked']"), function () {
+            sum += parseInt($("#row" + $(this).attr("value")).find("#sum_to_pay").text());
+        });
+        if (sum > parseInt($(".balance").text())){
+            $("#bulk_pay_sum").css("color", "red");
+            $("#error_alert_message").text("Not enough money.");
+            $(".alert-danger").slideToggle("slow");
+            setTimeout(function () {
+                $(".alert-danger").slideToggle("slow");
+            },3000);
+        } else {
+            $("#bulk_pay_sum").css("color", "green");
+        }
+        $("#bulk_pay_sum").text(sum);
     }
+    $("#check_all_invoices").change(function () {
+        $(this).attr("checked", !$(this).attr("checked"));
+        if ($(this).attr("checked") === "checked") {
+            $.each($(".checkbox_invoice_element"), function () {
+                $(this).attr("checked", true);
+                $(this).prop("checked", true);
+            });
+        } else {
+            $.each($(".checkbox_invoice_element"), function () {
+                $(this).removeAttr("checked");
+                $(this).prop("checked", false);
+            });
+        }
+        if ($(".bulk_btn_wrapper").css("display") === "none"){
+            $(".bulk_btn_wrapper").css("display", "block");
+        } else {
+            $(".bulk_btn_wrapper").css("display", "none");
+        }
+        getBulkSum();
+    });
+
+
+    $(".checkbox_invoice_element").change(function () {
+        $(this).attr("checked", !$(this).attr("checked"));
+        var isAnyChecked = false;
+        $.each($(".checkbox_invoice_element"), function () {
+            if ($(this).attr("checked") === "checked"){
+                isAnyChecked = true;
+            }
+        });
+
+        if (isAnyChecked === true){
+            $(".bulk_btn_wrapper").css("display", "block");
+            $("#check_all_invoices").attr("checked", "checked");
+        } else {
+            $(".bulk_btn_wrapper").css("display", "none");
+            $("#check_all_invoices").removeAttr("checked");
+            $("#check_all_invoices").prop("checked", false);
+        }
+        getBulkSum();
+    });
+
+    $("#bulk_pay_btn").click(function () {
+        if (parseInt($("#bulk_pay_sum")) > parseInt($(".balance").text())){
+            $("#error_alert_message").text("Not enough money.");
+            $(".alert-danger").slideToggle("slow");
+            setTimeout(function () {
+                $(".alert-danger").slideToggle("slow");
+            },3000);
+        } else {
+            var invoiceList = [];
+            $.each($(".checkbox_invoice_element[checked='checked']"), function () {
+                var correspondentCount = $(this).attr("value");
+                var description = "Invoice from " + $("#row" + $(this).attr("value")).find("#invoice_date").text() + " is paid. ";
+                var item = {};
+                item["correspondentCount"] = correspondentCount;
+                item["sum"] = $("#row" + $(this).attr("value")).find("#sum_to_pay").text();
+                item["description"] = description;
+                invoiceList.push(item);
+            });
+            $.ajax(
+                {
+                    url: "/bankAccount/payinvoice/bulk?bal=" + $(".balance").text(),
+                    type: "POST",
+                    beforeSend: function () {
+                        $("#load_icon_wrapper").modal("show");
+                    },
+                    contentType: "application/json",
+                    data: JSON.stringify(invoiceList),
+                    success: function () {
+                        location.reload();
+                    },
+                    error: function (response) {
+                        $("#error_alert_message").text(response.responseText);
+                        $(".alert-danger").slideToggle("slow");
+                        setTimeout(function () {
+                            $(".alert-danger").slideToggle("slow");
+                        },5000);
+                    }
+                }
+            )
+        }
+
+    });
 </script>
 </body>
 </html>
