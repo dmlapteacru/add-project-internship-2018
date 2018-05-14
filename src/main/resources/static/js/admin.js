@@ -258,15 +258,12 @@ $("#check_all_users").change(function () {
             $(this).attr("checked", true);
             $(this).prop("checked", true);
         });
+        $(".change_status_all_btn").css("display", "block");
     } else {
         $.each($(".checkbox_users_element"), function () {
             $(this).removeAttr("checked");
             $(this).prop("checked", false);
         });
-    }
-    if ($(".change_status_all_btn").css("display") === "none"){
-        $(".change_status_all_btn").css("display", "block");
-    } else {
         $(".change_status_all_btn").css("display", "none");
     }
 });
@@ -283,11 +280,8 @@ $(".checkbox_users_element").change(function () {
 
     if (isAnyChecked === true){
         $(".change_status_all_btn").css("display", "block");
-        $("#check_all_users").attr("checked", "checked");
     } else {
         $(".change_status_all_btn").css("display", "none");
-        $("#check_all_users").removeAttr("checked");
-        $("#check_all_users").prop("checked", false);
     }
 });
 
@@ -358,15 +352,12 @@ $("#check_all_messages").change(function () {
             $(this).attr("checked", true);
             $(this).prop("checked", true);
         });
+        $(".change_status_all_btn_mess").css("display", "block");
     } else {
         $.each($(".checkbox_mess_element"), function () {
             $(this).removeAttr("checked");
             $(this).prop("checked", false);
         });
-    }
-    if ($(".change_status_all_btn_mess").css("display") === "none"){
-        $(".change_status_all_btn_mess").css("display", "block");
-    } else {
         $(".change_status_all_btn_mess").css("display", "none");
     }
 });
@@ -382,11 +373,8 @@ function checkBTN(obj) {
 
     if (isAnyChecked === true){
         $(".change_status_all_btn_mess").css("display", "block");
-        $("#check_all_messages").attr("checked", "checked");
     } else {
         $(".change_status_all_btn_mess").css("display", "none");
-        $("#check_all_messages").removeAttr("checked");
-        $("#check_all_messages").prop("checked", false);
     }
 }
 

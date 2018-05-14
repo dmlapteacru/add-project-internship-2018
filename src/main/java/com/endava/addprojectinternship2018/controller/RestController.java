@@ -317,7 +317,7 @@ public class RestController {
     }
 
     @RequestMapping(value = "/admin/message/delete/{id}", method = RequestMethod.DELETE)
-    public String deleteMessage(@PathVariable int id) {
+    public String deleteMessage(@PathVariable int id){
         adminMessageService.deleteById(id);
         return "OK";
     }
@@ -338,31 +338,31 @@ public class RestController {
         return "OK";
     }
     @RequestMapping(value = "/bankAccount/create", method = POST)
-    public ResponseEntity<UserBankAccountDto> newAccount() {
+    public ResponseEntity<UserBankAccountDto> newAccount(){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<>("param", headers);
-        UserBankAccountDto response = restTemplate.postForObject(bankIP + "/bankaccount/create", request, UserBankAccountDto.class);
+        UserBankAccountDto response = restTemplate.postForObject( bankIP +"/bankaccount/create", request , UserBankAccountDto.class );
         userBankAccountService.save(response);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/bankAccount/balance", method = POST)
-    public String getBalance() {
+    public String getBalance(){
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
         headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
         HttpEntity<String> request = new HttpEntity<>("param", headers);
-        String response = restTemplate.postForObject(bankIP + "/bankaccount/balance", request, String.class);
+        String response = restTemplate.postForObject( bankIP +"/bankaccount/balance", request , String.class );
         return response;
     }
 
     @RequestMapping(value = "/bankAccount/addmoney", method = POST)
     public ResponseEntity<?> addMoney(@RequestParam Double sum){
-        if (sum < 1){
-            return new ResponseEntity<>("Must be greater than 0.", HttpStatus.BAD_REQUEST);
+        if (sum == null || sum < 0.01){
+            return new ResponseEntity<>("Must be greater than 0.01 MDL.", HttpStatus.BAD_REQUEST);
         }
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
         HttpHeaders headers = new HttpHeaders();
