@@ -394,24 +394,30 @@ public class RestController {
         restTemplate.postForObject( bankIP +"/sendmoney", request , String.class );
         return new ResponseEntity<>(HttpStatus.OK);
     }
-//    @RequestMapping(value = "/bankAccount/payinvoice/bulk", method = POST)
-//    public ResponseEntity<?> payInvoice(@RequestParam(name = "bal") Double balance, @RequestBody List<PaymentDto> paymentDtoList, BindingResult error){
-//        validator.validateBulkInvoicePayment(balance, paymentDtoList, error);
-//        if (error.hasErrors()){
-//            return new ResponseEntity<>(error.getFieldError().getCode(), HttpStatus.BAD_REQUEST);
-//        }
-//        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-//        headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
-//        headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
-//        invoiceService.setInvoiceAsPaid(paymentDto.getCorrespondentCount().intValue());
-//        paymentDto.setDescription(paymentDto.getDescription() + invoiceService.setInvoiceDescription(paymentDto.getCorrespondentCount().intValue()).getFullDescription());
-//        paymentDto.setCorrespondentCount(companyService.getCompanyByInvoiceId(paymentDto.getCorrespondentCount().intValue()).getCountNumber());
+    @RequestMapping(value = "/bankAccount/payinvoice/bulk", method = POST)
+    public ResponseEntity<?> payInvoice(@RequestParam(name = "bal") Double balance, @RequestBody List<PaymentDto> paymentDtoList, BindingResult error){
+        validator.validateBulkInvoicePayment(balance, paymentDtoList, error);
+        if (error.hasErrors()){
+            return new ResponseEntity<>("Not enough money.", HttpStatus.BAD_REQUEST);
+        }
+        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
+        headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
+        for (PaymentDto p:paymentDtoList
+             ) {
+            invoiceService.setInvoiceAsPaid(p.getCorrespondentCount().intValue());
+            p.setDescription(p.getDescription() +
+                    invoiceService.setInvoiceDescription(p.getCorrespondentCount().intValue())
+                            .getFullDescription());
+            p.setCorrespondentCount(companyService.getCompanyByInvoiceId(p.getCorrespondentCount().intValue())
+                    .getCountNumber());
+        }
 //        HttpEntity<PaymentDto> request = new HttpEntity<>(paymentDto, headers);
 //        restTemplate.postForObject( bankIP +"/sendmoney", request , String.class );
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
     @RequestMapping(value = "/bankAccount/statement", method = POST)
     public ResponseEntity<?> getStatement(@RequestBody StatementDateReqDto dateReqDto, BindingResult error){
         validator.validateStatementDates(dateReqDto, error);

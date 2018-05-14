@@ -11,6 +11,4 @@ public class PaymentDto {
     private Long correspondentCount;
     private Double sum;
     private String description;
-
-
 }
