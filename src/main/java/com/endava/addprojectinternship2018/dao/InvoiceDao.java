@@ -31,6 +31,8 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
 
     List<Invoice> findAllByContractCustomerId(int id);
 
+    List<Invoice> findAllByContractCustomerIdAndStatusNot(int customerId, InvoiceStatus status);
+
     List<Invoice> findAllByContract_Company_Name(String name);
 
     List<Invoice> findAllByContract_Company_IdOrderById(int id);

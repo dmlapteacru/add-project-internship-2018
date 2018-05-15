@@ -61,6 +61,10 @@ public class InvoiceService {
         return invoiceDao.findAllByContractCustomerId(id);
     }
 
+    public List<Invoice> getAllByCustomerIdAndStatusNot(int customerId) {
+        return invoiceDao.findAllByContractCustomerIdAndStatusNot(customerId, InvoiceStatus.ISSUED);
+    }
+
     public List<Invoice> getInvoicesByCompanyId(int id) {
         return invoiceDao.findAllByContract_Company_IdOrderById(id);
     }

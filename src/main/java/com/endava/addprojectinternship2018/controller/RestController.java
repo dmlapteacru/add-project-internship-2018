@@ -112,7 +112,7 @@ public class RestController {
     @RequestMapping(value = "/admin/newCategory", method = RequestMethod.PUT)
     public ResponseEntity<?> saveNewCategory(@RequestBody Category category, BindingResult error) {
         validator.validate(category, error);
-        if (error.hasErrors()){
+        if (error.hasErrors()) {
             return new ResponseEntity<>(error.getFieldError().getCode(), HttpStatus.BAD_REQUEST);
         }
         categoryService.saveCategory(category);
@@ -251,16 +251,19 @@ public class RestController {
         response.setStatus("SUCCESS");
         final List<ErrorMessage> errorMessageList = new ArrayList<>();
 
-        if (bindingResult.hasErrors()) {
+        if (productDtoTest.getName() == null || productDtoTest.getName().isEmpty()) {
             response.setStatus("FAIL");
-            bindingResult.getFieldErrors().stream()
-                    .map(fieldError -> new ErrorMessage(fieldError.getField(), fieldError.getDefaultMessage()))
-                    .forEach(errorMessageList::add);
+            errorMessageList.add(new ErrorMessage("new_service_name", "Must not be empty"));
         }
 
-        if (productDtoTest.getPrice() < 0) {
+        if (productDtoTest.getName().matches("(<\\s*script\\s*>)|(alert\\s*\\(\\s*\\))")) {
             response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("new_service_price", "Price cannot be negative"));
+            errorMessageList.add(new ErrorMessage("new_service_name", "contains illegal characters"));
+        }
+
+        if (productDtoTest.getPrice() <= 0) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_service_price", "Price must be more than 0"));
         }
 
         Optional<Product> optionalProduct = productService.getByNameAndCategoryIdAndCompanyId(
@@ -270,6 +273,13 @@ public class RestController {
         if (optionalProduct.isPresent()) {
             response.setStatus("FAIL");
             errorMessageList.add(new ErrorMessage("new_service_name", "Service name exists"));
+        }
+
+        if (bindingResult.hasErrors()) {
+            response.setStatus("FAIL");
+            bindingResult.getFieldErrors().stream()
+                    .map(fieldError -> new ErrorMessage(fieldError.getField(), fieldError.getDefaultMessage()))
+                    .forEach(errorMessageList::add);
         }
 
         response.setErrorMessageList(errorMessageList);
@@ -307,11 +317,13 @@ public class RestController {
         adminMessageService.changeMessageStatus(id);
         return "OK";
     }
+
     @RequestMapping(value = "/admin/message/changeStatus/read", method = RequestMethod.PUT)
     public String changeMessageStatusOnRead(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList) {
         adminMessageService.changeMessageStatusOnRead(changeMessageStatusDtoList);
         return "OK";
     }
+
     @RequestMapping(value = "/admin/message/changeStatus/unread", method = RequestMethod.PUT)
     public String changeMessageStatusOnUnRead(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList) {
         adminMessageService.changeMessageStatusOnUnRead(changeMessageStatusDtoList);
@@ -319,51 +331,54 @@ public class RestController {
     }
 
     @RequestMapping(value = "/admin/message/delete/{id}", method = RequestMethod.DELETE)
-    public String deleteMessage(@PathVariable int id){
+    public String deleteMessage(@PathVariable int id) {
         adminMessageService.deleteById(id);
         return "OK";
     }
+
     @RequestMapping(value = "/admin/message/bulkDelete", method = RequestMethod.DELETE)
-    public String deleteMessage(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList){
+    public String deleteMessage(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList) {
         adminMessageService.deleteMessages(changeMessageStatusDtoList);
         return "OK";
     }
 
     @RequestMapping(value = "/admin/changeUserStatus/active", method = POST)
-    public String changeUserStatusOnActive(@RequestBody List<ChangeUserStatusDto> changeUserStatusDto){
+    public String changeUserStatusOnActive(@RequestBody List<ChangeUserStatusDto> changeUserStatusDto) {
         userService.changeUserStatusOnActive(changeUserStatusDto);
         return "OK";
     }
+
     @RequestMapping(value = "/admin/changeUserStatus/inactive", method = POST)
-    public String changeUserStatusOnInactive(@RequestBody List<ChangeUserStatusDto> changeUserStatusDto){
+    public String changeUserStatusOnInactive(@RequestBody List<ChangeUserStatusDto> changeUserStatusDto) {
         userService.changeUserStatusOnInactive(changeUserStatusDto);
         return "OK";
     }
+
     @RequestMapping(value = "/bankAccount/create", method = POST)
-    public ResponseEntity<UserBankAccountDto> newAccount(){
+    public ResponseEntity<UserBankAccountDto> newAccount() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<String> request = new HttpEntity<>("param", headers);
-        UserBankAccountDto response = restTemplate.postForObject( bankIP +"/bankaccount/create", request , UserBankAccountDto.class );
+        UserBankAccountDto response = restTemplate.postForObject(bankIP + "/bankaccount/create", request, UserBankAccountDto.class);
         userBankAccountService.save(response);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/bankAccount/balance", method = POST)
-    public String getBalance(){
+    public String getBalance() {
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
         headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
         HttpEntity<String> request = new HttpEntity<>("param", headers);
-        String response = restTemplate.postForObject( bankIP +"/bankaccount/balance", request , String.class );
+        String response = restTemplate.postForObject(bankIP + "/bankaccount/balance", request, String.class);
         return response;
     }
 
     @RequestMapping(value = "/bankAccount/addmoney", method = POST)
-    public ResponseEntity<?> addMoney(@RequestParam Double sum){
-        if (sum == null || sum < 0.01){
+    public ResponseEntity<?> addMoney(@RequestParam Double sum) {
+        if (sum == null || sum < 0.01) {
             return new ResponseEntity<>("Must be greater than 0.01 MDL.", HttpStatus.BAD_REQUEST);
         }
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
@@ -374,14 +389,14 @@ public class RestController {
         Map<String, Double> body = new HashMap<>();
         body.put("sum", sum);
         HttpEntity<Map> request = new HttpEntity<>(body, headers);
-        restTemplate.postForObject( bankIP +"/bankaccount/addmoney", request , String.class );
+        restTemplate.postForObject(bankIP + "/bankaccount/addmoney", request, String.class);
         return new ResponseEntity<>("Money added.", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/bankAccount/payinvoice", method = POST)
-    public ResponseEntity<?> payInvoice(@RequestParam(name = "bal") Double balance, @RequestBody PaymentDto paymentDto, BindingResult error){
+    public ResponseEntity<?> payInvoice(@RequestParam(name = "bal") Double balance, @RequestBody PaymentDto paymentDto, BindingResult error) {
         validator.validateInvoicePayment(balance, paymentDto, error);
-        if (error.hasErrors()){
+        if (error.hasErrors()) {
             return new ResponseEntity<>(error.getFieldError().getCode(), HttpStatus.BAD_REQUEST);
         }
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
@@ -393,13 +408,14 @@ public class RestController {
         paymentDto.setDescription(paymentDto.getDescription() + invoiceService.setInvoiceDescription(paymentDto.getCorrespondentCount().intValue()).getFullDescription());
         paymentDto.setCorrespondentCount(companyService.getCompanyByInvoiceId(paymentDto.getCorrespondentCount().intValue()).getCountNumber());
         HttpEntity<PaymentDto> request = new HttpEntity<>(paymentDto, headers);
-        restTemplate.postForObject( bankIP +"/sendmoney", request , String.class );
+        restTemplate.postForObject(bankIP + "/sendmoney", request, String.class);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
     @RequestMapping(value = "/bankAccount/payinvoice/bulk", method = POST)
-    public ResponseEntity<?> payInvoice(@RequestParam(name = "bal") Double balance, @RequestBody List<PaymentDto> paymentDtoList, BindingResult error){
+    public ResponseEntity<?> payInvoice(@RequestParam(name = "bal") Double balance, @RequestBody List<PaymentDto> paymentDtoList, BindingResult error) {
         validator.validateBulkInvoicePayment(balance, paymentDtoList, error);
-        if (error.hasErrors()){
+        if (error.hasErrors()) {
             return new ResponseEntity<>("Not enough money.", HttpStatus.BAD_REQUEST);
         }
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
@@ -407,8 +423,8 @@ public class RestController {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
         headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
-        for (PaymentDto p:paymentDtoList
-             ) {
+        for (PaymentDto p : paymentDtoList
+                ) {
             invoiceService.setInvoiceAsPaid(p.getCorrespondentCount().intValue());
             p.setDescription(p.getDescription() +
                     invoiceService.setInvoiceDescription(p.getCorrespondentCount().intValue())
@@ -420,10 +436,11 @@ public class RestController {
 //        restTemplate.postForObject( bankIP +"/sendmoney", request , String.class );
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
     @RequestMapping(value = "/bankAccount/statement", method = POST)
-    public ResponseEntity<?> getStatement(@RequestBody StatementDateReqDto dateReqDto, BindingResult error){
+    public ResponseEntity<?> getStatement(@RequestBody StatementDateReqDto dateReqDto, BindingResult error) {
         validator.validateStatementDates(dateReqDto, error);
-        if (error.hasErrors()){
+        if (error.hasErrors()) {
             return new ResponseEntity<>(error.getFieldError().getCode(), HttpStatus.BAD_REQUEST);
         }
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
@@ -432,7 +449,8 @@ public class RestController {
         headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
         headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
         HttpEntity<StatementDateReqDto> request = new HttpEntity<>(dateReqDto, headers);
-        ResponseEntity<List<StatementDto>> response = restTemplate.exchange( bankIP +"/statement/statement",HttpMethod.POST, request , new ParameterizedTypeReference<List<StatementDto>>(){});
+        ResponseEntity<List<StatementDto>> response = restTemplate.exchange(bankIP + "/statement/statement", HttpMethod.POST, request, new ParameterizedTypeReference<List<StatementDto>>() {
+        });
         return new ResponseEntity<>(response.getBody(), HttpStatus.OK);
     }
 

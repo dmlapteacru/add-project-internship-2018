@@ -95,17 +95,16 @@
         </tr>
         </thead>
         <tbody class="filter_body">
-        <tr th:each="invoice: ${invoices}" th:id="'row' + ${invoice.id}">
-            <td><input type="checkbox" th:value="${invoice.id}" th:if="${invoice.status}!='PAID'" class="checkbox_invoice_element"/></td>
-            <!--<td id="invoice_date" th:text="${#temporals.format(invoice.issueDate, 'dd-MM-yyyy')} ">Issue Date</td>-->
-            <td id="invoice_date" th:text="${#dates.format(invoice.issueDate, 'dd-MM-yyyy')}">Issue Date</td>
-            <td th:text="${#dates.format(invoice.dueDate, 'dd-MM-yyyy')}">Expire Date</td>
+        <tr th:each="invoice: ${invoices}" th:id="'row' + ${invoice.getId()}">
+            <td><input type="checkbox" th:value="${invoice.id}" th:if="${invoice.status}!=${invoice.status.PAID}" class="checkbox_invoice_element"/></td>
+            <td id="invoice_date" th:text="${#temporals.format(invoice.issueDate, 'dd-MM-yyyy')} ">Issue Date</td>
+            <td th:text="${#temporals.format(invoice.dueDate, 'dd-MM-yyyy')}">Expire Date</td>
             <td><span id="sum_to_pay" th:text="${invoice.sum}"></span><span> MDL</span></td>
             <td class="filter_status_invoice" th:text="${invoice.getStatus()}">Status</td>
-            <td th:text="${invoice.companyName}">Company</td>
-            <td th:text="${invoice.productName}">Service</td>
+            <td th:text="${invoice.getContract().getCompany().getName()}">Company</td>
+            <td th:text="${invoice.getContract().getProduct().getName()}">Service</td>
             <td>
-                <button th:if="${invoice.status}!='PAID'" th:id="${invoice.id}" class="btn btn-danger" onclick="payInvoice(this)">PAY</button>
+                <button th:if="${invoice.getStatus()}!=${invoice.status.PAID}" th:id="${invoice.getId()}" class="btn btn-danger" onclick="payInvoice(this)">PAY</button>
             </td>
         </tr>
         </tbody>

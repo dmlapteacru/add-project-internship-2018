@@ -179,7 +179,7 @@ public class CustomerController {
     public String getInvoicesPage(Model model) {
 
         int currentCustomerId = userUtil.getCurrentCustomer().getId();
-        model.addAttribute("invoices", invoiceService.getInvoicesByCustomerId(currentCustomerId));
+        model.addAttribute("invoices", invoiceService.getAllByCustomerIdAndStatusNot(currentCustomerId));
         model.addAttribute("filter", new AdvancedFilter());
 
         model.addAttribute("statusListForFilter", Arrays.asList(InvoiceStatus.values()));
