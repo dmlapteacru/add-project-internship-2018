@@ -23,7 +23,7 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
 
     List<Invoice> findByContractId(int id);
 
-    List<Invoice>findAllByStatus(InvoiceStatus invoiceStatus);
+    List<Invoice> findAllByStatus(InvoiceStatus invoiceStatus);
 
     List<Invoice> findAllByIssueDate(LocalDate localDate);
 
@@ -54,5 +54,25 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
             "LEFT JOIN company com on com.id=co.company_id\n" +
             "LEFT JOIN product pr on co.product_id=pr.id\n WHERE co.customer_id=:id",nativeQuery = true)
     List<Object[]> findAllInvoiceCustomerViewByCustomerId(@Param(value = "id") int id);
+
+    long countAllByContractCustomerIdAndStatus(int customerId, InvoiceStatus status);
+
+    long countAllByContractCompanyIdAndStatus(int companyId, InvoiceStatus status);
+
+    List<Invoice> findAllByContractCustomerIdAndStatusAndSumBetweenAndIssueDateBetween(int customerId, InvoiceStatus status,
+                                                                                       double sumFrom, double sumTo,
+                                                                                       LocalDate dateFrom, LocalDate dateTo);
+
+    List<Invoice> findAllByContractCompanyIdAndStatusAndSumBetweenAndIssueDateBetween(int companyId, InvoiceStatus status,
+                                                                                      double sumFrom, double sumTo,
+                                                                                      LocalDate dateFrom, LocalDate dateTo);
+
+    List<Invoice> findAllByContractCompanyIdAndSumBetweenAndIssueDateBetween(int companyId,
+                                                                             double sumFrom, double sumTo,
+                                                                             LocalDate dateFrom, LocalDate dateTo);
+
+    List<Invoice> findAllByContractCustomerIdAndSumBetweenAndIssueDateBetween(int customerId,
+                                                                             double sumFrom, double sumTo,
+                                                                             LocalDate dateFrom, LocalDate dateTo);
 
 }

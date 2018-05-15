@@ -34,6 +34,14 @@ public class ProductService {
         return productDao.findAll();
     }
 
+    public long countAll() {
+        return productDao.count();
+    }
+
+    public long countByCompanyId(int companyId) {
+        return productDao.countByCompanyId(companyId);
+    }
+
     public List<Product> getAllByCategoryId(int categoryId) {
         return productDao.findAllByCategoryId(categoryId);
     }

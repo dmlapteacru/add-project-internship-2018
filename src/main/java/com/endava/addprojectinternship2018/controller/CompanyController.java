@@ -49,17 +49,31 @@ public class CompanyController {
 
     @GetMapping(value = "home")
     public String showCompanyPage(Model model) {
+
         Company currentCompany = userUtil.getCurrentCompany();
+        int currentCompanyId = currentCompany.getId();
         model.addAttribute("companyName", currentCompany.getName());
         model.addAttribute("activeContracts",
-                contractService.countByCompanyAndStatus(currentCompany.getId(), ContractStatus.ACTIVE));
+                contractService.countByCompanyAndStatus(currentCompanyId, ContractStatus.ACTIVE));
         model.addAttribute("signedContracts",
-                contractService.countByCompanyAndStatus(currentCompany.getId(), ContractStatus.SIGNED_BY_COMPANY));
+                contractService.countByCompanyAndStatus(currentCompanyId, ContractStatus.SIGNED_BY_COMPANY));
         model.addAttribute("unsignedContracts",
-                contractService.countByCompanyAndStatus(currentCompany.getId(), ContractStatus.UNSIGNED));
+                contractService.countByCompanyAndStatus(currentCompanyId, ContractStatus.UNSIGNED));
         model.addAttribute("filterActiveContracts", new AdvancedFilter(ContractStatus.ACTIVE));
-        model.addAttribute("filterSignedContracts", new AdvancedFilter(ContractStatus.SIGNED_BY_CUSTOMER));
+        model.addAttribute("filterSignedContracts", new AdvancedFilter(ContractStatus.SIGNED_BY_COMPANY));
         model.addAttribute("filterUnsignedContracts", new AdvancedFilter(ContractStatus.UNSIGNED));
+
+        model.addAttribute("totalServices", productService.countByCompanyId(currentCompany.getId()));
+
+        model.addAttribute("filterIssuedInvoices", new AdvancedFilter(InvoiceStatus.ISSUED));
+        model.addAttribute("filterSentInvoices", new AdvancedFilter(InvoiceStatus.SENT));
+        model.addAttribute("filterPaidInvoices", new AdvancedFilter(InvoiceStatus.PAID));
+        model.addAttribute("filterOverdueInvoices", new AdvancedFilter(InvoiceStatus.OVERDUE));
+        model.addAttribute("issuedInvoices", invoiceService.countByCompanyIdAndStatus(currentCompanyId, InvoiceStatus.ISSUED));
+        model.addAttribute("sentInvoices", invoiceService.countByCompanyIdAndStatus(currentCompanyId, InvoiceStatus.SENT));
+        model.addAttribute("paidInvoices", invoiceService.countByCompanyIdAndStatus(currentCompanyId, InvoiceStatus.PAID));
+        model.addAttribute("overdueInvoices", invoiceService.countByCompanyIdAndStatus(currentCompanyId, InvoiceStatus.OVERDUE));
+
         return "company/homePage";
     }
 
@@ -73,7 +87,6 @@ public class CompanyController {
         model.addAttribute("customerId", 0);
         model.addAttribute("companyId", currentCompanyId);
         model.addAttribute("companyName", currentCompanyName);
-        model.addAttribute("productId", 0);
         model.addAttribute("status", InvoiceStatus.ISSUED);
         model.addAttribute("statusListForFilter", Arrays.asList(ContractStatus.values()));
         model.addAttribute("filter", new AdvancedFilter());
@@ -93,7 +106,6 @@ public class CompanyController {
         model.addAttribute("customerId", 0);
         model.addAttribute("companyId", currentCompanyId);
         model.addAttribute("companyName", currentCompanyName);
-        model.addAttribute("productId", 0);
         model.addAttribute("status", InvoiceStatus.ISSUED);
         model.addAttribute("statusListForFilter", contractStatusList);
         model.addAttribute("filter", filter);
@@ -110,6 +122,22 @@ public class CompanyController {
         model.addAttribute("companyId", currentCompanyId);
         model.addAttribute("invoices", invoices);
 
+        model.addAttribute("filter", new AdvancedFilter());
+        model.addAttribute("statusListForFilter", Arrays.asList(InvoiceStatus.values()));
+
+        return "invoice/invoicesByCompany";
+    }
+
+    @PostMapping(value = "invoices/filtered")
+    public String getInvoicesFiltered(@ModelAttribute(name = "filter") AdvancedFilter filter, Model model) {
+
+        int currentCompanyId = userUtil.getCurrentCompany().getId();
+        model.addAttribute("companyId", currentCompanyId);
+        model.addAttribute("invoices", invoiceService.getInvoicesByCompanyIdFiltered(currentCompanyId, filter));
+
+        model.addAttribute("filter", filter);
+        model.addAttribute("statusListForFilter", Arrays.asList(InvoiceStatus.values()));
+
         return "invoice/invoicesByCompany";
     }
 
@@ -121,7 +149,7 @@ public class CompanyController {
         model.addAttribute("companyId", company.getId());
         model.addAttribute("products", productService.getAllByCompanyId(company.getId()));
         model.addAttribute("categoryList", categoryService.getAllCategory());
-        model.addAttribute("filter" , new AdvancedFilter());
+        model.addAttribute("filter", new AdvancedFilter());
 
         return "product/productListPage";
     }
@@ -134,7 +162,7 @@ public class CompanyController {
         model.addAttribute("companyId", company.getId());
         model.addAttribute("products", productService.getAllByCompanyIdFiltered(company.getId(), filter));
         model.addAttribute("categoryList", categoryService.getAllCategory());
-        model.addAttribute("filter" , filter);
+        model.addAttribute("filter", filter);
 
         return "product/productListPage";
     }

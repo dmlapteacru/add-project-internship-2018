@@ -20,6 +20,44 @@
 <div class="modal fade" id="load_icon_wrapper" data-backdrop="static" data-keyboard="false">
     <img id="load" src="/img/load_icon.gif"/>
 </div>
+
+<div class="panel panel-default panel-no-border">
+    <div class="panel-body">
+        <form class="form-inline pull-right"
+              th:object="${filter}"
+              th:action="@{/customer/invoices/filtered}"
+              method="post">
+            <div class="form-group">
+                <select id="adv_filter_status" class="form-control input-sm" th:field="*{invoiceStatus}">
+                    <option value="">--all--</option>
+                    <option th:each="currStatus : ${statusListForFilter}"
+                            th:value="${currStatus.name()}"
+                            th:text="${currStatus.toString()}">
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumFrom}"
+                       placeholder="sum from"/>
+                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumTo}"
+                       placeholder="sum to"/>
+            </div>
+            <div class="form-group">
+                <input type="date" id="adv_filter_date_from" class="form-control input-sm col-sm-2"
+                       th:field="*{dateFrom}"/>
+                <input type="date" id="adv_filter_date_to" class="form-control input-sm col-sm-2"
+                       th:field="*{dateTo}"/>
+            </div>
+
+            <button type="submit" class="btn btn-info btn-sm">apply
+                <span class="glyphicon glyphicon-filter"></span>
+            </button>
+            <a th:href="@{/customer/invoices}"
+               class="btn btn-default btn-sm">clear</a>
+        </form>
+    </div>
+</div>
+
 <div class="panel panel-primary filterable">
     <div class="panel-heading">
         <h3 class="panel-title">Invoices</h3>

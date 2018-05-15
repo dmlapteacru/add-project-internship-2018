@@ -5,6 +5,7 @@ import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
 import com.endava.addprojectinternship2018.model.dto.ContractDto;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
+import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.service.*;
 import com.endava.addprojectinternship2018.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,16 +48,26 @@ public class CustomerController {
     public String getHomePage(Model model) {
 
         Customer currentCustomer = userUtil.getCurrentCustomer();
+        int currentCustomerId = currentCustomer.getId();
         model.addAttribute("customerName", currentCustomer.getFullName());
         model.addAttribute("activeContracts",
-                contractService.countByCustomerAndStatus(currentCustomer.getId(), ContractStatus.ACTIVE));
+                contractService.countByCustomerAndStatus(currentCustomerId, ContractStatus.ACTIVE));
         model.addAttribute("signedContracts",
-                contractService.countByCustomerAndStatus(currentCustomer.getId(), ContractStatus.SIGNED_BY_CUSTOMER));
+                contractService.countByCustomerAndStatus(currentCustomerId, ContractStatus.SIGNED_BY_CUSTOMER));
         model.addAttribute("unsignedContracts",
-                contractService.countByCustomerAndStatus(currentCustomer.getId(), ContractStatus.UNSIGNED));
+                contractService.countByCustomerAndStatus(currentCustomerId, ContractStatus.UNSIGNED));
         model.addAttribute("filterActiveContracts", new AdvancedFilter(ContractStatus.ACTIVE));
         model.addAttribute("filterSignedContracts", new AdvancedFilter(ContractStatus.SIGNED_BY_CUSTOMER));
         model.addAttribute("filterUnsignedContracts", new AdvancedFilter(ContractStatus.UNSIGNED));
+
+        model.addAttribute("totalServices", productService.countAll());
+
+        model.addAttribute("filterSentInvoices", new AdvancedFilter(InvoiceStatus.SENT));
+        model.addAttribute("filterPaidInvoices", new AdvancedFilter(InvoiceStatus.PAID));
+        model.addAttribute("filterOverdueInvoices", new AdvancedFilter(InvoiceStatus.OVERDUE));
+        model.addAttribute("sentInvoices", invoiceService.countByCustomerIdAndStatus(currentCustomerId, InvoiceStatus.SENT));
+        model.addAttribute("paidInvoices", invoiceService.countByCustomerIdAndStatus(currentCustomerId, InvoiceStatus.PAID));
+        model.addAttribute("overdueInvoices", invoiceService.countByCustomerIdAndStatus(currentCustomerId, InvoiceStatus.OVERDUE));
 
         return "customer/homePage";
     }
@@ -98,7 +109,6 @@ public class CustomerController {
         model.addAttribute("contractList", contractService.getAllByCustomerId(currentCustomerId));
         model.addAttribute("customerId", currentCustomerId);
         model.addAttribute("companyId", 0);
-        model.addAttribute("productId", 0);
         model.addAttribute("statusListForFilter", Arrays.asList(ContractStatus.values()));
         model.addAttribute("filter", new AdvancedFilter());
 
@@ -113,7 +123,6 @@ public class CustomerController {
         model.addAttribute("contractList", contractService.getAllByCustomerIdFiltered(currentCustomerId, filter));
         model.addAttribute("customerId", currentCustomerId);
         model.addAttribute("companyId", 0);
-        model.addAttribute("productId", 0);
         model.addAttribute("statusListForFilter", Arrays.asList(ContractStatus.values()));
         model.addAttribute("filter", filter);
 
@@ -148,6 +157,7 @@ public class CustomerController {
         return "product/productListPage";
     }
 
+    @Deprecated
     @GetMapping(value = "services/newcontract")
     public String getProductsPageSignContract(@RequestParam(name = "customerId") int customerId,
                                               @RequestParam(name = "companyId") int companyId,
@@ -169,7 +179,22 @@ public class CustomerController {
     public String getInvoicesPage(Model model) {
 
         int currentCustomerId = userUtil.getCurrentCustomer().getId();
-        model.addAttribute("invoices", invoiceService.getInvoiceCustomerViewByCutomerId(currentCustomerId));
+        model.addAttribute("invoices", invoiceService.getInvoicesByCustomerId(currentCustomerId));
+        model.addAttribute("filter", new AdvancedFilter());
+
+        model.addAttribute("statusListForFilter", Arrays.asList(InvoiceStatus.values()));
+
+        return "invoice/invoiceListPage";
+    }
+
+    @PostMapping(value = "invoices/filtered")
+    public String getInvoicesFiltered(@ModelAttribute(name = "filter") AdvancedFilter filter, Model model) {
+
+        int currentCustomerId = userUtil.getCurrentCustomer().getId();
+        model.addAttribute("invoices", invoiceService.getInvoicesByCustomerIdFiltered(currentCustomerId, filter));
+        model.addAttribute("filter", filter);
+
+        model.addAttribute("statusListForFilter", Arrays.asList(InvoiceStatus.values()));
 
         return "invoice/invoiceListPage";
     }

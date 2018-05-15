@@ -5,6 +5,7 @@ import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
 import com.endava.addprojectinternship2018.model.Product;
 import com.endava.addprojectinternship2018.model.dto.InvoiceCustomerViewDto;
+import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
 import com.endava.addprojectinternship2018.model.dto.InvoiceDescriptionPaymentDto;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
@@ -32,25 +33,27 @@ public class InvoiceService {
     @Autowired
     private InvoiceDao invoiceDao;
 
-    public List<Invoice> getAllInvoices(){
+    public List<Invoice> getAllInvoices() {
         return invoiceDao.findAll();
     }
 
-    public Invoice getInvoiceById(int invoiceId){return invoiceDao.findById(invoiceId).get();}
+    public Invoice getInvoiceById(int invoiceId) {
+        return invoiceDao.findById(invoiceId).get();
+    }
 
-    public List<Invoice> getAllInvoiceByContractId(int id){
+    public List<Invoice> getAllInvoiceByContractId(int id) {
         return invoiceDao.findByContractId(id);
     }
 
-    public List<Invoice> getAllInvoicesByStatus(InvoiceStatus status){
+    public List<Invoice> getAllInvoicesByStatus(InvoiceStatus status) {
         return invoiceDao.findAllByStatus(status);
     }
 
-    public List<Invoice> getAllInvoicesByIssueDate(LocalDate localDate){
+    public List<Invoice> getAllInvoicesByIssueDate(LocalDate localDate) {
         return invoiceDao.findAllByIssueDate(localDate);
     }
 
-    public List<Invoice> getAllInvoicesByDueDate(LocalDate localDate){
+    public List<Invoice> getAllInvoicesByDueDate(LocalDate localDate) {
         return invoiceDao.findAllByDueDate(localDate);
     }
 
@@ -58,25 +61,25 @@ public class InvoiceService {
         return invoiceDao.findAllByContractCustomerId(id);
     }
 
-    public List<Invoice> getInvoicesByCompanyId(int id){
+    public List<Invoice> getInvoicesByCompanyId(int id) {
         return invoiceDao.findAllByContract_Company_IdOrderById(id);
     }
 
-    public List<Invoice> getInvoicesByCompany(String name){
+    public List<Invoice> getInvoicesByCompany(String name) {
         return invoiceDao.findAllByContract_Company_Name(name);
-    };
+    }
 
-    public void save(Invoice invoice){
+    public void save(Invoice invoice) {
         invoiceDao.save(invoice);
     }
 
-    public void saveDto(InvoiceDto invoiceDto){
+    public void saveDto(InvoiceDto invoiceDto) {
         Invoice invoice = new Invoice(invoiceDto.getSum(), invoiceDto.getIssueDate()
                 , invoiceDto.getDueDate(), invoiceDto.getStatus(), invoiceDto.getContract());
         invoiceDao.save(invoice);
     }
 
-    public void deleteInvoice(int id){
+    public void deleteInvoice(int id) {
         invoiceDao.deleteById(id);
     }
 
@@ -108,11 +111,11 @@ public class InvoiceService {
         } else invoice.setStatus(ACTIVE);
     }
 
-    public List<Invoice> getInvoicesByStatus(InvoiceStatus invoiceStatus){
+    public List<Invoice> getInvoicesByStatus(InvoiceStatus invoiceStatus) {
         return invoiceDao.findAllByStatus(invoiceStatus);
     }
 
-    public void setInvoiceAsPaid(int id){
+    public void setInvoiceAsPaid(int id) {
         Invoice invoice = invoiceDao.findById(id).get();
         invoice.setStatus(PAID);
         invoiceDao.save(invoice);
@@ -139,4 +142,41 @@ public class InvoiceService {
         }
         return invoiceCustomerViewDtoList;
     }
+
+    public long countByCustomerIdAndStatus(int customerId, InvoiceStatus status) {
+        return invoiceDao.countAllByContractCustomerIdAndStatus(customerId, status);
+    }
+
+    public long countByCompanyIdAndStatus(int companyId, InvoiceStatus status) {
+        return invoiceDao.countAllByContractCompanyIdAndStatus(companyId, status);
+    }
+
+    public List<Invoice> getInvoicesByCustomerIdFiltered(int customerId, AdvancedFilter filter) {
+        double sumFrom = (filter.getSumFrom() == 0 ? Double.MIN_VALUE : filter.getSumFrom());
+        double sumTo = (filter.getSumTo() == 0 ? Double.MAX_VALUE : filter.getSumTo());
+        LocalDate dateFrom = (filter.getDateFrom() == null ? LocalDate.of(1, 1, 1) : filter.getDateFrom());
+        LocalDate dateTo = (filter.getDateTo() == null ? LocalDate.of(4999, 12, 31) : filter.getDateTo());
+
+        if (filter.getInvoiceStatus() == null) {
+            return invoiceDao.findAllByContractCustomerIdAndSumBetweenAndIssueDateBetween(customerId,
+                    sumFrom, sumTo, dateFrom, dateTo);
+        }
+        return invoiceDao.findAllByContractCustomerIdAndStatusAndSumBetweenAndIssueDateBetween(customerId,
+                filter.getInvoiceStatus(), sumFrom, sumTo, dateFrom, dateTo);
+    }
+
+    public List<Invoice> getInvoicesByCompanyIdFiltered(int companyId, AdvancedFilter filter) {
+        double sumFrom = (filter.getSumFrom() == 0 ? Double.MIN_VALUE : filter.getSumFrom());
+        double sumTo = (filter.getSumTo() == 0 ? Double.MAX_VALUE : filter.getSumTo());
+        LocalDate dateFrom = (filter.getDateFrom() == null ? LocalDate.of(1, 1, 1) : filter.getDateFrom());
+        LocalDate dateTo = (filter.getDateTo() == null ? LocalDate.of(4999, 12, 31) : filter.getDateTo());
+
+        if (filter.getInvoiceStatus() == null) {
+            return invoiceDao.findAllByContractCompanyIdAndSumBetweenAndIssueDateBetween(companyId,
+                    sumFrom, sumTo, dateFrom, dateTo);
+        }
+        return invoiceDao.findAllByContractCompanyIdAndStatusAndSumBetweenAndIssueDateBetween(companyId,
+                filter.getInvoiceStatus(), sumFrom, sumTo, dateFrom, dateTo);
+    }
+
 }

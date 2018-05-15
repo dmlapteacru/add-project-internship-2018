@@ -31,4 +31,6 @@ public interface ProductDao extends JpaRepository<Product, Integer> {
     List<Product> findAllByCompanyIdAndPriceBetween(int companyId, double priceFrom, double priceTo);
 
     List<Product> findAllByPriceBetween(double priceFrom, double priceTo);
+
+    long countByCompanyId(int id);
 }

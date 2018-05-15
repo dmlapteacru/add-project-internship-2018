@@ -21,7 +21,17 @@
 
 <div class="container">
 
-    <h2 th:text="'Welcome, '+${companyName}+' !'"></h2>
+    <h2 th:text="'Welcome '+${companyName}+','"></h2>
+    <h3>here is your current statistics:</h3>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Provided services</div>
+        <div class="panel-body">
+            <a th:href="@{/company/services}" class="btn btn-primary"> Total
+                <span class="badge" th:text="${totalServices}"></span>
+            </a>
+        </div>
+    </div>
 
     <div class="panel panel-default">
         <div class="panel-heading">Contracts</div>
@@ -45,6 +55,40 @@
                 <input type="hidden" th:field="*{contractStatus}">
                 <button type="submit" class="btn"> Unsigned
                     <span class="badge" th:text="${unsignedContracts}"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Invoices</div>
+        <div class="panel-body">
+            <form th:action="@{/company/invoices/filtered}"
+                  th:object="${filterIssuedInvoices}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{invoiceStatus}">
+                <button type="submit" class="btn btn-info"> Issued
+                    <span class="badge" th:text="${issuedInvoices}"></span>
+                </button>
+            </form>
+            <form th:action="@{/company/invoices/filtered}"
+                  th:object="${filterSentInvoices}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{invoiceStatus}">
+                <button type="submit" class="btn btn-primary"> Sent
+                    <span class="badge" th:text="${sentInvoices}"></span>
+                </button>
+            </form>
+            <form th:action="@{/company/invoices/filtered}"
+                  th:object="${filterPaidInvoices}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{invoiceStatus}">
+                <button type="submit" class="btn btn-info"> Paid
+                    <span class="badge" th:text="${paidInvoices}"></span>
+                </button>
+            </form>
+            <form th:action="@{/company/invoices/filtered}"
+                  th:object="${filterOverdueInvoices}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{invoiceStatus}">
+                <button type="submit" class="btn"> Overdue
+                    <span class="badge" th:text="${overdueInvoices}"></span>
                 </button>
             </form>
         </div>

@@ -67,11 +67,11 @@ public class ContractService {
         return contractDao.findByCustomerIdAndCompanyIdAndProductId(customerId, companyId, productId);
     }
 
-    public int countByCompanyAndStatus(int companyId, ContractStatus status) {
+    public long countByCompanyAndStatus(int companyId, ContractStatus status) {
         return contractDao.countByCompanyIdAndStatus(companyId, status);
     }
 
-    public int countByCustomerAndStatus(int customerId, ContractStatus status) {
+    public long countByCustomerAndStatus(int customerId, ContractStatus status) {
         return contractDao.countByCustomerIdAndStatus(customerId, status);
     }
 
