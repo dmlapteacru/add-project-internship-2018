@@ -3,7 +3,7 @@
       xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title>Customer contracts list</title>
+    <title>Contract list</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -20,9 +20,32 @@
 
 </div>
 
-<a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalContract"
-   class="btn btn-info btn-sm" role="button" th:id="${companyId}"
-   onclick="createNewContract(this)">Create new contract</a>
+<div class="panel panel-default panel-no-border">
+    <div class="panel-body">
+        <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalContract"
+           class="btn btn-info btn-sm" role="button" th:id="${companyId}"
+           onclick="createNewContract(this)">Create new contract</a>
+        <form class="form-inline">
+            <!--<div class="form-group">-->
+                <!--<label>Advanced filter</label>-->
+            <!--</div>-->
+            <div class="form-group">
+                <label for="adv_filter_status">status</label>
+                <select id="adv_filter_status" class="form-control">
+                    <option th:each="status : ${statusListForFilter}"
+                            th:value="${status.name()}"
+                            th:text="${status.toString()}">
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label></label>
+                <input type="text" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-default">Apply</button>
+        </form>
+    </div>
+</div>
 
 <div class="panel panel-primary filterable">
     <div class="panel-heading">
@@ -39,47 +62,61 @@
                                                                 placeholder="Company name" disabled></th>
             <th sec:authorize="hasAuthority('COMPANY')"><input type="text" class="form-control"
                                                                placeholder="Customer name" disabled></th>
-            <!--<th><input type="text" class="form-control" placeholder="Contract ID" disabled></th>-->
             <th><input type="text" class="form-control" placeholder="Issue date" disabled></th>
             <th><input type="text" class="form-control" placeholder="Expire date" disabled></th>
             <th><input type="text" class="form-control" placeholder="Service name" disabled></th>
             <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Status" disabled></th>
+            <th>
+                <select class="sel_status_contract" disabled>
+                    <option selected value="Status">Status</option>
+                    <option th:each="contract : ${contractList}"
+                            th:text="${contract.getStatus()}">
+                    </option>
+                </select>
+            </th>
         </tr>
 
         </thead>
-        <tbody>
+        <tbody class="filter_body">
         <tr th:each="contract : ${contractList}" th:id="${'row'+contract.getId()}">
-            <!--style="display:none;"-->
+
             <td sec:authorize="hasAuthority('CUSTOMER')" th:text="${contract.getCompany().getName()}">company name</td>
-            <td sec:authorize="hasAuthority('COMPANY')" th:id="customer" th:text="${contract.getCustomer().getFullName()}">customer
+            <td sec:authorize="hasAuthority('COMPANY')" th:id="customer"
+                th:text="${contract.getCustomer().getFullName()}">customer
                 name
             </td>
-            <td th:id="contractId" th:text="${contract.getId()}" th:value="${contract.getId()}"  style="display: none"></td>
-            <td th:id="issueDate" th:text="${#temporals.format(contract.getIssueDate(),'dd MMM yyyy')}">issue date</td>
-            <td th:id="${'dueDate'+contract.getId()}" th:text="${#temporals.format(contract.getExpireDate(),'dd MMM yyyy')}">expire date</td>
-            <td th:id="productName" th:if="${contract.getProduct()!=null}" th:text="${contract.getProduct().getName()}">service name</td>
-            <td  th:if="${contract.getProduct()==null}" >There is no product</td>
+            <td th:id="issueDate" th:text="${#temporals.format(contract.getIssueDate(),'dd.MM.yyyy')}">issue date</td>
+            <td th:id="expireDate" th:text="${#temporals.format(contract.getExpireDate(),'dd.MM.yyyy')}">expire date
+            </td>
+            <td th:id="productName" th:text="${contract.getProduct().getName()}">service name</td>
             <td th:id="sum" th:text="${#numbers.formatDecimal(contract.getSum(),1,2)+' MDL'}">sum</td>
-            <td th:id="status" th:text="${contract.getStatus()}"
-                th:value="${contract.getStatus().name()}">Status</td>
-            <td sec:authorize="hasAuthority('COMPANY')">
-                <button type="button" class="btn btn-info btn-sm" role="button"
-                        th:id="${contract.getId()}"
-                        onclick="signContract(this)">Sign
-                </button>
+            <td class="filter_status_contract" th:id="status" th:text="${contract.getStatus()}"
+                th:value="${contract.getStatus().name()}">Status
             </td>
             <td>
-                <button type="button" class="btn btn-info btn-sm" role="button"
-                        th:id="${contract.getId()}"
-                        sec:authorize="hasAuthority('COMPANY')"
-                        onclick="createNewInvoice(this)">Create invoice
-                </button>
-            </td>
-            <td>
-                <button type="button" class="btn btn-warning btn-sm" role="button"
-                        th:id="${contract.getId()}" onclick="deleteContract(this)">Delete
-                </button>
+                <div class="dropdown">
+                    <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">
+                        Actions ...
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="menu1">
+                        <li role="presentation" th:if="not ${contract.getStatus().name()=='ACTIVE'}">
+                            <a role="menuitem" tabindex="-1"
+                               th:id="'btn_sign_'+${contract.getId()}"
+                               onclick="signContract(this)">Sign</a>
+                        </li>
+                        <li role="presentation" sec:authorize="hasAuthority('COMPANY')"
+                            th:if="${contract.getStatus().name()=='ACTIVE'}">
+                            <a role="menuitem" tabindex="-1"
+                               th:id="'btn_createInvoice_'+${contract.getId()}"
+                               onclick="createNewInvoice(this)">Create invoice</a>
+                        </li>
+                        <li role="presentation">
+                            <a role="menuitem" tabindex="-1"
+                               th:id="'btn_delete_'+${contract.getId()}"
+                               onclick="deleteContract(this)">Delete</a>
+                        </li>
+                    </ul>
+                </div>
             </td>
         </tr>
         </tbody>
@@ -124,7 +161,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">Expire date</label>
+                        <label class="col-sm-3 control-label">Due date</label>
                         <div class="col-sm-6">
                             <input type="date" class="form-control" id="expire_inv_date" required="required"/>
                             <!--<p class="error-message" id="expireDateError" style="display: none">validation error</p>-->
@@ -143,7 +180,7 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Sum</label>
                         <div class="col-sm-6">
-                            <input type="number" class="form-control" id="sum_inv" />
+                            <input type="number" class="form-control" id="sum_inv"/>
                         </div>
                     </div>
 
@@ -155,8 +192,8 @@
 
 
                             <!--<select class="form-control" id="statusA">-->
-                                <!--<option selected>Signed</option>-->
-                                <!--<option>Unsigned</option>-->
+                            <!--<option selected>Signed</option>-->
+                            <!--<option>Unsigned</option>-->
                             <!--</select>-->
                         </div>
                     </div>
@@ -164,8 +201,9 @@
                     <div class="form-group">
                         <div class="col-sm-6 col-xs-offset-3">
                             <!--<button type="submit" id="btn_save_contract" class="btn btn-info">Save</button>-->
-                            <button id="save_btn" onclick="saveInvoiceButton()" type="button" class="btn btn-success">Save
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button id="save_btn" onclick="saveInvoiceButton()" type="button" class="btn btn-success">
+                                Save
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </form>
@@ -231,34 +269,34 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Issue date</label>
                         <div class="col-sm-6">
-                            <input type="date" class="form-control" id="issueDate" required="required"/>
-                            <p class="error-message" id="issueDateError" style="display: none"> validation error</p>
+                            <input type="date" class="form-control" id="new_issueDate" required="required"/>
+                            <p class="error-message" id="new_issueDateError" style="display: none"> validation error</p>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Expire date</label>
                         <div class="col-sm-6">
-                            <input type="date" class="form-control" id="expireDate" required="required"/>
-                            <p class="error-message" id="expireDateError" style="display: none">validation error</p>
+                            <input type="date" class="form-control" id="new_expireDate" required="required"/>
+                            <p class="error-message" id="new_expireDateError" style="display: none">validation error</p>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Company</label>
                         <div class="col-sm-6">
-                            <input type="text" class="form-control" id="companyA" readonly/>
-                            <input type="hidden" class="form-control" id="companyIdA"/>
+                            <input type="text" class="form-control" id="new_company" readonly/>
+                            <input type="hidden" class="form-control" id="new_companyId"/>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Customer</label>
                         <div class="col-sm-6">
-                            <select class="form-control" id="customerSelect" required="required">
+                            <select class="form-control" id="new_customerSelect" required="required">
                                 <option value="0">--select--</option>
                             </select>
-                            <p class="error-message" id="customerSelectError" style="display: none">validation
+                            <p class="error-message" id="new_customerSelectError" style="display: none">validation
                                 error</p>
                         </div>
                     </div>
@@ -266,10 +304,10 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Service</label>
                         <div class="col-sm-6">
-                            <select class="form-control" id="productSelect" required="required">
+                            <select class="form-control" id="new_productSelect" required="required">
                                 <option value="0">--select--</option>
                             </select>
-                            <p class="error-message" id="productSelectError" style="display: none">validation
+                            <p class="error-message" id="new_productSelectError" style="display: none">validation
                                 error</p>
                         </div>
                     </div>
@@ -277,19 +315,23 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Sum</label>
                         <div class="col-sm-6">
-                            <input type="number" class="form-control" id="sumA" readonly/>
-                            <p class="error-message" id="sumAError" style="display: none">validation error</p>
+                            <input type="number" class="form-control" id="new_sum" readonly/>
+                            <p class="error-message" id="new_sumError" style="display: none">validation error</p>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Signature</label>
                         <div class="col-sm-6">
-                            <select class="form-control" id="statusA">
+                            <select class="form-control" id="new_status">
                                 <option selected>Signed</option>
                                 <option>Unsigned</option>
                             </select>
                         </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <span id="new_contractError" style="display: none">validation error</span>
                     </div>
 
                     <div class="form-group">
@@ -321,13 +363,14 @@
 </div>
 <script src="/js/loadbalance.js"></script>
 </body>
-
+<script src="/js/loadbalance.js"></script>
 <script>
 
     function deleteContract(btn) {
 
+        var rowId = btn.id.substring(11);
         $('#modalDeleteConfirm').modal('show');
-        $('#deleteContractId').val(btn.id);
+        $('#deleteContractId').val(rowId);
 
     }
 
@@ -347,8 +390,9 @@
 
     function createNewInvoice(btn) {
 
-        var row = $("#row" + btn.id);
-        var issueDate= new Date();
+        var rowId = btn.id.substring(18);
+        var row = $("#row" + rowId);
+        var issueDate = new Date();
 
         // console.log(row.find("#contractId").text());
 
@@ -358,9 +402,9 @@
         $('#customer_inv_name').val(row.find("#customer").text());
         $('#product_inv').val(row.find("#productName").text());
         $('#sum_inv').val(parseFloat(row.find("#sum").text()));
-        $('#contract_inv_ID').val(row.find("#contractId").text());
+        $('#contract_inv_ID').val(rowId);
 
-        console.log('Contract ID: '+$("#contract_inv_ID").val());
+        console.log('Contract ID: ' + $("#contract_inv_ID").val());
         console.log($('#customer_inv_name').val());
         console.log($('#product_inv').val());
         console.log($('#sum_inv').val());
@@ -404,7 +448,7 @@
                 // $("#dueDate" + data.id).text(moment(data.dueDate, 'YYYY-MM-DD').format('DD-MM-YYYY'));
                 // $("#sum" + data.id).text(data.sum);
                 $("#createInvoiceDialog").modal('hide')
-                $('#alertMessage').text('New contract was added successful');
+                $('#alertMessage').text('New invoice was added successful');
                 $('#modalAlert').modal('show');
             },
             error: function (errMsg, a, b) {
@@ -420,7 +464,7 @@
 
 
     function loadAllCustomers() {
-        $('#customerSelect').find('option').each(function () {
+        $('#new_customerSelect').find('option').each(function () {
             if ($(this).text() != '--select--') {
                 $(this).remove();
             }
@@ -431,7 +475,7 @@
                 type: "GET",
                 success: function (result) {
                     $.each(result, function (id, fullName) {
-                        $("#customerSelect").append("<option value='" + id + "'>" + fullName + "</option>")
+                        $("#new_customerSelect").append("<option value='" + id + "'>" + fullName + "</option>")
                     });
                 }
             }
@@ -439,7 +483,7 @@
     }
 
     function loadProducts(companyId) {
-        $('#productSelect').find('option').each(function () {
+        $('#new_productSelect').find('option').each(function () {
             if ($(this).text() != '--select--') {
                 $(this).remove();
             }
@@ -451,7 +495,7 @@
                 data: {"companyId": companyId},
                 success: function (result) {
                     $.each(result, function (id, name) {
-                        $("#productSelect").append("<option value='" + id + "'>" + name + "</option>")
+                        $("#new_productSelect").append("<option value='" + id + "'>" + name + "</option>")
                     });
                 }
             }
@@ -465,13 +509,13 @@
                 type: "GET",
                 data: {"companyId": companyId},
                 success: function (result) {
-                    $('#companyA').val(result);
+                    $('#new_company').val(result);
                 }
             }
         )
     }
 
-    $('#productSelect').change(function () {
+    $('#new_productSelect').change(function () {
         var productId = $(this).val();
         $.ajax(
             {
@@ -479,7 +523,7 @@
                 type: "GET",
                 data: {"productId": productId},
                 success: function (result) {
-                    $('#sumA').val(result);
+                    $('#new_sum').val(result);
                 }
             }
         )
@@ -493,10 +537,10 @@
         var day = ("0" + now.getDate()).slice(-2);
         var month = ("0" + (now.getMonth() + 1)).slice(-2);
         var today = now.getFullYear() + "-" + (month) + "-" + (day);
-        $('#issueDate').val(today);
-        $('#expireDate').val(null);
-        $('#companyIdA').val(companyId);
-        $('#sumA').val('0.0');
+        $('#new_issueDate').val(today);
+        $('#new_expireDate').val(null);
+        $('#new_companyId').val(companyId);
+        $('#new_sum').val('0.0');
         loadCompanyName(companyId);
         loadAllCustomers();
         loadProducts(companyId);
@@ -505,16 +549,17 @@
     $("#btn_save_contract").click(function (event) {
 
         event.preventDefault();
+
         $('#alertMessage').text('');
 
         var newContractData = {
-            "issueDate": $("#issueDate").val(),
-            "expireDate": $("#expireDate").val(),
-            "sum": $("#sumA").val(),
-            "status": ($("#statusA").val() === 'Signed' ? "SIGNED_BY_COMPANY" : "UNSIGNED"),
-            "companyId": $("#companyIdA").val(),
-            "customerId": $("#customerSelect").val(),
-            "productId": $("#productSelect").val()
+            "issueDate": $("#new_issueDate").val(),
+            "expireDate": $("#new_expireDate").val(),
+            "sum": $("#new_sum").val(),
+            "status": ($("#new_status").val() === 'Signed' ? "SIGNED_BY_COMPANY" : "UNSIGNED"),
+            "companyId": $("#new_companyId").val(),
+            "customerId": $("#new_customerSelect").val(),
+            "productId": $("#new_productSelect").val()
         }
 
         $.ajax(
@@ -551,35 +596,35 @@
     })
 
     function clearErrors() {
-        $('#issueDate').focus(function () {
-            $('#issueDate').parent().removeClass('has-error');
-            $('#issueDateError').hide();
+        $('#new_issueDate').focus(function () {
+            $('#new_issueDate').parent().removeClass('has-error');
+            $('#new_issueDateError').hide();
         })
-        $('#expireDate').focus(function () {
-            $('#expireDateError').hide();
-            $('#expireDate').parent().removeClass('has-error');
+        $('#new_expireDate').focus(function () {
+            $('#new_expireDateError').hide();
+            $('#new_expireDate').parent().removeClass('has-error');
         })
-        $('#customerSelect').focus(function () {
-            $('#customerSelectError').hide();
-            $('#customerSelect').parent().removeClass('has-error');
+        $('#new_customerSelect').focus(function () {
+            $('#new_customerSelectError').hide();
+            $('#new_customerSelect').parent().removeClass('has-error');
+            $('#new_contractError').hide();
         })
-        $('#productSelect').focus(function () {
-            $('#productSelectError').hide();
-            $('#productSelect').parent().removeClass('has-error');
+        $('#new_productSelect').focus(function () {
+            $('#new_productSelectError').hide();
+            $('#new_productSelect').parent().removeClass('has-error');
         })
-        $('#sumA').focus(function () {
-            $('#sumAError').hide();
-            $('#sumA').parent().removeClass('has-error');
+        $('#new_sum').focus(function () {
+            $('#new_sumError').hide();
+            $('#new_sum').parent().removeClass('has-error');
         })
     }
 
     function signContract(btn) {
-
-        var row = $("#row" + btn.id);
+        var rowId = btn.id.substring(9);
+        var row = $("#row" + rowId);
         $('#modalSignConfirm').modal('show');
-        $('#signContractId').val(btn.id);
+        $('#signContractId').val(rowId);
         $('#currentContractStatus').text(row.find('#status').text());
-
     }
 
     $('#btn_sign_contract').click(function () {

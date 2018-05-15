@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,8 @@ import java.util.Optional;
 public interface ContractDao extends JpaRepository<Contract, Integer> {
 
     Optional<Contract> findById(int id);
+
+    Optional<Contract> findByCustomerIdAndCompanyIdAndProductId(int customerId, int companyId, int productId);
 
     List<Contract> findAll();
 
@@ -25,5 +28,8 @@ public interface ContractDao extends JpaRepository<Contract, Integer> {
 
     List<Contract> findAllByProductId(int productId);
 
+    int countByCompanyIdAndStatus(int companyId, ContractStatus status);
+
+    int countByCustomerIdAndStatus(int customerId, ContractStatus status);
 }
 

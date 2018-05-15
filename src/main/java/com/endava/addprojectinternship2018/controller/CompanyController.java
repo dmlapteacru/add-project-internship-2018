@@ -4,6 +4,7 @@ import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.model.dto.CompanyDto;
 import com.endava.addprojectinternship2018.model.dto.ContractDto;
 import com.endava.addprojectinternship2018.model.dto.ProductDto;
+import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.service.*;
 import com.endava.addprojectinternship2018.util.UserUtil;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +66,8 @@ public class CompanyController {
         model.addAttribute("companyName", currentCompanyName);
         model.addAttribute("productId", 0);
         model.addAttribute("status", InvoiceStatus.ISSUED);
+
+        model.addAttribute("statusListForFilter", new ArrayList<ContractStatus>());
 
         return "contract/contractListPage";
     }

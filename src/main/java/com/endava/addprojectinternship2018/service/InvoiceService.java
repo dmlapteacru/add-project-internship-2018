@@ -4,6 +4,7 @@ import com.endava.addprojectinternship2018.dao.CompanyDao;
 import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
 import com.endava.addprojectinternship2018.model.Product;
+import com.endava.addprojectinternship2018.model.dto.InvoiceCustomerViewDto;
 import com.endava.addprojectinternship2018.model.dto.InvoiceDescriptionPaymentDto;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
@@ -15,6 +16,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.ACTIVE;
@@ -115,6 +119,24 @@ public class InvoiceService {
     }
 
     public InvoiceDescriptionPaymentDto setInvoiceDescription(int id){
-       return invoiceDao.setInvoiceDescriptionPayment(id);
+        Object[] objects = invoiceDao.setInvoiceDescriptionPayment(id).get(0);
+        return new InvoiceDescriptionPaymentDto(objects[0].toString(), objects[1].toString());
+    }
+
+    public List<InvoiceCustomerViewDto> getInvoiceCustomerViewByCutomerId(int id){
+        List<InvoiceCustomerViewDto> invoiceCustomerViewDtoList = new ArrayList<>();
+        List<Object[]> objects = invoiceDao.findAllInvoiceCustomerViewByCustomerId(id);
+        for (Object[] obj:objects
+             ) {
+            invoiceCustomerViewDtoList.add(new InvoiceCustomerViewDto(
+                    (Integer)obj[0],
+                    (Double)obj[1],
+                    (Date)obj[2],
+                    (Date)obj[3],
+                    obj[4].toString(),
+                    obj[5].toString(),
+                    obj[6].toString()));
+        }
+        return invoiceCustomerViewDtoList;
     }
 }

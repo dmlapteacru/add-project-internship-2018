@@ -1,5 +1,6 @@
 package com.endava.addprojectinternship2018.controller;
 
+import com.endava.addprojectinternship2018.dao.InvoiceDao;
 import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.model.dto.*;
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
@@ -18,12 +19,11 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @org.springframework.web.bind.annotation.RestController
@@ -125,7 +125,7 @@ public class RestController {
         return "OK";
     }
 
-    @RequestMapping(value = "/contractRest/newContract", method = POST)
+    @PostMapping(value = "/contractRest/newContract")
     public @ResponseBody
     ValidationResponse saveNewContract(@Valid @RequestBody ContractDtoTest contractDtoTest,
                                        BindingResult bindingResult) {
@@ -134,29 +134,54 @@ public class RestController {
         response.setStatus("SUCCESS");
         final List<ErrorMessage> errorMessageList = new ArrayList<>();
 
+        if (contractDtoTest.getIssueDate() == null) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_issueDate", "cannot be null"));
+            return response;
+        }
+
+        if (contractDtoTest.getExpireDate() == null) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_expireDate", "cannot be null"));
+            return response;
+        }
+
+        if (contractDtoTest.getExpireDate().isBefore(contractDtoTest.getIssueDate())) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_expireDate", "cannot be more than issue date"));
+        }
+
+        if (contractDtoTest.getProductId() == 0) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_productSelect", "product must be selected"));
+        }
+
+        if (contractDtoTest.getCustomerId() == 0) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_customerSelect", "customer must be selected"));
+        }
+
+        if (contractDtoTest.getSum() == 0) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_sum", "cannot be null"));
+        }
+
         if (bindingResult.hasErrors()) {
             response.setStatus("FAIL");
             bindingResult.getFieldErrors().stream()
                     .map(fieldError -> new ErrorMessage(fieldError.getField(), fieldError.getDefaultMessage()))
                     .forEach(errorMessageList::add);
-        } else if (contractDtoTest.getExpireDate().isBefore(contractDtoTest.getIssueDate())) {
-            response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("expireDate", "can not be more than issue date"));
         }
 
-        if (contractDtoTest.getProductId() == 0) {
-            response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("productSelect", "product must be selected"));
-        }
-
-        if (contractDtoTest.getCustomerId() == 0) {
-            response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("customerSelect", "customer must be selected"));
-        }
-
-        if (contractDtoTest.getSum() == 0) {
-            response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("sumA", "must not be null"));
+        Optional<Contract> optionalContract = contractService.getByCustomerIdCompanyIdProductId(
+                contractDtoTest.getCustomerId(),
+                contractDtoTest.getCompanyId(),
+                contractDtoTest.getProductId());
+        if (optionalContract.isPresent()) {
+            if (optionalContract.get().getExpireDate().isAfter(LocalDate.now())) {
+                response.setStatus("FAIL");
+                errorMessageList.add(new ErrorMessage("new_contract", "Duplicate contract exists!"));
+            }
         }
 
         response.setErrorMessageList(errorMessageList);
@@ -218,9 +243,42 @@ public class RestController {
     }
 
     @RequestMapping(value = "/companyRest/newService", method = POST)
-    public String addNewService(@RequestBody ProductDtoTest product) {
-        productService.save(product);
-        return "OK";
+    public @ResponseBody
+    ValidationResponse addNewService(@RequestBody @Valid ProductDtoTest productDtoTest,
+                                     BindingResult bindingResult) {
+
+        ValidationResponse response = new ValidationResponse();
+        response.setStatus("SUCCESS");
+        final List<ErrorMessage> errorMessageList = new ArrayList<>();
+
+        if (bindingResult.hasErrors()) {
+            response.setStatus("FAIL");
+            bindingResult.getFieldErrors().stream()
+                    .map(fieldError -> new ErrorMessage(fieldError.getField(), fieldError.getDefaultMessage()))
+                    .forEach(errorMessageList::add);
+        }
+
+        if (productDtoTest.getPrice() < 0) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_service_price", "Price cannot be negative"));
+        }
+
+        Optional<Product> optionalProduct = productService.getByNameAndCategoryIdAndCompanyId(
+                productDtoTest.getName(),
+                productDtoTest.getCategoryId(),
+                productDtoTest.getCompanyId());
+        if (optionalProduct.isPresent()) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_service_name", "Service name exists"));
+        }
+
+        response.setErrorMessageList(errorMessageList);
+
+        if (response.getStatus().equals("SUCCESS")) {
+            productService.save(productDtoTest);
+        }
+
+        return response;
     }
 
     @RequestMapping(value = "/admin/messages", method = RequestMethod.GET)
@@ -259,6 +317,7 @@ public class RestController {
         adminMessageService.changeMessageStatusOnUnRead(changeMessageStatusDtoList);
         return "OK";
     }
+
     @RequestMapping(value = "/admin/message/delete/{id}", method = RequestMethod.DELETE)
     public String deleteMessage(@PathVariable int id){
         adminMessageService.deleteById(id);
@@ -304,9 +363,8 @@ public class RestController {
 
     @RequestMapping(value = "/bankAccount/addmoney", method = POST)
     public ResponseEntity<?> addMoney(@RequestParam Double sum){
-        System.out.println(sum);
-        if (sum < 1){
-            return new ResponseEntity<>("Must be greater than 0.", HttpStatus.BAD_REQUEST);
+        if (sum == null || sum < 0.01){
+            return new ResponseEntity<>("Must be greater than 0.01 MDL.", HttpStatus.BAD_REQUEST);
         }
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
         HttpHeaders headers = new HttpHeaders();
@@ -377,4 +435,5 @@ public class RestController {
         ResponseEntity<List<StatementDto>> response = restTemplate.exchange( bankIP +"/statement/statement",HttpMethod.POST, request , new ParameterizedTypeReference<List<StatementDto>>(){});
         return new ResponseEntity<>(response.getBody(), HttpStatus.OK);
     }
+
 }

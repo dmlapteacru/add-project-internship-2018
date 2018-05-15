@@ -57,9 +57,9 @@ $("#delete_btn_confirm").click(function () {
                     $("#modalDeleteConfirm").modal("hide");
                     $("#categories_btn_req").click();
                     $("#confirm_alert_message").text("Category deleted.")
-                    $(".alert").slideToggle("slow");
+                    $("#alert_success").slideToggle("slow");
                     setTimeout(function () {
-                        $(".alert").slideToggle("slow");
+                        $("#alert_success").slideToggle("slow");
                     },5000);
                 }
             }
@@ -73,9 +73,9 @@ $("#delete_btn_confirm").click(function () {
                 $("#modalDeleteConfirm").modal("hide");
                 $("#messages_read_all_req").click();
                 $("#confirm_alert_message").text("Message deleted.")
-                $(".alert").slideToggle("slow");
+                $("#alert_success").slideToggle("slow");
                 setTimeout(function () {
-                    $(".alert").slideToggle("slow");
+                    $("#alert_success").slideToggle("slow");
                 },5000);
             }
         }
@@ -107,9 +107,9 @@ $("#reset_pass_btn_confirm").click(function () {
             success: function () {
                 $("#modalResetPassConfirm").modal("hide");
                 $("#confirm_alert_message").text("Password reset success.");
-                $(".alert-success").slideToggle("slow");
+                $("#alert_success").slideToggle("slow");
                 setTimeout(function () {
-                    $(".alert-success").slideToggle("slow");
+                    $("#alert_success").slideToggle("slow");
                 },5000);
             }
         }
@@ -141,9 +141,9 @@ $("#save_btn_category").click(function () {
             },
             error: function (request) {
                 $("#error_alert_message").text(request.responseText);
-                $(".alert-danger").slideToggle("slow");
+                $("#alert_error").slideToggle("slow");
                 setTimeout(function () {
-                    $(".alert-danger").slideToggle("slow");
+                    $("#alert_error").slideToggle("slow");
                 },5000);
             }
         }
@@ -258,15 +258,12 @@ $("#check_all_users").change(function () {
             $(this).attr("checked", true);
             $(this).prop("checked", true);
         });
+        $(".change_status_all_btn").css("display", "block");
     } else {
         $.each($(".checkbox_users_element"), function () {
             $(this).removeAttr("checked");
             $(this).prop("checked", false);
         });
-    }
-    if ($(".change_status_all_btn").css("display") === "none"){
-        $(".change_status_all_btn").css("display", "block");
-    } else {
         $(".change_status_all_btn").css("display", "none");
     }
 });
@@ -283,11 +280,9 @@ $(".checkbox_users_element").change(function () {
 
     if (isAnyChecked === true){
         $(".change_status_all_btn").css("display", "block");
-        $("#check_all_users").attr("checked", "checked");
     } else {
         $(".change_status_all_btn").css("display", "none");
-        $("#check_all_users").removeAttr("checked");
-        $("#check_all_users").prop("checked", false);
+        resetCheckBoxUsers();
     }
 });
 
@@ -358,15 +353,12 @@ $("#check_all_messages").change(function () {
             $(this).attr("checked", true);
             $(this).prop("checked", true);
         });
+        $(".change_status_all_btn_mess").css("display", "block");
     } else {
         $.each($(".checkbox_mess_element"), function () {
             $(this).removeAttr("checked");
             $(this).prop("checked", false);
         });
-    }
-    if ($(".change_status_all_btn_mess").css("display") === "none"){
-        $(".change_status_all_btn_mess").css("display", "block");
-    } else {
         $(".change_status_all_btn_mess").css("display", "none");
     }
 });
@@ -382,11 +374,9 @@ function checkBTN(obj) {
 
     if (isAnyChecked === true){
         $(".change_status_all_btn_mess").css("display", "block");
-        $("#check_all_messages").attr("checked", "checked");
     } else {
         $(".change_status_all_btn_mess").css("display", "none");
-        $("#check_all_messages").removeAttr("checked");
-        $("#check_all_messages").prop("checked", false);
+        resetCheckBoxMessages();
     }
 }
 

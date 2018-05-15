@@ -64,6 +64,18 @@ public class ContractService {
         return contractDao.findById(contractId).get();
     }
 
+    public Optional<Contract> getByCustomerIdCompanyIdProductId(int customerId, int companyId, int productId) {
+        return contractDao.findByCustomerIdAndCompanyIdAndProductId(customerId, companyId, productId);
+    }
+
+    public int countByCompanyAndStatus(int companyId, ContractStatus status) {
+        return contractDao.countByCompanyIdAndStatus(companyId, status);
+    }
+
+    public int countByCustomerAndStatus(int customerId, ContractStatus status) {
+        return contractDao.countByCustomerIdAndStatus(customerId, status);
+    }
+
     @Transactional
     public void saveContract(ContractDto contractDto) {
         contractDao.save(convertContractDtoToContract(contractDto));

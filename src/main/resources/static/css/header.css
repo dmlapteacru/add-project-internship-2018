@@ -13,13 +13,17 @@ body {
     width: 80px;
     height: 25px;
 }
-.menu_wrapper {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0 10px 0 10px;
+/*.header_wrapper {*/
+    /*!*position: fixed;*!*/
+    /*width:100%;*/
+    /*top: 0;*/
+/*}*/
 
-}
+/*.panel-heading {*/
+    /*!*position: fixed;*!*/
+    /*width: 100%;*/
+    /*top: 52px;*/
+/*}*/
 .menu_company, .menu_customer {
     display: flex;
     justify-content: space-between;

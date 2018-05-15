@@ -18,6 +18,9 @@
     -moz-appearance: none;
     height: auto;
     padding: 0;
+    background-color: transparent;
+    cursor: auto;
+    box-shadow: none;
 }
 .filterable .filters input[disabled]::-webkit-input-placeholder {
     color: #333;

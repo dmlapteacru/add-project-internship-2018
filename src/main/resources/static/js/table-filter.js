@@ -11,6 +11,9 @@ $(document).ready(function(){
             $(".filter_body").append($rows);
             $selectors.val('Roles').prop('disabled', true);
             $(".sel_status").val('Status').prop('disabled', true);
+            $(".sel_status_contract").val('Status').prop('disabled', true);
+            $(".sel_status_invoice").val('Status_INV').prop('disabled', true);
+            $(".sel_category").val('Category').prop('disabled', true);
             $filters.val('').prop('disabled', true);
             $tbody.find('.no-result').remove();
             $tbody.find('tr').show();
@@ -18,6 +21,7 @@ $(document).ready(function(){
     });
 
     var $rows = $(".filter_body tr");
+
     $(".sel_roles").change(function () {
         $(".filter_body").append($rows);
         $(".sel_roles option:selected").each(function () {
@@ -25,12 +29,52 @@ $(document).ready(function(){
                 $(".filter_body").append($rows);
             } else {
                 var $choice = $(this).val().toUpperCase();
-                var $fl =  $(".filter_body td[class='filter_role']").filter(function () {
+                $(".filter_body td[class='filter_role']").filter(function () {
                     return $(this).text().indexOf($choice) === -1;
                 }).parent().remove();
             }
         });
     });
+    $(".sel_category").change(function () {
+        $(".filter_body").append($rows);
+        $(".sel_category option:selected").each(function () {
+            if ($(this).val()=="Category"){
+                $(".filter_body").append($rows);
+            } else {
+                var $choice = $(this).val();
+                $(".filter_body td[class='filter_category']").filter(function () {
+                    return $(this).text().indexOf($choice) === -1;
+                }).parent().remove();
+            }
+        });
+    });
+    $(".sel_status_contract").change(function () {
+        $(".filter_body").append($rows);
+        $(".sel_status_contract option:selected").each(function () {
+            if ($(this).val()=="Status"){
+                $(".filter_body").append($rows);
+            } else {
+                var $choice = $(this).val();
+                $(".filter_body td[class='filter_status_contract']").filter(function () {
+                    return $(this).text().indexOf($choice) === -1;
+                }).parent().remove();
+            }
+        });
+    });
+    $(".sel_status_invoice").change(function () {
+        $(".filter_body").append($rows);
+        $(".sel_status_invoice option:selected").each(function () {
+            if ($(this).val()=="Status_INV"){
+                $(".filter_body").append($rows);
+            } else {
+                var $choice = $(this).val().toUpperCase();
+                $(".filter_body td[class='filter_status_invoice']").filter(function () {
+                    return $(this).text().indexOf($choice) === -1;
+                }).parent().remove();
+            }
+        });
+    });
+
     $(".sel_status").change(function () {
         $(".filter_body").append($rows);
         $(".sel_status option:selected").each(function () {
@@ -42,7 +86,7 @@ $(document).ready(function(){
                 }).parent().remove();
             } else {
                 var $choice = $(this).val().toUpperCase();
-                var $fl =  $(".filter_body td[class='filter_status']").filter(function () {
+                $(".filter_body td[class='filter_status']").filter(function () {
                     return $(this).text().indexOf($choice) === -1;
                 }).parent().remove();
             }

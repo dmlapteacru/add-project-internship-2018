@@ -31,8 +31,8 @@
     <table class="table">
         <thead>
         <div class="bulk_btn_wrapper" style="display: none;">
-            <a id="bulk_pay_btn" class="btn btn-danger bulk_invoices_btn">PAY</a>
-            <span>Total: <span id="bulk_pay_sum" style="font-weight: bold;"></span> MDL</span>
+            <span>Total Sum: <span id="bulk_pay_sum" style="font-weight: bold;border: 1px solid #ddd; padding: 5px; border-radius: 3px;"></span> MDL</span>
+            <a id="bulk_pay_btn" class="btn btn-danger bulk_invoices_btn" style="width: 100px;">PAY</a>
         </div>
         <tr class="filters">
             <th>
@@ -43,45 +43,38 @@
             <th><input type="text" class="form-control" placeholder="Issue Date" disabled></th>
             <th><input type="text" class="form-control" placeholder="Expire Date" disabled></th>
             <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Status" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Contract_id" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Full Name" disabled></th>
+            <th>
+                <select class="sel_status_invoice" disabled>
+                    <option selected value="Status_INV">Status</option>
+                    <option>PAID</option>
+                    <option>SENT</option>
+                    <option>OVERDUE</option>
+                </select>
+            </th>
+            <th><input type="text" class="form-control" placeholder="Company" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Service" disabled></th>
             <th></th>
         </tr>
         </thead>
-
-        <tr th:each="invoice: ${invoices}" th:id="'row' + ${invoice.getId()}">
-            <td><input type="checkbox" th:value="${invoice.id}" class="checkbox_invoice_element"/></td>
-            <td id="invoice_date" th:text="${#temporals.format(invoice.getIssueDate(), 'dd-MM-yyyy')} ">Issue Date</td>
-            <td th:text="${#temporals.format(invoice.getDueDate(), 'dd-MM-yyyy')}">Expire Date</td>
-            <td id="sum_to_pay" th:text="${invoice.getSum()}">Sum</td>
-            <td th:text="${invoice.getStatus()}" class="font-weight-bold">Status</td>
-            <td th:text="${invoice.getContract().getId()}">Contract_id</td>
-            <td th:text="${invoice.getContract().getCustomer().getFullName()}">Full Name</td>
+        <tbody class="filter_body">
+        <tr th:each="invoice: ${invoices}" th:id="'row' + ${invoice.id}">
+            <td><input type="checkbox" th:value="${invoice.id}" th:if="${invoice.status}!='PAID'" class="checkbox_invoice_element"/></td>
+            <!--<td id="invoice_date" th:text="${#temporals.format(invoice.issueDate, 'dd-MM-yyyy')} ">Issue Date</td>-->
+            <td id="invoice_date" th:text="${#dates.format(invoice.issueDate, 'dd-MM-yyyy')}">Issue Date</td>
+            <td th:text="${#dates.format(invoice.dueDate, 'dd-MM-yyyy')}">Expire Date</td>
+            <td><span id="sum_to_pay" th:text="${invoice.sum}"></span><span> MDL</span></td>
+            <td class="filter_status_invoice" th:text="${invoice.getStatus()}">Status</td>
+            <td th:text="${invoice.companyName}">Company</td>
+            <td th:text="${invoice.productName}">Service</td>
             <td>
-                <button th:if="${invoice.status}!=${invoice.status.PAID}" th:id="${invoice.getId()}" class="btn btn-danger" onclick="payInvoice(this)">PAY</button>
+                <button th:if="${invoice.status}!='PAID'" th:id="${invoice.id}" class="btn btn-danger" onclick="payInvoice(this)">PAY</button>
             </td>
         </tr>
+        </tbody>
     </table>
 </div>
 
-<form class="col-md-3 input-group pull-right" th:action="@{/invoice/filterByActiveStatus}" method="get">
-
-    <label for="status" class="control-label">Invoice Status</label>
-    <select class="form-control" id="status" name="status">
-        <option value="">-Select-</option>
-        <option value="ISSUED" th:text="ISSUED"></option>
-        <option value="SENT" th:text="SENT"></option>
-        <option value="PAID" th:text="PAID"></option>
-        <option value="ACTIVE" th:text="ACTIVE"></option>
-        <option value="IN_PROGRESS" th:text="IN_PROGRESS"></option>
-        <option value="OVERDUE" th:text="OVERDUE"></option>
-    </select>
-
-    <button type="submit" class="btn pull-right btn-success ">Check</button>
-
-</form>
-<div class="alert alert-success alert-dismissible fade in">
+<div id="alert_success" class="alert alert-success alert-dismissible fade in">
     <div id="approval_info">
         <strong id="confirm_alert_message"></strong>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -89,7 +82,7 @@
         </button>
     </div>
 </div>
-<div class="alert alert-danger alert-dismissible fade in">
+<div id="alert_error" class="alert alert-danger alert-dismissible fade in">
     <div id="alert_error_info">
         <strong id="error_alert_message"></strong>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -116,17 +109,19 @@
                 },
                 success: function () {
                     $("#confirm_alert_message").text("Invoice paid.");
-                    $(".alert-success").slideToggle("slow");
+                    $("#alert_success").slideToggle("slow");
                     setTimeout(function () {
-                        $(".alert-success").slideToggle("slow");
+                        $("#alert_success").slideToggle("slow");
                     },5000);
+                    $("#load_icon_wrapper").modal("hide");
                 },
                 error : function (response) {
                     $("#error_alert_message").text(response.responseText);
-                    $(".alert-danger").slideToggle("slow");
+                    $("#alert_error").slideToggle("slow");
                     setTimeout(function () {
-                        $(".alert-danger").slideToggle("slow");
+                        $("#alert_error").slideToggle("slow");
                     },5000);
+                    $("#load_icon_wrapper").modal("hide");
                 }
             }
         )
@@ -140,9 +135,9 @@
         if (sum > parseInt($(".balance").text())){
             $("#bulk_pay_sum").css("color", "red");
             $("#error_alert_message").text("Not enough money.");
-            $(".alert-danger").slideToggle("slow");
+            $("#alert_error").slideToggle("slow");
             setTimeout(function () {
-                $(".alert-danger").slideToggle("slow");
+                $("#alert_error").slideToggle("slow");
             },3000);
         } else {
             $("#bulk_pay_sum").css("color", "green");
@@ -156,15 +151,12 @@
                 $(this).attr("checked", true);
                 $(this).prop("checked", true);
             });
+            $(".bulk_btn_wrapper").css("display", "block");
         } else {
             $.each($(".checkbox_invoice_element"), function () {
                 $(this).removeAttr("checked");
                 $(this).prop("checked", false);
             });
-        }
-        if ($(".bulk_btn_wrapper").css("display") === "none"){
-            $(".bulk_btn_wrapper").css("display", "block");
-        } else {
             $(".bulk_btn_wrapper").css("display", "none");
         }
         getBulkSum();
@@ -182,7 +174,6 @@
 
         if (isAnyChecked === true){
             $(".bulk_btn_wrapper").css("display", "block");
-            $("#check_all_invoices").attr("checked", "checked");
         } else {
             $(".bulk_btn_wrapper").css("display", "none");
             $("#check_all_invoices").removeAttr("checked");
@@ -192,45 +183,52 @@
     });
 
     $("#bulk_pay_btn").click(function () {
-        if (parseInt($("#bulk_pay_sum")) > parseInt($(".balance").text())){
-            $("#error_alert_message").text("Not enough money.");
+        if(parseInt($("#bulk_pay_sum").text()) === 0){
+            $("#error_alert_message").text("Nothing selected.");
             $(".alert-danger").slideToggle("slow");
             setTimeout(function () {
-                $(".alert-danger").slideToggle("slow");
+                $("#alert_error").slideToggle("slow");
             },3000);
-        } else {
-            var invoiceList = [];
-            $.each($(".checkbox_invoice_element[checked='checked']"), function () {
-                var correspondentCount = $(this).attr("value");
-                var description = "Invoice from " + $("#row" + $(this).attr("value")).find("#invoice_date").text() + " is paid. ";
-                var item = {};
-                item["correspondentCount"] = correspondentCount;
-                item["sum"] = $("#row" + $(this).attr("value")).find("#sum_to_pay").text();
-                item["description"] = description;
-                invoiceList.push(item);
-            });
-            $.ajax(
-                {
-                    url: "/bankAccount/payinvoice/bulk?bal=" + $(".balance").text(),
-                    type: "POST",
-                    beforeSend: function () {
-                        $("#load_icon_wrapper").modal("show");
-                    },
-                    contentType: "application/json",
-                    data: JSON.stringify(invoiceList),
-                    success: function () {
-                        location.reload();
-                    },
-                    error: function (response) {
-                        $("#error_alert_message").text(response.responseText);
-                        $(".alert-danger").slideToggle("slow");
-                        setTimeout(function () {
-                            $(".alert-danger").slideToggle("slow");
-                        },5000);
+        }else if (parseInt($("#bulk_pay_sum").text()) > parseInt($(".balance").text())){
+                $("#error_alert_message").text("Not enough money.");
+                $(".alert-danger").slideToggle("slow");
+                setTimeout(function () {
+                    $("#alert_error").slideToggle("slow");
+                },3000);
+            } else {
+                var invoiceList = [];
+                $.each($(".checkbox_invoice_element[checked='checked']"), function () {
+                    var correspondentCount = $(this).attr("value");
+                    var description = "Invoice from " + $("#row" + $(this).attr("value")).find("#invoice_date").text() + " is paid. ";
+                    var item = {};
+                    item["correspondentCount"] = correspondentCount;
+                    item["sum"] = $("#row" + $(this).attr("value")).find("#sum_to_pay").text();
+                    item["description"] = description;
+                    invoiceList.push(item);
+                });
+                $.ajax(
+                    {
+                        url: "/bankAccount/payinvoice/bulk?bal=" + $(".balance").text(),
+                        type: "POST",
+                        beforeSend: function () {
+                            $("#load_icon_wrapper").modal("show");
+                        },
+                        contentType: "application/json",
+                        data: JSON.stringify(invoiceList),
+                        success: function () {
+                            location.reload();
+                        },
+                        error: function (response) {
+                            $("#error_alert_message").text(response.responseText);
+                            $("#alert_error").slideToggle("slow");
+                            setTimeout(function () {
+                                $("#alert_error").slideToggle("slow");
+                            },5000);
+                            $("#load_icon_wrapper").modal("hide");
+                        }
                     }
-                }
-            )
-        }
+                )
+            }
 
     });
 </script>
