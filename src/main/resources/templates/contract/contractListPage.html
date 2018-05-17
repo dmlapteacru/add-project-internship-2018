@@ -40,9 +40,9 @@
             </div>
             <div class="form-group">
                 <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumFrom}"
-                       placeholder="sum from"/>
+                       placeholder="sum from" required/>
                 <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumTo}"
-                       placeholder="sum to"/>
+                       placeholder="sum to" required/>
             </div>
             <div class="form-group">
                 <input type="date" id="adv_filter_date_from" class="form-control input-sm col-sm-2"
@@ -83,8 +83,8 @@
             <th>
                 <select class="sel_status_contract" disabled>
                     <option selected value="Status">Status</option>
-                    <option th:each="contract : ${contractList}"
-                            th:text="${contract.getStatus()}">
+                    <option th:each="status : ${statusListForFilter}"
+                            th:text="${status.toString()}">
                     </option>
                 </select>
             </th>
@@ -116,7 +116,7 @@
                         <li role="presentation" th:if="not ${contract.getStatus().name()=='ACTIVE'}">
                             <a role="menuitem" tabindex="-1"
                                th:id="'btn_sign_'+${contract.getId()}"
-                               onclick="signContract(this)">Sign</a>
+                               onclick="askForSignContract(this)">Sign</a>
                         </li>
                         <li role="presentation" sec:authorize="hasAuthority('COMPANY')"
                             th:if="${contract.getStatus().name()=='ACTIVE'}">
@@ -136,7 +136,6 @@
         </tbody>
     </table>
 </div>
-
 
 <div class="modal fade" id="createInvoiceDialog" role="dialog">
     <div class="modal-dialog">
@@ -179,7 +178,8 @@
                         <label class="col-sm-3 control-label">Due date</label>
                         <div class="col-sm-6">
                             <input type="date" class="form-control" id="expire_inv_date" required="required"/>
-                            <p class="error-message" id="expire_inv_dateError" style="display: none">validation error</p>
+                            <p class="error-message" id="expire_inv_dateError" style="display: none">validation
+                                error</p>
                         </div>
                     </div>
 
@@ -258,7 +258,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Do you want to sign this contract?</h4>
+                <h4 class="modal-title"></h4>
             </div>
             <div class="modal-body">
                 <div class="form-control">
@@ -270,7 +270,10 @@
                 </div>
             </div>
             <div class="modal-footer modal_btn">
-                <button id="btn_sign_contract" type="button" class="btn btn-primary">Sign</button>
+                <button id="btn_sign_contract" type="button"
+                        class="btn btn-primary" onclick="signContract()">Sign</button>
+                <button id="btn_unsign_contract" type="button"
+                        class="btn btn-primary" onclick="signContract()">Unsign</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -667,6 +670,7 @@
         $('#new_productSelect').focus(function () {
             $('#new_productSelectError').hide();
             $('#new_productSelect').parent().removeClass('has-error');
+            $('#new_contractError').hide();
         })
         $('#new_sum').focus(function () {
             $('#new_sumError').hide();
@@ -682,15 +686,25 @@
     }
 
 
-    function signContract(btn) {
+    function askForSignContract(btn) {
         var rowId = btn.id.substring(9);
         var row = $("#row" + rowId);
-        $('#modalSignConfirm').modal('show');
+        var currentStatus = row.find('#status').text();
         $('#signContractId').val(rowId);
-        $('#currentContractStatus').text(row.find('#status').text());
+        $('#currentContractStatus').text(currentStatus);
+        var title = "";
+        if (currentStatus === 'Unsigned') {
+            title = "Do you want to sing this contract?";
+            $('#btn_unsign_contract').hide();
+        } else {
+            title = "Do you want to change signature of this contract?";
+            $('#btn_sign_contract').hide();
+        }
+        $('#modalSignConfirm').find('.modal-title').text(title);
+        $('#modalSignConfirm').modal('show');
     }
 
-    $('#btn_sign_contract').click(function () {
+    function signContract() {
         $.ajax(
             {
                 url: "/contractRest/signContract",
@@ -700,12 +714,12 @@
                 },
                 success: function (result) {
                     $("#modalSignConfirm").modal("hide");
-                    var row = $("#row" + $("#signContractId").val());
-                    row.find('#status').text(result);
+                    location.reload();
                 }
-            }
-        )
-    })
+            })
+    }
+
+    $('#btn_sign_contract').click(signContract());
 
 </script>
 

@@ -21,13 +21,12 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.*;
 
 @Service
-@Transactional
 public class InvoiceService {
 
     @Autowired
@@ -45,11 +44,11 @@ public class InvoiceService {
     }
 
     public List<Invoice> getAllInvoiceByContractId(int id) {
-        return invoiceDao.findByContractId(id);
+        return invoiceDao.findByContractIdOrderByIssueDate(id);
     }
 
     public List<Invoice> getAllInvoicesByStatus(InvoiceStatus status) {
-        return invoiceDao.findAllByStatus(status);
+        return invoiceDao.findAllByStatusOrderByIssueDate(status);
     }
 
     public List<Invoice> getAllInvoicesByIssueDate(LocalDate localDate) {
@@ -60,12 +59,8 @@ public class InvoiceService {
         return invoiceDao.findAllByDueDate(localDate);
     }
 
-    public List<Invoice> getInvoicesByCustomerId(int id) {
-        return invoiceDao.findAllByContractCustomerId(id);
-    }
-
-    public List<Invoice> getAllByCustomerIdAndStatusNot(int customerId) {
-        return invoiceDao.findAllByContractCustomerIdAndStatusNot(customerId, InvoiceStatus.ISSUED);
+    public List<Invoice> getAllByCustomerId(int customerId) {
+        return invoiceDao.findAllByContractCustomerIdAndStatusIsInOrderByIssueDate(customerId, getStatusesForCustomer());
     }
 
     public List<Invoice> getInvoicesByCompanyId(int id) {
@@ -80,20 +75,24 @@ public class InvoiceService {
         return invoiceTransactionDao.getInvoiceByPeriodContractStatus(date, contract_id, status);
     }
 
-    public void save(Invoice invoice){
+    @Transactional
+    public void save(Invoice invoice) {
         invoiceDao.save(invoice);
     }
 
+    @Transactional
     public void saveInvoiceDto(InvoiceDto invoiceDto){
         Invoice invoice = new Invoice(invoiceDto.getSum(), invoiceDto.getIssueDate()
                 , invoiceDto.getDueDate(), invoiceDto.getStatus(), invoiceDto.getContract());
         invoiceDao.save(invoice);
     }
 
+    @Transactional
     public void deleteInvoice(int id) {
         invoiceDao.deleteById(id);
     }
 
+    @Deprecated
     public Invoice convertInvoiceDtoToInvoice(InvoiceDto invoiceDto) {
         Invoice invoice = invoiceDao.findById(invoiceDto.getInvoiceId())
                 .orElseGet(Invoice::new);
@@ -105,6 +104,7 @@ public class InvoiceService {
         return invoice;
     }
 
+    @Deprecated
     public InvoiceDto convertInvoiceToInvoiceDto(Invoice invoice) {
         InvoiceDto invoiceDto = new InvoiceDto();
         invoiceDto.setContract(invoice.getContract());
@@ -131,10 +131,11 @@ public class InvoiceService {
         } else System.out.println("Status not corresponding to ISSUED !!!");
     }
 
-    public List<Invoice> getInvoicesByStatus(InvoiceStatus invoiceStatus){
-        return invoiceDao.findAllByStatus(invoiceStatus);
+    public List<Invoice> getInvoicesByStatus(InvoiceStatus invoiceStatus) {
+        return invoiceDao.findAllByStatusOrderByIssueDate(invoiceStatus);
     }
 
+    @Transactional
     public void setInvoiceAsPaid(int id) {
         Invoice invoice = invoiceDao.findById(id).get();
         invoice.setStatus(PAID);
@@ -144,23 +145,6 @@ public class InvoiceService {
     public InvoiceDescriptionPaymentDto setInvoiceDescription(int id){
         Object[] objects = invoiceDao.setInvoiceDescriptionPayment(id).get(0);
         return new InvoiceDescriptionPaymentDto(objects[0].toString(), objects[1].toString());
-    }
-
-    public List<InvoiceCustomerViewDto> getInvoiceCustomerViewByCutomerId(int id){
-        List<InvoiceCustomerViewDto> invoiceCustomerViewDtoList = new ArrayList<>();
-        List<Object[]> objects = invoiceDao.findAllInvoiceCustomerViewByCustomerId(id);
-        for (Object[] obj:objects
-             ) {
-            invoiceCustomerViewDtoList.add(new InvoiceCustomerViewDto(
-                    (Integer)obj[0],
-                    (Double)obj[1],
-                    (Date)obj[2],
-                    (Date)obj[3],
-                    obj[4].toString(),
-                    obj[5].toString(),
-                    obj[6].toString()));
-        }
-        return invoiceCustomerViewDtoList;
     }
 
     public long countByCustomerIdAndStatus(int customerId, InvoiceStatus status) {
@@ -178,11 +162,11 @@ public class InvoiceService {
         LocalDate dateTo = (filter.getDateTo() == null ? LocalDate.of(4999, 12, 31) : filter.getDateTo());
 
         if (filter.getInvoiceStatus() == null) {
-            return invoiceDao.findAllByContractCustomerIdAndSumBetweenAndIssueDateBetween(customerId,
-                    sumFrom, sumTo, dateFrom, dateTo);
+            return invoiceDao.findAllByContractCustomerIdAndStatusInAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+                    (customerId, getStatusesForCustomer(), sumFrom, sumTo, dateFrom, dateTo);
         }
-        return invoiceDao.findAllByContractCustomerIdAndStatusAndSumBetweenAndIssueDateBetween(customerId,
-                filter.getInvoiceStatus(), sumFrom, sumTo, dateFrom, dateTo);
+        return invoiceDao.findAllByContractCustomerIdAndStatusAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+                (customerId, filter.getInvoiceStatus(), sumFrom, sumTo, dateFrom, dateTo);
     }
 
     public List<Invoice> getInvoicesByCompanyIdFiltered(int companyId, AdvancedFilter filter) {
@@ -192,13 +176,18 @@ public class InvoiceService {
         LocalDate dateTo = (filter.getDateTo() == null ? LocalDate.of(4999, 12, 31) : filter.getDateTo());
 
         if (filter.getInvoiceStatus() == null) {
-            return invoiceDao.findAllByContractCompanyIdAndSumBetweenAndIssueDateBetween(companyId,
-                    sumFrom, sumTo, dateFrom, dateTo);
+            return invoiceDao.findAllByContractCompanyIdAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+                    (companyId, sumFrom, sumTo, dateFrom, dateTo);
         }
-        return invoiceDao.findAllByContractCompanyIdAndStatusAndSumBetweenAndIssueDateBetween(companyId,
-                filter.getInvoiceStatus(), sumFrom, sumTo, dateFrom, dateTo);
+        return invoiceDao.findAllByContractCompanyIdAndStatusAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+                (companyId, filter.getInvoiceStatus(), sumFrom, sumTo, dateFrom, dateTo);
     }
 
+    public List<InvoiceStatus> getStatusesForCustomer() {
+        return Arrays.stream(InvoiceStatus.values())
+                .filter(invoiceStatus -> invoiceStatus == PAID || invoiceStatus == SENT || invoiceStatus == OVERDUE)
+                .collect(Collectors.toList());
+    }
 
     public List<Invoice> getInvoiceInPeriodService(int contract_id, LocalDate issueDate){
         return invoiceDao.findInvoiceInPeriod(contract_id, issueDate);

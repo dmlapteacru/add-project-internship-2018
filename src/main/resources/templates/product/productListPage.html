@@ -24,15 +24,17 @@
     <div class="panel-body">
         <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalService"
            class="btn btn-info btn-sm" role="button" onclick="getCategories()">Create new service</a>
+        <a sec:authorize="hasAuthority('CUSTOMER')" th:href="@{/servicesRest/pdfExport}"
+           class="btn btn-info btn-sm" role="button">Download as PDF</a>
         <form class="form-inline pull-right"
               th:object="${filter}"
               th:action="${ownerType=='customer'} ? @{/customer/services/filtered} : @{/company/services/filtered}"
               method="post">
             <div class="form-group">
                 <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumFrom}"
-                       placeholder="sum from"/>
+                       placeholder="sum from" required/>
                 <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumTo}"
-                       placeholder="sum to"/>
+                       placeholder="sum to" required/>
             </div>
             <button type="submit" class="btn btn-info btn-sm">apply
                 <span class="glyphicon glyphicon-filter"></span>
@@ -116,11 +118,14 @@
                 <div class="modal-body modal_body_category">
                     <p id="company_id" sec:authorize="hasAuthority('COMPANY')"
                        th:text="${companyId}" style="display: none"></p>
-                    <input id="new_category_id" type="text" hidden="hidden"/>
+                    <!--<input id="new_category_id" type="text" hidden="hidden"/>-->
 
                     <div class="form-group">
                         <label>Category name</label>
-                        <select id="select_category" class="form-control"></select>
+                        <select id="select_category" class="form-control">
+                            <option id="0">--select--</option>
+                        </select>
+                        <p id="select_categoryError" style="color: red; display: none"> validation error</p>
                     </div>
                     <div class="form-group">
                         <label>Name</label>
@@ -129,7 +134,7 @@
                     </div>
                     <div class="form-group">
                         <label>Price</label>
-                        <input id="new_service_price" class="form-control" type="number" min="0" step="0.01" value="0.0"
+                        <input id="new_service_price" class="form-control" type="number" min="0" step="0.01" value="0.00"
                                required="required"/>
                         <p id="new_service_priceError" style="color: red;display: none"> validation error</p>
                     </div>
@@ -219,7 +224,7 @@
                         </div>
                     </div>
 
-                    <div class="alert alert-warning">
+                    <div class="alert-warning">
                         <span id="new_contractError" style="display: none">validation error</span>
                     </div>
 
@@ -262,6 +267,11 @@
         $("#new_service_name").val("");
         $("#new_service_desc").val("");
         $("#new_service_price").val("0.0");
+        $('#select_category').find('option').each(function () {
+            if ($(this).text() !== '--select--') {
+                $(this).remove();
+            }
+        });
         $.ajax(
             {
                 url: "/categories",
@@ -273,9 +283,6 @@
     }
 
     function loadCategories(data) {
-        $('#select_category').find('option').each(function () {
-            $(this).remove();
-        });
         $.each(data, function (id, object) {
             var categoryID = object.id;
             $.each(object, function (key, value) {
@@ -309,6 +316,7 @@
                         var allErrors = response.errorMessageList;
                         for (i = 0; i < allErrors.length; i++) {
                             var currFieldName = allErrors[i].fieldName;
+                            $('#' + currFieldName).parent().addClass('has-error');
                             $('#' + currFieldName + 'Error').text(allErrors[i].message);
                             $('#' + currFieldName + 'Error').show();
                         }
@@ -393,17 +401,27 @@
         $('#new_issueDate').focus(function () {
             $('#new_issueDate').parent().removeClass('has-error');
             $('#new_issueDateError').hide();
-        })
+        });
         $('#new_expireDate').focus(function () {
-            $('#new_expireDateError').hide();
             $('#new_expireDate').parent().removeClass('has-error');
-        })
+            $('#new_expireDateError').hide();
+        });
         $('#new_service_name').focus(function () {
+            $('#new_service_name').parent().removeClass('has-error');
             $('#new_service_nameError').hide();
-        })
+        });
         $('#new_service_price').focus(function () {
+            $('#new_service_price').parent().removeClass('has-error');
             $('#new_service_priceError').hide();
-        })
+        });
+        $('#new_service_desc').focus(function () {
+            $('#new_service_desc').parent().removeClass('has-error');
+            $('#new_service_descError').hide();
+        });
+        $('#select_category').focus(function () {
+            $('#select_category').parent().removeClass('has-error');
+            $('#select_categoryError').hide();
+        });
     }
 
 </script>

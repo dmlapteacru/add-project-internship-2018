@@ -79,6 +79,7 @@ public class InvoiceController {
         return "redirect:/company/invoices";
     }
 
+    @Deprecated
     @GetMapping(value = "updateInvoice")
     public String updateInvoiceById(Model model, @RequestParam("id") int invoiceId){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");

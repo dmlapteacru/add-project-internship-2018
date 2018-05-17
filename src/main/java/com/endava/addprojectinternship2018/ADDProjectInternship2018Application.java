@@ -12,31 +12,34 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 public class ADDProjectInternship2018Application {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ADDProjectInternship2018Application.class, args);
-	}
-	@Bean
-	public LoginAuthenticationSuccessHandler loginAuthenticationSuccessHandler(){
-		return new LoginAuthenticationSuccessHandler();
-	}
-	@Bean
-	public LoginAuthenticationFailureHandler loginAuthenticationFailureHandler(){
-		return new LoginAuthenticationFailureHandler();
-	}
-	@Bean
-	public EmailServiceImpl emailService(){
-		return new EmailServiceImpl();
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ADDProjectInternship2018Application.class, args);
+    }
 
-	@Bean
-	public RestTemplate restTemplate(){
-		return new RestTemplate();
-	}
+    @Bean
+    public LoginAuthenticationSuccessHandler loginAuthenticationSuccessHandler() {
+        return new LoginAuthenticationSuccessHandler();
+    }
 
-	@Bean
-	@Qualifier("bank_ip")
-	public String bankIP(){
-		return "http://localhost:64509/api";
-	}
+    @Bean
+    public LoginAuthenticationFailureHandler loginAuthenticationFailureHandler() {
+        return new LoginAuthenticationFailureHandler();
+    }
+
+    @Bean
+    public EmailServiceImpl emailService() {
+        return new EmailServiceImpl();
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
+    @Bean
+    @Qualifier("bank_ip")
+    public String bankIP() {
+        return "http://localhost:64509/api";
+    }
 
 }

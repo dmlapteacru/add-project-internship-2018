@@ -22,17 +22,17 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
 
     List<Invoice> findAll();
 
-    List<Invoice> findByContractId(int id);
+    List<Invoice> findByContractIdOrderByIssueDate(int id);
 
-    List<Invoice> findAllByStatus(InvoiceStatus invoiceStatus);
+    List<Invoice> findAllByStatusOrderByIssueDate(InvoiceStatus invoiceStatus);
 
     List<Invoice> findAllByIssueDate(LocalDate localDate);
 
     List<Invoice> findAllByDueDate(LocalDate localDate);
 
-    List<Invoice> findAllByContractCustomerId(int id);
+    List<Invoice> findAllByContractCustomerIdOrderByIssueDate(int id);
 
-    List<Invoice> findAllByContractCustomerIdAndStatusNot(int customerId, InvoiceStatus status);
+    List<Invoice> findAllByContractCustomerIdAndStatusIsInOrderByIssueDate(int customerId, List<InvoiceStatus> statuses);
 
     List<Invoice> findAllByContract_Company_Name(String name);
 
@@ -48,31 +48,20 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
             "WHERE i.id=:id",nativeQuery = true)
     List<Object[]> setInvoiceDescriptionPayment(@Param("id") int id);
 
-
-    @Query(value = "SELECT i.id, i.sum, i.issue_date, i.due_date, i.status, com.name as comName, pr.name as prodName FROM invoice i\n" +
-            "LEFT JOIN contract co on i.contract_id=co.id\n" +
-            "LEFT JOIN company com on com.id=co.company_id\n" +
-            "LEFT JOIN product pr on co.product_id=pr.id\n WHERE co.customer_id=:id",nativeQuery = true)
-    List<Object[]> findAllInvoiceCustomerViewByCustomerId(@Param(value = "id") int id);
-
     long countAllByContractCustomerIdAndStatus(int customerId, InvoiceStatus status);
 
     long countAllByContractCompanyIdAndStatus(int companyId, InvoiceStatus status);
 
-    List<Invoice> findAllByContractCustomerIdAndStatusAndSumBetweenAndIssueDateBetween(int customerId, InvoiceStatus status,
-                                                                                       double sumFrom, double sumTo,
-                                                                                       LocalDate dateFrom, LocalDate dateTo);
+    List<Invoice> findAllByContractCustomerIdAndStatusAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+            (int customerId, InvoiceStatus status, double sumFrom, double sumTo, LocalDate dateFrom, LocalDate dateTo);
 
-    List<Invoice> findAllByContractCompanyIdAndStatusAndSumBetweenAndIssueDateBetween(int companyId, InvoiceStatus status,
-                                                                                      double sumFrom, double sumTo,
-                                                                                      LocalDate dateFrom, LocalDate dateTo);
+    List<Invoice> findAllByContractCompanyIdAndStatusAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+            (int companyId, InvoiceStatus status, double sumFrom, double sumTo, LocalDate dateFrom, LocalDate dateTo);
 
-    List<Invoice> findAllByContractCompanyIdAndSumBetweenAndIssueDateBetween(int companyId,
-                                                                             double sumFrom, double sumTo,
-                                                                             LocalDate dateFrom, LocalDate dateTo);
+    List<Invoice> findAllByContractCompanyIdAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+            (int companyId, double sumFrom, double sumTo, LocalDate dateFrom, LocalDate dateTo);
 
-    List<Invoice> findAllByContractCustomerIdAndSumBetweenAndIssueDateBetween(int customerId,
-                                                                             double sumFrom, double sumTo,
-                                                                             LocalDate dateFrom, LocalDate dateTo);
+    List<Invoice> findAllByContractCustomerIdAndStatusInAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+            (int customerId, List<InvoiceStatus> statuses, double sumFrom, double sumTo, LocalDate dateFrom, LocalDate dateTo);
 
 }

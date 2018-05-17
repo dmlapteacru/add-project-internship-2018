@@ -1,6 +1,5 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.dao.InvoiceDao;
 import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.model.dto.*;
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
@@ -9,9 +8,11 @@ import com.endava.addprojectinternship2018.util.UserUtil;
 import com.endava.addprojectinternship2018.validation.ErrorMessage;
 import com.endava.addprojectinternship2018.validation.ValidationResponse;
 import com.endava.addprojectinternship2018.validation.Validator;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +20,12 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @org.springframework.web.bind.annotation.RestController
@@ -71,6 +73,8 @@ public class RestController {
     @Autowired
     private Validator validator;
 
+    private static final Logger LOGGER = Logger.getLogger(RestController.class);
+
     //  -----   REST Company
     @GetMapping("/rest/getCompanyByEmail/{name}")
     public Company getCompanyByEmail(@PathVariable String name) {
@@ -116,12 +120,16 @@ public class RestController {
             return new ResponseEntity<>(error.getFieldError().getCode(), HttpStatus.BAD_REQUEST);
         }
         categoryService.saveCategory(category);
+        LOGGER.info(String.format("admin has created new category %s:%s", category.getId(), category.getName()));
         return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/admin/deleteCategory/{id}", method = RequestMethod.DELETE)
     public String deleteCategory(@PathVariable Integer id) {
+        LOGGER.info(String.format("admin is trying to delete category with id %s", id));
+        String categoryName = categoryService.getCategoryById(id).getName();
         categoryService.deleteCategory(id);
+        LOGGER.info(String.format("category %s:%s was deleted", id, categoryName));
         return "OK";
     }
 
@@ -130,6 +138,9 @@ public class RestController {
     ValidationResponse saveNewContract(@Valid @RequestBody ContractDtoTest contractDtoTest,
                                        BindingResult bindingResult) {
 
+        String currentUsername = userUtil.getCurrentUser().getUsername();
+        LOGGER.info(String.format("%s: creating new contract...", currentUsername));
+
         ValidationResponse response = new ValidationResponse();
         response.setStatus("SUCCESS");
         final List<ErrorMessage> errorMessageList = new ArrayList<>();
@@ -137,12 +148,14 @@ public class RestController {
         if (contractDtoTest.getIssueDate() == null) {
             response.setStatus("FAIL");
             errorMessageList.add(new ErrorMessage("new_issueDate", "cannot be null"));
+            response.setErrorMessageList(errorMessageList);
             return response;
         }
 
         if (contractDtoTest.getExpireDate() == null) {
             response.setStatus("FAIL");
             errorMessageList.add(new ErrorMessage("new_expireDate", "cannot be null"));
+            response.setErrorMessageList(errorMessageList);
             return response;
         }
 
@@ -196,6 +209,13 @@ public class RestController {
             contractDto.setExpireDate(contractDtoTest.getExpireDate());
             contractDto.setStatus(ContractStatus.valueOf(contractDtoTest.getStatus()));
             contractService.saveContract(contractDto);
+            LOGGER.info(String.format("%s: creating new contract... SUCCESS", currentUsername));
+        }
+
+        if (!errorMessageList.isEmpty()) {
+            for (ErrorMessage errorMessage : errorMessageList) {
+                LOGGER.warn(String.format("%s: contract validation error (field:%s message:%s)", currentUsername, errorMessage.getFieldName(), errorMessage.getMessage()));
+            }
         }
 
         return response;
@@ -228,6 +248,7 @@ public class RestController {
 
     @RequestMapping(value = "/contractRest/deleteContract", method = POST)
     public String deleteContract(@RequestParam(name = "contractId") int contractId) {
+        LOGGER.info(String.format("%s: attempt to delete contract: %s", userUtil.getCurrentUser().getUsername(), contractId));
         return contractService.deleteContract(contractId);
     }
 
@@ -244,16 +265,21 @@ public class RestController {
 
     @RequestMapping(value = "/companyRest/newService", method = POST)
     public @ResponseBody
-    ValidationResponse addNewService(@RequestBody @Valid ProductDtoTest productDtoTest,
-                                     BindingResult bindingResult) {
+    ValidationResponse saveNewService(@RequestBody @Valid ProductDtoTest productDtoTest,
+                                      BindingResult bindingResult) {
 
         ValidationResponse response = new ValidationResponse();
         response.setStatus("SUCCESS");
         final List<ErrorMessage> errorMessageList = new ArrayList<>();
 
+        if (productDtoTest.getCategoryId() == 0) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("select_category", "must not be empty"));
+        }
+
         if (productDtoTest.getName() == null || productDtoTest.getName().isEmpty()) {
             response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("new_service_name", "Must not be empty"));
+            errorMessageList.add(new ErrorMessage("new_service_name", "must not be empty"));
         }
 
         if (productDtoTest.getName().matches("(<\\s*script\\s*>)|(alert\\s*\\(\\s*\\))")) {
@@ -261,9 +287,15 @@ public class RestController {
             errorMessageList.add(new ErrorMessage("new_service_name", "contains illegal characters"));
         }
 
+        if (productDtoTest.getDescription().matches("(<\\s*script\\s*>)|(alert\\s*\\(\\s*\\))")) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("new_service_desc", "contains illegal characters"));
+        }
+
+
         if (productDtoTest.getPrice() <= 0) {
             response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("new_service_price", "Price must be more than 0"));
+            errorMessageList.add(new ErrorMessage("new_service_price", "must be more than 0"));
         }
 
         Optional<Product> optionalProduct = productService.getByNameAndCategoryIdAndCompanyId(
@@ -272,7 +304,7 @@ public class RestController {
                 productDtoTest.getCompanyId());
         if (optionalProduct.isPresent()) {
             response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("new_service_name", "Service name exists"));
+            errorMessageList.add(new ErrorMessage("new_service_name", "service name exists"));
         }
 
         if (bindingResult.hasErrors()) {
@@ -452,6 +484,22 @@ public class RestController {
         ResponseEntity<List<StatementDto>> response = restTemplate.exchange(bankIP + "/statement/statement", HttpMethod.POST, request, new ParameterizedTypeReference<List<StatementDto>>() {
         });
         return new ResponseEntity<>(response.getBody(), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "servicesRest/pdfExport", method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<InputStreamResource> citiesReport() throws IOException {
+
+        ByteArrayInputStream bis = productService.getPriceList();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "inline; filename=ServicePriceList.pdf");
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(bis));
     }
 
 }

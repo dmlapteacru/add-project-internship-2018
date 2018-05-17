@@ -23,31 +23,27 @@ public interface ContractDao extends JpaRepository<Contract, Integer> {
 
     List<Contract> findAllByCompanyName(String companyName);
 
-    List<Contract> findAllByCompanyId(int id);
+    List<Contract> findAllByCompanyIdOrderByIssueDate(int id);
 
-    List<Contract> findAllByCustomerId(int id);
+    List<Contract> findAllByCustomerIdOrderByIssueDate(int id);
 
-    List<Contract> findAllByProductId(int productId);
+    List<Contract> findAllByProductIdOrderByIssueDate(int productId);
 
     long countByCompanyIdAndStatus(int companyId, ContractStatus status);
 
     long countByCustomerIdAndStatus(int customerId, ContractStatus status);
 
-    List<Contract> findAllByCompanyIdAndSumBetweenAndIssueDateBetween(int id,
-                                                                      double sumFrom, double sumTo,
-                                                                      LocalDate dateFrom, LocalDate dateTo);
+    List<Contract> findAllByCompanyIdAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+            (int id, double sumFrom, double sumTo, LocalDate dateFrom, LocalDate dateTo);
 
-    List<Contract> findAllByCustomerIdAndSumBetweenAndIssueDateBetween(int id,
-                                                                       double sumFrom, double sumTo,
-                                                                       LocalDate dateFrom, LocalDate dateTo);
+    List<Contract> findAllByCustomerIdAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+            (int id, double sumFrom, double sumTo, LocalDate dateFrom, LocalDate dateTo);
 
-    List<Contract> findAllByCustomerIdAndStatusAndSumBetweenAndIssueDateBetween(int id, ContractStatus status,
-                                                                                double sumFrom, double sumTo,
-                                                                                LocalDate dateFrom, LocalDate dateTo);
+    List<Contract> findAllByCustomerIdAndStatusAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+            (int id, ContractStatus status, double sumFrom, double sumTo, LocalDate dateFrom, LocalDate dateTo);
 
-    List<Contract> findAllByCompanyIdAndStatusAndSumBetweenAndIssueDateBetween(int id, ContractStatus status,
-                                                                               double sumFrom, double sumTo,
-                                                                               LocalDate dateFrom, LocalDate dateTo);
+    List<Contract> findAllByCompanyIdAndStatusAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+            (int id, ContractStatus status, double sumFrom, double sumTo, LocalDate dateFrom, LocalDate dateTo);
 
 }
 

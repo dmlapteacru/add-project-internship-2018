@@ -46,7 +46,14 @@
                   th:object="${filterSignedContracts}" method="post" class="input-group pull-left">
                 <input type="hidden" th:field="*{contractStatus}">
                 <button type="submit" class="btn btn-info"> Signed only by you
-                    <span class="badge" th:text="${signedContracts}"></span>
+                    <span class="badge" th:text="${onePartSignedContracts}"></span>
+                </button>
+            </form>
+            <form th:action="@{/customer/contracts/filtered}"
+                  th:object="${filterSignedContracts}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{contractStatus}">
+                <button type="submit" class="btn btn-info"> Signed only your partner
+                    <span class="badge" th:text="${anotherPartSignedContracts}"></span>
                 </button>
             </form>
             <form th:action="@{/customer/contracts/filtered}"

@@ -227,15 +227,15 @@
             </div>
             <div class="form-group">
                 <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumFrom}"
-                       placeholder="sum from"/>
+                       placeholder="sum from" required/>
                 <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumTo}"
-                       placeholder="sum to"/>
+                       placeholder="sum to" required/>
             </div>
             <div class="form-group">
                 <input type="date" id="adv_filter_date_from" class="form-control input-sm col-sm-2"
                        th:field="*{dateFrom}"/>
                 <input type="date" id="adv_filter_date_to" class="form-control input-sm col-sm-2"
-                       th:field="*{dateTo}"/>
+                       th:field="*{dateTo}" />
             </div>
 
             <button type="submit" class="btn btn-info btn-sm">apply
