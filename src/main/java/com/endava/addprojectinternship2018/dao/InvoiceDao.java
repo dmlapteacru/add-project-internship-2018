@@ -1,6 +1,7 @@
 package com.endava.addprojectinternship2018.dao;
 
 import com.endava.addprojectinternship2018.model.dto.InvoiceCustomerViewDto;
+import com.endava.addprojectinternship2018.model.Contract;
 import com.endava.addprojectinternship2018.model.dto.InvoiceDescriptionPaymentDto;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
@@ -37,12 +38,9 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
 
     List<Invoice> findAllByContract_Company_IdOrderById(int id);
 
-//    @Query("select new com.endava.addprojectinternship2018.model.dto.InvoiceDescriptionPaymentDto(pr.name, pr.name) " +
-//            "from Invoice i " +
-//            "left join Contract co on i.contract=co.id " +
-////            "left join Company com on co.company=com.id " +
-//            "left join Product pr on co.product=pr.id " +
-//            "where i.id=:id")
+    @Query("select inv from Invoice inv join inv.contract contr where inv.dueDate >=:date AND contr.id =:contract_id")
+    List<Invoice> findInvoiceInPeriod(@Param("contract_id")int contract_id, @Param(  "date")LocalDate date);
+
     @Query(value = "SELECT com.name as companyName, pr.name as productName FROM invoice i\n" +
             "LEFT JOIN contract co on i.contract_id=co.id\n" +
             "LEFT JOIN company com on com.id=co.company_id\n" +

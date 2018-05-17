@@ -4,6 +4,7 @@ import com.endava.addprojectinternship2018.dao.CompanyDao;
 import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
 import com.endava.addprojectinternship2018.dao.InvoiceTransactionDao;
+import com.endava.addprojectinternship2018.model.Contract;
 import com.endava.addprojectinternship2018.model.Product;
 import com.endava.addprojectinternship2018.model.dto.InvoiceCustomerViewDto;
 import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
@@ -23,9 +24,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.ACTIVE;
-import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.IN_PROGRESS;
-import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.PAID;
+import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.*;
 
 @Service
 @Transactional
@@ -123,7 +122,16 @@ public class InvoiceService {
         } else invoice.setStatus(ACTIVE);
     }
 
-    public List<Invoice> getInvoicesByStatus(InvoiceStatus invoiceStatus) {
+    public void changeInvoiceStatusToSent(int invoiceId) {
+        Invoice invoice = invoiceDao.findById(invoiceId).get();
+        System.out.println(invoice);
+        System.out.println(invoice.getStatus());
+        if (invoice.getStatus() == InvoiceStatus.ISSUED) {
+            invoice.setStatus(SENT);
+        } else System.out.println("Status not corresponding to ISSUED !!!");
+    }
+
+    public List<Invoice> getInvoicesByStatus(InvoiceStatus invoiceStatus){
         return invoiceDao.findAllByStatus(invoiceStatus);
     }
 
@@ -191,4 +199,8 @@ public class InvoiceService {
                 filter.getInvoiceStatus(), sumFrom, sumTo, dateFrom, dateTo);
     }
 
+
+    public List<Invoice> getInvoiceInPeriodService(int contract_id, LocalDate issueDate){
+        return invoiceDao.findInvoiceInPeriod(contract_id, issueDate);
+    }
 }

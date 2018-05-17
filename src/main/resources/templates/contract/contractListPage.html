@@ -137,6 +137,7 @@
     </table>
 </div>
 
+
 <div class="modal fade" id="createInvoiceDialog" role="dialog">
     <div class="modal-dialog">
         <!-- Modal content-->
@@ -162,7 +163,7 @@
                         <label class="col-sm-3 control-label">Customer</label>
                         <div class="col-sm-6">
                             <input type="text" class="form-control" id="customer_inv_name" value="" readonly/>
-                            <!--<input type="hidden" class="form-control" id="customerIdA"/>-->
+                            <p class="error-message" id="customer_inv_nameError" style="display: none"> validation error</p>
                         </div>
                     </div>
 
@@ -170,7 +171,7 @@
                         <label class="col-sm-3 control-label">Issue date</label>
                         <div class="col-sm-6">
                             <input type="date" class="form-control" id="issue_inv_date" required="required"/>
-                            <!--<p class="error-message" id="issueDateError" style="display: none"> validation error</p>-->
+                            <p class="error-message" id="issue_inv_dateError" style="display: none"> validation error</p>
                         </div>
                     </div>
 
@@ -187,7 +188,6 @@
                         <label class="col-sm-3 control-label">Service</label>
                         <div class="col-sm-6">
                             <input type="text" class="form-control" id="product_inv" value="" readonly/>
-                            <!--<input type="hidden" class="form-control" id="productIdA"/>-->
                         </div>
                     </div>
 
@@ -201,27 +201,35 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Status</label>
                         <div class="col-sm-6">
-                            <input type="hidden" id="status_inv_in" th:value="${status}">
+                            <input type="hidden" id="status_inv_in" th:value="${status}"/>
                             <input type="text" class="form-control" id="status_inv_out" readonly/>
-
-
-                            <!--<select class="form-control" id="statusA">-->
-                            <!--<option selected>Signed</option>-->
-                            <!--<option>Unsigned</option>-->
-                            <!--</select>-->
                         </div>
                     </div>
 
                     <div class="form-group">
                         <div class="col-sm-6 col-xs-offset-3">
-                            <!--<button type="submit" id="btn_save_contract" class="btn btn-info">Save</button>-->
-                            <button id="save_btn" onclick="saveInvoiceButton()" type="button" class="btn btn-success">
-                                Save
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button id="save_btn" onclick="saveInvoiceButton()" type="button" class="btn btn-success">Save</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
 
+<div class="modal fade" id="modalDeleteInvoice" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Are you sure?</h4>
+                <input id="deleteInvoiceId" type="text" hidden="hidden"/>
+            </div>
+            <div class="modal-footer modal_btn">
+                <button id="btn_delete_invoice" type="button" class="btn btn-danger">Delete</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -355,7 +363,6 @@
                         </div>
                     </div>
                 </form>
-
             </div>
         </div>
     </div>
@@ -402,8 +409,22 @@
         )
     })
 
-    function createNewInvoice(btn) {
+    $('#btn_delete_invoice').click(function () {
+        $.ajax(
+            {
+                url: "/restinvoice/deleteInvoice",
+                type: "POST",
+                data: {"invoiceId": $('#deleteInvoiceId').val()},
+                success: function () {
+                    $("#modalDeleteConfirm").modal("hide");
+                    location.reload();
+                }
+            }
+        )
+    })
 
+    function createNewInvoice(btn) {
+        clearErrorsSecond();
         var rowId = btn.id.substring(18);
         var row = $("#row" + rowId);
         var issueDate = new Date();
@@ -452,18 +473,38 @@
     function editAjax(data) {
         $.ajax({
             type: "POST",
-            url: "/restinvoice/createInvoice",
+            url: "/restinvoice/newInvoice",
             // The key needs to match your method's input parameter (case-sensitive).
             data: JSON.stringify(data),
             contentType: "application/json; charset=utf-8",
             success: function (response) {
                 console.log(data);
-                console.log("success");
+                console.log("success!!!");
+                console.log(response);
+
+                if (response.status === 'FAIL') {
+                    console.log('FAILED !!!');
+                    var allErrors = response.errorMessageList;
+                    for (i = 0; i < allErrors.length; i++) {
+                        var currFieldName = allErrors[i].fieldName;
+                        var currErrorMessage = allErrors[i].message;
+                        $('#' + currFieldName).parent().addClass('has-error');
+                        $('#' + currFieldName + 'Error').text(currErrorMessage);
+                        $('#' + currFieldName + 'Error').show();
+                    }
+                } else {
+                    $('#createInvoiceDialog').modal('hide');
+                    $('#alertMessage').text('New contract was added successful');
+                    location.reload();
+                    $('#modalAlert').modal('show');
+                }
+
+
                 // $("#dueDate" + data.id).text(moment(data.dueDate, 'YYYY-MM-DD').format('DD-MM-YYYY'));
                 // $("#sum" + data.id).text(data.sum);
-                $("#createInvoiceDialog").modal('hide')
-                $('#alertMessage').text('New invoice was added successful');
-                $('#modalAlert').modal('show');
+                // $("#createInvoiceDialog").modal('hide')
+                // $('#alertMessage').text('New invoice was added successful');
+                // $('#modalAlert').modal('show');
             },
             error: function (errMsg, a, b) {
                 alert("Please call admins")
@@ -632,6 +673,14 @@
             $('#new_sum').parent().removeClass('has-error');
         })
     }
+
+    function clearErrorsSecond() {
+        $('#new_expireDate').focus(function () {
+            $('#expire_inv_dateError').hide();
+            $('#expire_inv_date').parent().removeClass('has-error');
+        })
+    }
+
 
     function signContract(btn) {
         var rowId = btn.id.substring(9);

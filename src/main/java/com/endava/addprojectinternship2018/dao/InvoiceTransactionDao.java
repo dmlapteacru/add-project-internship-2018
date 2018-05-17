@@ -79,12 +79,12 @@ public class InvoiceTransactionDao {
     }
 
     public String checkInvoiceByPeriod(String set_date, int contract_id, String status){
-        String query  = "select inv.id" +
-                "from Invoice inv" +
+        String query  = "select inv.id " +
+                "from Invoice inv " +
                 "where set_date >= inv.issueDate " +
                 "and set_date<=inv.dueDate " +
-                "and inv.staus=:status " +
-                "and inv.contract_id=:contract_id";
+                "and inv.status=:status " +
+                "and inv.contract_id=:contract_id ";
         return query;
     }
 
