@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @org.springframework.web.bind.annotation.RestController
 public class RestController {
@@ -71,6 +72,9 @@ public class RestController {
     @Autowired
     private Validator validator;
 
+    @Autowired
+    private NotificationService notificationService;
+
     //  -----   REST Company
     @GetMapping("/rest/getCompanyByEmail/{name}")
     public Company getCompanyByEmail(@PathVariable String name) {
@@ -93,7 +97,7 @@ public class RestController {
         return productService.getAllProducts();
     }
 
-    @RequestMapping(value = "/newUserPassword", method = RequestMethod.PUT)
+    @RequestMapping(value = "/newUserPassword", method = PUT)
     public String setNewPass(@RequestBody UserDto user) {
         userService.changeUserPassword(user);
         return "OK";
@@ -109,7 +113,7 @@ public class RestController {
         return categoryService.getAllCategory();
     }
 
-    @RequestMapping(value = "/admin/newCategory", method = RequestMethod.PUT)
+    @RequestMapping(value = "/admin/newCategory", method = PUT)
     public ResponseEntity<?> saveNewCategory(@RequestBody Category category, BindingResult error) {
         validator.validate(category, error);
         if (error.hasErrors()) {
@@ -312,19 +316,19 @@ public class RestController {
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/message/changeStatus/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/admin/message/changeStatus/{id}", method = PUT)
     public String changeMessageStatus(@PathVariable int id) {
         adminMessageService.changeMessageStatus(id);
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/message/changeStatus/read", method = RequestMethod.PUT)
+    @RequestMapping(value = "/admin/message/changeStatus/read", method = PUT)
     public String changeMessageStatusOnRead(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList) {
         adminMessageService.changeMessageStatusOnRead(changeMessageStatusDtoList);
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/message/changeStatus/unread", method = RequestMethod.PUT)
+    @RequestMapping(value = "/admin/message/changeStatus/unread", method = PUT)
     public String changeMessageStatusOnUnRead(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList) {
         adminMessageService.changeMessageStatusOnUnRead(changeMessageStatusDtoList);
         return "OK";
@@ -453,5 +457,13 @@ public class RestController {
         });
         return new ResponseEntity<>(response.getBody(), HttpStatus.OK);
     }
-
+    @RequestMapping(value = "/admin/notifications/unread", method = GET)
+    public List<Notification> getAllNotificationByStatusUnread(){
+        return notificationService.getAllByStatusUnread();
+    }
+    @RequestMapping(value = "/admin/notifications/changeStatus", method = PUT)
+    public String changeNotificationStatus(@RequestParam("id") int id){
+        notificationService.changeNotificationStatusOnRead(id);
+        return "OK";
+    }
 }

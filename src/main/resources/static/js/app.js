@@ -19,10 +19,8 @@ function connect() {
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        console.log("before CON");
         stompClient.subscribe('/topic/user', function (greeting) {
-            console.log("CON");
-            showGreeting(JSON.parse(greeting.body).content);
+            showGreeting();
         });
     });
 }
@@ -35,19 +33,41 @@ function disconnect() {
     console.log("Disconnected");
 }
 
-function sendName() {
-    stompClient.send("/app/user", {}, JSON.stringify({'name': $("#name").val()}));
-}
+// function sendName() {
+//     var json = {
+//         "notificationCase" : "NEW_USER",
+//         "content" : "Registered new user.",
+//         "userTo" : "admin"
+//     };
+//     stompClient.send("/app/user", {}, JSON.stringify(json));
+// }
 
-function showGreeting(message) {
-    $("#userinfo").append("<tr><td>" + message + "</td></tr>");
-}
+function showGreeting() {
+    loadNotifications();
 
-$(function () {
-    $("form").on('submit', function (e) {
-        e.preventDefault();
-    });
-    $( "#connect" ).click(function() { connect(); });
-    $( "#disconnect" ).click(function() { disconnect(); });
-    $( "#send" ).click(function() { sendName(); });
-});
+    $("#not_icon").addClass("cue");
+    setTimeout(function () {
+        $("#not_icon").removeClass("cue");
+    }, 1010);
+    var count = parseInt($("#not_count").attr("value"));
+    $("#not_count").attr("value", ++count);
+    if (count === 0){
+        $("#not_count").text("");
+        $("#not_icon").css("visibility", "hidden");
+    } else {
+        $("#not_count").text(count);
+        $("#not_icon").css("visibility", "visible");
+    }
+}
+//
+// $(function () {
+//     $("form").on('submit', function (e) {
+//         e.preventDefault();
+//     });
+//     $( "#connect" ).click(function() { connect(); });
+//     $( "#disconnect" ).click(function() { disconnect(); });
+//     $( "#send" ).click(function() { sendName(); });
+// });
+
+//
+

@@ -190,7 +190,7 @@ function loadMessages(data) {
                 .append('<tr id="' + messageID + '" class="unread_message_bold">' +
                     '<td><input type="checkbox" class="checkbox_mess_element" onclick="checkBTN(this)"/></td></td><td><span class="circle circle_active" onclick="changeMessageStatus(this)"></span></td></tr>');
             $("#table-messages tr[id="+ "" + messageID + "]")
-                .append("<td onclick='showMessage(this)'>" + object.user_email + "</td>");
+                .append("<td onclick='showMessage(this)'>" + object.userEmail + "</td>");
 
             $("#table-messages tr[id="+ "" + messageID + "]")
                 .append("<td onclick='showMessage(this)'>" + object.subject + " <div style='display: none;' id='mess"+messageID+"'>" + object.message +"</div></td>");
@@ -199,7 +199,7 @@ function loadMessages(data) {
                 .append('<tr id="' + messageID + '">' +
                     '<td><input type="checkbox" class="checkbox_mess_element" onclick="checkBTN(this)"/></td><td><span class="circle circle_inactive" onclick="changeMessageStatus(this)"></span></td></tr>');
             $("#table-messages tr[id="+ "" + messageID + "]")
-                .append("<td onclick='showMessage(this)'>" + object.user_email + "</td>");
+                .append("<td onclick='showMessage(this)'>" + object.userEmail + "</td>");
 
             $("#table-messages tr[id="+ "" + messageID + "]")
                 .append("<td onclick='showMessage(this)'>" + object.subject + " <div style='display: none;' id='mess"+messageID+"'>" + object.message + "</div></td>");
