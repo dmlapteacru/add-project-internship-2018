@@ -289,11 +289,12 @@
             $("#messages_btn_req").click();
             showNotificatedMessage(id);
         }
+        $(obj).parent().find("a").click();
     }
     function showNotificatedMessage(id) {
         setTimeout(function () {
             $("#table-messages tr[id='"+id+"']").toggleClass("act");
-        }, 300);
+        }, 500);
 
     }
     function deleteNotification(link) {

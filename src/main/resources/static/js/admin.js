@@ -213,10 +213,10 @@ function loadMessages(data) {
 }
 function setTitleForMessageCircles() {
     $.each($(".circle_active"),function () {
-        $(this).append("<span>Mark as unread</span>");
+        $(this).append("<span>Mark as read</span>");
     });
     $.each($(".circle_inactive"),function () {
-        $(this).append("<span>Mark as read</span>");
+        $(this).append("<span>Mark as unread</span>");
     });
 }
 
@@ -235,6 +235,7 @@ function changeMessageStatus(circle) {
 function showMessage(col) {
     $("#mess"+$(col).parent().attr("id")).slideToggle("slow");
 
+    $(col).parent().removeClass("act");
     if ($(col).parent().hasClass("unread_message_bold")) {
         changeMessageStatus($(col).parent().find("td > span.circle"));
     }
