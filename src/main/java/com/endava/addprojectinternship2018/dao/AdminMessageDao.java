@@ -27,4 +27,5 @@ public interface AdminMessageDao extends JpaRepository<AdminMessage, Integer>{
     @Transactional
     void deleteAllByIdIn(List<Integer> ids);
 
+    AdminMessage findByUserEmail(String email);
 }

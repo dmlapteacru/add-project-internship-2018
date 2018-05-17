@@ -6,7 +6,9 @@
     <title>ADD login page</title>
     <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>-->
     <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript"></script>
+    <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" type="text/javascript"></script>
     <link rel="stylesheet" type="text/css" href="/css/default.css"  />
 </head>
@@ -20,7 +22,7 @@
                 <strong> Registration success! Wait for admin's approval.</strong>
             </div>
         </div>
-        <div class="alert alert-success alert-dismissible fade in">
+        <div id="alert_success" class="alert alert-success alert-dismissible fade in">
             <div id="approval_info">
                 <strong id="confirm_alert_message"></strong>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -99,7 +101,7 @@
                 </div>
                 <div class="modal-footer modal_btn">
                     <button type="button" style="display: none;" class="btn"></button>
-                    <button id="save_btn_message" type="submit" class="btn btn-success">Send</button>
+                    <button id="save_btn_message" type="button" class="btn btn-success">Send</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </form>
@@ -142,15 +144,16 @@
                 url: "/message/send",
                 type: "post",
                 contentType: "application/json",
-                data: JSON.stringify(message)
-//                success: function () {
-//                    $("#modalMessage").modal("hide");
-//                    $("#confirm_alert_message").text("Message sent.");
-//                    $(".alert").slideToggle("slow");
-//                    setTimeout(function () {
-//                        $(".alert").slideToggle("slow");
-//                    },5000);
-//                }
+                data: JSON.stringify(message),
+                success: function () {
+                    $("#modalMessage").modal("hide");
+                    $("#confirm_alert_message").text("Message sent.");
+                    $("#alert_success").slideToggle("slow");
+                    setTimeout(function () {
+                        $(".alert").slideToggle("slow");
+                    },5000);
+                    sendMessageNotification();
+                }
             }
         )
     });
@@ -182,6 +185,26 @@
     $(document).ready(function () {
         $(".approval_info").slideToggle("slow");
     })
+//
+//
+    $(document).ready(function () {
+        connect();
+    });
+    function connect() {
+        var socket = new SockJS('/websocket-example');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function () {
+        });
+    }
+    function sendMessageNotification() {
+        console.log("AAO");
+        var json = {
+            "notificationCase" : "NEW_MESSAGE",
+            "content" : "New message from: " + $("#new_message_email").val(),
+            "userTo" : "admin"
+        };
+        stompClient.send("/app/admin", {}, JSON.stringify(json));
+    }
 </script>
 </body>
 </html>

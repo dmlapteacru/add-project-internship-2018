@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" type="text/css" href="/css/default.css"  />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!--<script src="/js/app.js"></script>-->
 
     <title>Registration</title>
 </head>
@@ -106,7 +111,7 @@
                 </div>
 
                 <div th:if="not ${update}" class="form-group">
-                    <button type="submit" class="btn btn-success">Register</button>
+                    <button id="registration_btn" type="submit" class="btn btn-success">Register</button>
                     <span>Already registered? <a href="/" th:href="@{/login}">Login here</a></span>
                 </div>
 
@@ -121,8 +126,27 @@
     </div>
 </div>
 
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 <script src="/js/show_pass.js"></script>
+<script>
+    $(document).ready(function () {
+        connect();
+    });
+    function connect() {
+        var socket = new SockJS('/websocket-example');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function () {
+        });
+    }
+    $("#registration_btn").click(function () {
+        console.log("AAO");
+        var json = {
+            "notificationCase" : "NEW_USER",
+            "content" : "Registered new user with username: " + $("#username").val(),
+            "userTo" : "admin"
+        };
+        stompClient.send("/app/admin", {}, JSON.stringify(json));
+    });
+</script>
 </body>
 </html>
