@@ -26,7 +26,9 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @org.springframework.web.bind.annotation.RestController
 public class RestController {
@@ -75,6 +77,9 @@ public class RestController {
 
     private static final Logger LOGGER = Logger.getLogger(RestController.class);
 
+    @Autowired
+    private NotificationService notificationService;
+
     //  -----   REST Company
     @GetMapping("/rest/getCompanyByEmail/{name}")
     public Company getCompanyByEmail(@PathVariable String name) {
@@ -92,28 +97,28 @@ public class RestController {
         return companyService.getCompanyByName(companyName).get();
     }
 
-    @RequestMapping(value = "/admin/services", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin/services", method = GET)
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
 
-    @RequestMapping(value = "/newUserPassword", method = RequestMethod.PUT)
+    @RequestMapping(value = "/newUserPassword", method = PUT)
     public String setNewPass(@RequestBody UserDto user) {
         userService.changeUserPassword(user);
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/categories", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin/categories", method = GET)
     public List<Category> getAllCategory() {
         return categoryService.getAllCategory();
     }
 
-    @RequestMapping(value = "/categories", method = RequestMethod.GET)
+    @RequestMapping(value = "/categories", method = GET)
     public List<Category> getAllCategories() {
         return categoryService.getAllCategory();
     }
 
-    @RequestMapping(value = "/admin/newCategory", method = RequestMethod.PUT)
+    @RequestMapping(value = "/admin/newCategory", method = PUT)
     public ResponseEntity<?> saveNewCategory(@RequestBody Category category, BindingResult error) {
         validator.validate(category, error);
         if (error.hasErrors()) {
@@ -323,17 +328,17 @@ public class RestController {
         return response;
     }
 
-    @RequestMapping(value = "/admin/messages", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin/messages", method = GET)
     public List<AdminMessage> showMessages() {
         return adminMessageService.getAllMessages();
     }
 
-    @RequestMapping(value = "/admin/messages/unread", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin/messages/unread", method = GET)
     public List<AdminMessage> showMessagesByStatusUnread() {
         return adminMessageService.getAllMessagesByStatusUnread();
     }
 
-    @RequestMapping(value = "/admin/messages/read", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin/messages/read", method = GET)
     public List<AdminMessage> showMessagesByStatusRead() {
         return adminMessageService.getAllMessagesByStatusRead();
     }
@@ -344,19 +349,19 @@ public class RestController {
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/message/changeStatus/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/admin/message/changeStatus/{id}", method = PUT)
     public String changeMessageStatus(@PathVariable int id) {
         adminMessageService.changeMessageStatus(id);
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/message/changeStatus/read", method = RequestMethod.PUT)
+    @RequestMapping(value = "/admin/message/changeStatus/read", method = PUT)
     public String changeMessageStatusOnRead(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList) {
         adminMessageService.changeMessageStatusOnRead(changeMessageStatusDtoList);
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/message/changeStatus/unread", method = RequestMethod.PUT)
+    @RequestMapping(value = "/admin/message/changeStatus/unread", method = PUT)
     public String changeMessageStatusOnUnRead(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList) {
         adminMessageService.changeMessageStatusOnUnRead(changeMessageStatusDtoList);
         return "OK";
@@ -485,8 +490,17 @@ public class RestController {
         });
         return new ResponseEntity<>(response.getBody(), HttpStatus.OK);
     }
+    @RequestMapping(value = "/admin/notifications/unread", method = GET)
+    public List<Notification> getAllNotificationByStatusUnread(){
+        return notificationService.getAllByStatusUnread();
+    }
+    @RequestMapping(value = "/admin/notifications/changeStatus", method = PUT)
+    public String changeNotificationStatus(@RequestParam("id") int id){
+        notificationService.changeNotificationStatusOnRead(id);
+        return "OK";
+    }
 
-    @RequestMapping(value = "servicesRest/pdfExport", method = RequestMethod.GET,
+    @RequestMapping(value = "servicesRest/pdfExport", method = GET,
             produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<InputStreamResource> citiesReport() throws IOException {
 

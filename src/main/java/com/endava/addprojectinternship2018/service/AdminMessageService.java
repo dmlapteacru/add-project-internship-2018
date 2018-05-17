@@ -74,4 +74,8 @@ public class AdminMessageService {
         }
         adminMessageDao.deleteAllByIdIn(idList);
     }
+
+    public AdminMessage getAdminMessageByEmail(String email){
+        return adminMessageDao.findByUserEmail(email);
+    }
 }
