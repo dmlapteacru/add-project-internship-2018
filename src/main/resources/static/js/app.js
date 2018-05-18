@@ -33,14 +33,14 @@ function disconnect() {
     console.log("Disconnected");
 }
 
-// function sendName() {
-//     var json = {
-//         "notificationCase" : "NEW_USER",
-//         "content" : "Registered new user.",
-//         "userTo" : "admin"
-//     };
-//     stompClient.send("/app/user", {}, JSON.stringify(json));
-// }
+function sendName() {
+    var json = {
+        "notificationCase" : "NEW_USER",
+        "content" : "Registered new user.",
+        "userTo" : "admin"
+    };
+    stompClient.send("/app/user", {}, JSON.stringify(json));
+}
 
 function showGreeting() {
     loadNotifications();
