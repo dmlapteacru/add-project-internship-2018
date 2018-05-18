@@ -264,6 +264,7 @@ public class RestController {
 
     @RequestMapping(value = "/resetPassword", method = POST)
     public String resetPassword(@RequestBody PasswordToken passwordToken) {
+        System.out.println(passwordToken);
         passwordTokenService.save(passwordToken);
         return "OK";
     }
@@ -406,8 +407,12 @@ public class RestController {
         UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
-        headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
+        try {
+            headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
+            headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
+        } catch (NullPointerException ex){
+            LOGGER.error(ex.getMessage());
+        }
         HttpEntity<String> request = new HttpEntity<>("param", headers);
         String response = restTemplate.postForObject(bankIP + "/bankaccount/balance", request, String.class);
         return response;
@@ -441,11 +446,14 @@ public class RestController {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
         headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
-        invoiceService.setInvoiceAsPaid(paymentDto.getCorrespondentCount().intValue());
+        int idInvoice = paymentDto.getCorrespondentCount().intValue();
         paymentDto.setDescription(paymentDto.getDescription() + invoiceService.setInvoiceDescription(paymentDto.getCorrespondentCount().intValue()).getFullDescription());
         paymentDto.setCorrespondentCount(companyService.getCompanyByInvoiceId(paymentDto.getCorrespondentCount().intValue()).getCountNumber());
         HttpEntity<PaymentDto> request = new HttpEntity<>(paymentDto, headers);
-        restTemplate.postForObject(bankIP + "/sendmoney", request, String.class);
+        ResponseEntity<Object> response = restTemplate.postForEntity(bankIP + "/sendmoney", request, Object.class);
+        if (response.getStatusCode().equals(HttpStatus.OK)){
+            invoiceService.setInvoiceAsPaid(idInvoice);
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -460,15 +468,15 @@ public class RestController {
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
         headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
-        for (PaymentDto p : paymentDtoList
-                ) {
-            invoiceService.setInvoiceAsPaid(p.getCorrespondentCount().intValue());
-            p.setDescription(p.getDescription() +
-                    invoiceService.setInvoiceDescription(p.getCorrespondentCount().intValue())
-                            .getFullDescription());
-            p.setCorrespondentCount(companyService.getCompanyByInvoiceId(p.getCorrespondentCount().intValue())
-                    .getCountNumber());
-        }
+//        for (PaymentDto p : paymentDtoList
+//                ) {
+//            invoiceService.setInvoiceAsPaid(p.getCorrespondentCount().intValue());
+//            p.setDescription(p.getDescription() +
+//                    invoiceService.setInvoiceDescription(p.getCorrespondentCount().intValue())
+//                            .getFullDescription());
+//            p.setCorrespondentCount(companyService.getCompanyByInvoiceId(p.getCorrespondentCount().intValue())
+//                    .getCountNumber());
+//        }
 //        HttpEntity<PaymentDto> request = new HttpEntity<>(paymentDto, headers);
 //        restTemplate.postForObject( bankIP +"/sendmoney", request , String.class );
         return new ResponseEntity<>(HttpStatus.OK);
@@ -488,6 +496,7 @@ public class RestController {
         HttpEntity<StatementDateReqDto> request = new HttpEntity<>(dateReqDto, headers);
         ResponseEntity<List<StatementDto>> response = restTemplate.exchange(bankIP + "/statement/statement", HttpMethod.POST, request, new ParameterizedTypeReference<List<StatementDto>>() {
         });
+
         return new ResponseEntity<>(response.getBody(), HttpStatus.OK);
     }
     @RequestMapping(value = "/admin/notifications/unread", method = GET)

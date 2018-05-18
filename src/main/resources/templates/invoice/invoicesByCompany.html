@@ -329,8 +329,8 @@
                     <option>ISSUED</option>
                 </select>
             </th>
-            <th><input type="text" class="form-control" placeholder="Contract_id" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Full Name" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Customer Name" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Service Name" disabled></th>
             <th><input type="text" class="form-control" placeholder="" disabled></th>
             <th><input type="text" class="form-control" placeholder="" disabled></th>
 
@@ -349,8 +349,8 @@
             <td th:id="${'sum'+invoice.getId()}" th:text="${invoice.getSum()}">Sum</td>
             <td class="filter_status_invoice" th:id="${'status'+invoice.getId()}" th:text="${invoice.getStatus()}"
                 th:class="${invoice.getStatus() == 'ACTIVE'} ? 'success' : (${invoice.getStatus() == 'ISSUED'} ? 'warning' : 'red')"></td>
-            <td th:id="${'contract_id'+invoice.getId()}" th:text="${invoice.getContract().getId()}">Contract_id</td>
-            <td th:id="${'fullName'+invoice.getId()}" th:text="${invoice.getContract().getCustomer().getFullName()}">
+            <td th:id="${'contract_id'+invoice.getId()}" th:text="${invoice.getContract().getCustomer().getFullName()}">Contract_id</td>
+            <td th:id="${'fullName'+invoice.getId()}" th:text="${invoice.getContract().getProduct().getName()}">
                 Full Name
             </td>
             <td>

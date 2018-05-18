@@ -42,6 +42,7 @@ public class PasswordTokenService {
                 passwordToken.setToken(passwordEncoder.encode(passwordToken.getToken()));
                 passwordTokenDao.save(passwordToken);
                 UserEmailDto userEmailDto = userService.getUserEmailByUsername(passwordToken.getUsername());
+                System.out.println(passwordToken.getUsername());
                 String RESET_PASS_LINK = "http://localhost:8080/reset/password?username=" + passwordToken.getUsername() + "&token=" + passwordToken.getToken();
                 emailService.sendSimpleMessage(userEmailDto.getEmail(), "Endava reset password!", RESET_PASS_LINK);
             }
