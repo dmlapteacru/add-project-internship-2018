@@ -1,5 +1,6 @@
 package com.endava.addprojectinternship2018.service;
 
+import com.endava.addprojectinternship2018.controller.CustomerController;
 import com.endava.addprojectinternship2018.dao.CompanyDao;
 import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
@@ -13,6 +14,7 @@ import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
 import com.endava.addprojectinternship2018.model.User;
 import com.endava.addprojectinternship2018.model.dto.InvoiceDto;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,8 @@ public class InvoiceService {
 
     @Autowired
     private InvoiceTransactionDao invoiceTransactionDao;
+
+    private static final Logger LOGGER = Logger.getLogger(InvoiceService.class);
 
     public List<Invoice> getAllInvoices(){
         return invoiceDao.findAll();
@@ -125,9 +129,10 @@ public class InvoiceService {
     public void changeInvoiceStatusToSent(int invoiceId) {
         Invoice invoice = invoiceDao.findById(invoiceId).get();
         System.out.println(invoice);
-        System.out.println(invoice.getStatus());
+        LOGGER.info("current invoice status:"+invoice.getStatus());
         if (invoice.getStatus() == InvoiceStatus.ISSUED) {
             invoice.setStatus(SENT);
+            invoiceDao.save(invoice);
         } else System.out.println("Status not corresponding to ISSUED !!!");
     }
 
