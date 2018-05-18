@@ -107,7 +107,7 @@ public class UserRegistrationController {
         }
 
         companyService.saveCompany(companyDto);
-        return "redirect:/login?error=reg_approval";
+        return "redirect:/login";
 
     }
 
