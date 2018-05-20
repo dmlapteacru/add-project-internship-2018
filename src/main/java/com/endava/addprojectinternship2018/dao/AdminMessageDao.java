@@ -28,4 +28,6 @@ public interface AdminMessageDao extends JpaRepository<AdminMessage, Integer>{
     void deleteAllByIdIn(List<Integer> ids);
 
     AdminMessage findByUserEmail(String email);
+
+    AdminMessage findFirstByUserEmailOrderByDateDesc(String email);
 }

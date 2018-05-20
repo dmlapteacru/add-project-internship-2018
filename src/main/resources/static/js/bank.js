@@ -18,7 +18,8 @@ $("#create_account").click(function () {
         }
     )
 });
-$("#btn_add_money_req").click(function () {
+$(".add_money").submit(function (e) {
+    e.preventDefault();
     $.ajax(
         {
             url : "/bankAccount/addmoney?sum=" + $("#money_sum").val(),
@@ -28,8 +29,9 @@ $("#btn_add_money_req").click(function () {
                 $("#alert_success").slideToggle("slow");
                 setTimeout(function () {
                     $("#alert_success").slideToggle("slow");
-                },5000);
+                },3000);
                 $(".btn_add_money_toggle").click();
+                $("#money_sum").val("0.0");
                 loadBalance();
             },
             error: function (response) {
@@ -37,7 +39,7 @@ $("#btn_add_money_req").click(function () {
                 $("#alert_error").slideToggle("slow");
                 setTimeout(function () {
                     $("#alert_error").slideToggle("slow");
-                },5000);
+                },3000);
             }
         }
     )
@@ -62,26 +64,47 @@ $("#btn_statement_req").click(function () {
                 data : JSON.stringify(body),
                 success: function (result) {
                     loadStatement(result);
+                    console.log(result);
                 },
                 error : function (response) {
                     $("#error_alert_message").text(response.responseText);
                     $("#alert_error").slideToggle("slow");
                     setTimeout(function () {
                         $("#alert_error").slideToggle("slow");
-                    },5000);
+                    },3000);
                 }
             }
         )
     }
 });
 function loadStatement(data) {
-    $.each(data, function (id, object) {
+    $("#bal-change").html("+/-");
+    $(".table_statement tbody").html("");
+    $("#bal-change").append("<br><span style='color: orange'>" + data.balanceBefore+ " MDL</span>");
+    var sumFinal = data.balanceBefore;
+    $.each(data.listOfTransactions, function (id, object) {
         $(".table_statement tbody").append("<tr id='"+id+"'></tr>");
-        $(".table_statement tbody tr[id='"+id+"']").append("<td>"+ object.date.split("-").reverse().join("-")+"</td><td>"+object.description+"</td>");
+        $(".table_statement tbody tr[id='"+id+"']").append("<td>"+ dateParse(object.date)+"</td><td>"+object.description+"</td>");
         if (object.correspondentCount === 1){
             $(".table_statement tbody tr[id='"+id+"']").append("<td class='income'>"+ object.sum+"</td>");
         } else {
             $(".table_statement tbody tr[id='"+id+"']").append("<td class='loss'>"+ object.sum+"</td>");
         }
+        sumFinal+=object.sum;
     });
+    $(".table_statement tbody").append("<tr" +
+                                "><td></td><td style='color: orange; font-weight: bold;'>Current SUM :</td>" +
+                                "<td style='color: orange; font-weight: bold;'><span>"+sumFinal+" MDL</span></td>" +
+                                "</tr>");
+}
+
+
+function dateParse(date) {
+    var dateList = date.split("-");
+    var year = dateList[0];
+    var month = dateList[1];
+    var day = dateList[2].split("T")[0];
+
+    return day + "-" + month + "-"+ year;
+
 }

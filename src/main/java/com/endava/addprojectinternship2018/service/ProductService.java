@@ -5,11 +5,18 @@ import com.endava.addprojectinternship2018.model.Product;
 import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
 import com.endava.addprojectinternship2018.model.dto.ProductDto;
 import com.endava.addprojectinternship2018.model.dto.ProductDtoTest;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +32,8 @@ public class ProductService {
 
     @Autowired
     private CompanyService companyService;
+
+    private static final Logger LOGGER = Logger.getLogger(ProductService.class);
 
     public List<Product> getAllByCompanyId(int id) {
         return productDao.findAllByCompanyId(id);
@@ -123,6 +132,80 @@ public class ProductService {
         double priceFrom = (filter.getSumFrom() == 0 ? Double.MIN_VALUE : filter.getSumFrom());
         double priceTo = (filter.getSumTo() == 0 ? Double.MAX_VALUE : filter.getSumTo());
         return productDao.findAllByPriceBetween(priceFrom, priceTo);
+    }
+
+    public ByteArrayInputStream getPriceList() {
+
+        List<Product> products = getAllProducts();
+
+        Document document = new Document();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+
+            PdfPTable table = new PdfPTable(4);
+            table.setWidthPercentage(60);
+            table.setWidths(new int[]{4, 4, 3, 10});
+
+            Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+
+            PdfPCell hcell;
+            hcell = new PdfPCell(new Phrase("Company name", headFont));
+            hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.addCell(hcell);
+
+            hcell = new PdfPCell(new Phrase("Product name", headFont));
+            hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.addCell(hcell);
+
+            hcell = new PdfPCell(new Phrase("Price", headFont));
+            hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.addCell(hcell);
+
+            hcell = new PdfPCell(new Phrase("Description", headFont));
+            hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.addCell(hcell);
+
+            for (Product product : products) {
+
+                PdfPCell cell;
+
+                cell = new PdfPCell(new Phrase(product.getCompany().getName()));
+                cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                table.addCell(cell);
+
+                cell = new PdfPCell(new Phrase(product.getName()));
+                cell.setPaddingLeft(5);
+                cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                table.addCell(cell);
+
+                cell = new PdfPCell(new Phrase(String.valueOf(product.getPrice())));
+                cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                cell.setPaddingRight(5);
+                table.addCell(cell);
+
+                cell = new PdfPCell(new Phrase(product.getDescription()));
+                cell.setPaddingLeft(5);
+                cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                table.addCell(cell);
+            }
+
+            PdfWriter.getInstance(document, out);
+            document.open();
+            document.add(table);
+
+            document.close();
+
+        } catch (DocumentException ex) {
+
+            LOGGER.error(ex.getMessage());
+        }
+
+        return new ByteArrayInputStream(out.toByteArray());
     }
 
 }

@@ -8,6 +8,7 @@ import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.service.*;
 import com.endava.addprojectinternship2018.util.UserUtil;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -44,6 +45,8 @@ public class CustomerController {
     @Autowired
     private ContractService contractService;
 
+    private static final Logger LOGGER = Logger.getLogger(CustomerController.class);
+
     @GetMapping(value = "home")
     public String getHomePage(Model model) {
 
@@ -52,8 +55,10 @@ public class CustomerController {
         model.addAttribute("customerName", currentCustomer.getFullName());
         model.addAttribute("activeContracts",
                 contractService.countByCustomerAndStatus(currentCustomerId, ContractStatus.ACTIVE));
-        model.addAttribute("signedContracts",
+        model.addAttribute("onePartSignedContracts",
                 contractService.countByCustomerAndStatus(currentCustomerId, ContractStatus.SIGNED_BY_CUSTOMER));
+        model.addAttribute("anotherPartSignedContracts",
+                contractService.countByCompanyAndStatus(currentCustomerId, ContractStatus.SIGNED_BY_COMPANY));
         model.addAttribute("unsignedContracts",
                 contractService.countByCustomerAndStatus(currentCustomerId, ContractStatus.UNSIGNED));
         model.addAttribute("filterActiveContracts", new AdvancedFilter(ContractStatus.ACTIVE));
@@ -68,6 +73,8 @@ public class CustomerController {
         model.addAttribute("sentInvoices", invoiceService.countByCustomerIdAndStatus(currentCustomerId, InvoiceStatus.SENT));
         model.addAttribute("paidInvoices", invoiceService.countByCustomerIdAndStatus(currentCustomerId, InvoiceStatus.PAID));
         model.addAttribute("overdueInvoices", invoiceService.countByCustomerIdAndStatus(currentCustomerId, InvoiceStatus.OVERDUE));
+
+        LOGGER.info(String.format("Customer %s:%s accessed home page", currentCustomer.getId(), currentCustomer.getFullName()));
 
         return "customer/homePage";
     }
@@ -99,6 +106,9 @@ public class CustomerController {
         }
 
         customerService.saveCustomer(customerDto);
+
+        LOGGER.info(String.format("Customer %s:%s updated profile", customerDto.getCustomerId(), customerDto.getLastName()));
+
         return "redirect:/customer/home";
     }
 
@@ -111,6 +121,8 @@ public class CustomerController {
         model.addAttribute("companyId", 0);
         model.addAttribute("statusListForFilter", Arrays.asList(ContractStatus.values()));
         model.addAttribute("filter", new AdvancedFilter());
+
+        LOGGER.info(String.format("customer %s:%s accessed contracts page", currentCustomerId, userUtil.getCurrentCustomer().getFullName()));
 
         return "contract/contractListPage";
 
@@ -179,10 +191,10 @@ public class CustomerController {
     public String getInvoicesPage(Model model) {
 
         int currentCustomerId = userUtil.getCurrentCustomer().getId();
-        model.addAttribute("invoices", invoiceService.getAllByCustomerIdAndStatusNot(currentCustomerId));
+        model.addAttribute("invoices", invoiceService.getAllByCustomerId(currentCustomerId));
         model.addAttribute("filter", new AdvancedFilter());
 
-        model.addAttribute("statusListForFilter", Arrays.asList(InvoiceStatus.values()));
+        model.addAttribute("statusListForFilter", invoiceService.getStatusesForCustomer());
 
         return "invoice/invoiceListPage";
     }
@@ -194,7 +206,7 @@ public class CustomerController {
         model.addAttribute("invoices", invoiceService.getInvoicesByCustomerIdFiltered(currentCustomerId, filter));
         model.addAttribute("filter", filter);
 
-        model.addAttribute("statusListForFilter", Arrays.asList(InvoiceStatus.values()));
+        model.addAttribute("statusListForFilter", invoiceService.getStatusesForCustomer());
 
         return "invoice/invoiceListPage";
     }

@@ -1,5 +1,7 @@
 package com.endava.addprojectinternship2018.controller;
 
+import com.endava.addprojectinternship2018.model.Notification;
+import com.endava.addprojectinternship2018.model.enums.NotificationCase;
 import com.endava.addprojectinternship2018.model.enums.Role;
 import com.endava.addprojectinternship2018.model.dto.CompanyDto;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
@@ -8,8 +10,11 @@ import com.endava.addprojectinternship2018.model.enums.UserStatus;
 import com.endava.addprojectinternship2018.security.config.LoginAuthenticationSuccessHandler;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.CustomerService;
+import com.endava.addprojectinternship2018.service.NotificationService;
 import com.endava.addprojectinternship2018.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,7 +43,10 @@ public class UserRegistrationController {
 
     @Autowired
     private LoginAuthenticationSuccessHandler loginAuthenticationSuccessHandler;
-
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private NotificationService notificationService;
     @GetMapping(value = "")
     public String showRegistrationForm() {
         return "redirect:/login";
@@ -88,6 +96,7 @@ public class UserRegistrationController {
         return "registration/company";
     }
 
+
     @PostMapping(value = "company")
     public String registerCompany(@ModelAttribute("companyDto") @Valid CompanyDto companyDto,
                                   BindingResult result, Model model) {
@@ -106,8 +115,10 @@ public class UserRegistrationController {
             return "registration/company";
         }
 
+        notificationService.save(new Notification(NotificationCase.NEW_USER, "New company - "+companyDto.getName()+" registered.", "admin"));
+        messagingTemplate.convertAndSendToUser("admin","/queue/messages", "NOTIFICATION");
         companyService.saveCompany(companyDto);
-        return "redirect:/login";
+        return "redirect:/login?error=reg_approval";
 
     }
 
@@ -129,8 +140,12 @@ public class UserRegistrationController {
             return "registration/customer";
         }
 
+        notificationService.save(new Notification(NotificationCase.NEW_USER, "New company - "+customerDto.getFirstName()
+                                    +" "+
+                                    customerDto.getLastName()+" registered.", "admin"));
+        messagingTemplate.convertAndSendToUser("admin","/queue/messages", "NOTIFICATION");
         customerService.saveCustomer(customerDto);
-        return "redirect:/login?error=reg_approval";
+        return "redirect:/login";
     }
 
 }

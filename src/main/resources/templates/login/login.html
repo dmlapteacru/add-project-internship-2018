@@ -17,8 +17,8 @@
 <div class="main_wrapper">
 
     <div style="display: flex; flex-direction: column;" class="wrapper">
-        <div class="alert alert-success" th:if="${#httpServletRequest.getParameter('error') == 'reg_approval'}">
-            <div style="display: none" class="approval_info">
+        <div id="approval_reg" class="alert alert-success alert-dismissible fade in" th:if="${#httpServletRequest.getParameter('error') == 'reg_approval'}">
+            <div class="approval_info">
                 <strong> Registration success! Wait for admin's approval.</strong>
             </div>
         </div>
@@ -80,6 +80,7 @@
         </div>
     </div>
 </div>
+<button id="AS">AESE</button>
 <!--MODALS-->
 <div class="modal fade" id="modalMessage" role="dialog">
     <div class="modal-dialog">
@@ -167,7 +168,7 @@
         var object = {
             "username" : $("#username_reset_pass").val(),
             "token" : $("#username_reset_pass").val() + "tkn"
-        }
+        };
         $.ajax(
             {
                 url: "/resetPassword",
@@ -183,7 +184,7 @@
 
 
     $(document).ready(function () {
-        $(".approval_info").slideToggle("slow");
+        $("#approval_reg").slideToggle("slow");
     })
 //
 //
@@ -191,20 +192,20 @@
         connect();
     });
     function connect() {
-        var socket = new SockJS('/websocket-example');
+        var socket = new SockJS('/admin-sock');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function () {
         });
     }
     function sendMessageNotification() {
-        console.log("AAO");
         var json = {
             "notificationCase" : "NEW_MESSAGE",
             "content" : "New message from: " + $("#new_message_email").val(),
             "userTo" : "admin"
         };
         stompClient.send("/app/admin", {}, JSON.stringify(json));
-    }
+    };
+
 </script>
 </body>
 </html>

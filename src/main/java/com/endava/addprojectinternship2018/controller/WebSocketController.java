@@ -18,19 +18,17 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Controller
 public class WebSocketController {
-
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private NotificationService notificationService;
@@ -39,25 +37,17 @@ public class WebSocketController {
     private AdminMessageService adminMessageService;
 
     @MessageMapping("/admin")
-    @SendTo("/topic/user")
-    public NotificationDto getNotification(NotificationDto notificationDto) {
+    public void getNotificationMessage(NotificationDto notificationDto) {
+
         Notification notification = new Notification();
-        if (notificationDto.getNotificationCase().equals("NEW_USER")){
-            notification.setNotificationCase(NotificationCase.NEW_USER);
-        } else if (notificationDto.getNotificationCase().equals("NEW_MESSAGE")){
+        if (notificationDto.getNotificationCase().equals("NEW_MESSAGE")){
             notification.setNotificationCase(NotificationCase.NEW_MESSAGE);
             notification.setIdSearch(adminMessageService.getAdminMessageByEmail(notificationDto.getContent().split(": ")[1]).getId());
         }
-
         notification.setContent(notificationDto.getContent());
         notification.setUserTo(notificationDto.getUserTo());
         notificationService.save(notification);
-        return notificationDto;
-    }
-
-    @RequestMapping(value = "/test", method = GET)
-    public String show(){
-        return "test";
+        messagingTemplate.convertAndSendToUser(notificationDto.getUserTo(),"/queue/messages", notificationDto);
     }
 
 }

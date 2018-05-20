@@ -60,7 +60,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/**").access("hasAuthority('ADMIN')")
                 .antMatchers("/customer/**").access("hasAuthority('CUSTOMER')")
                 .antMatchers("/company/**").access("hasAuthority('COMPANY')")
-                .antMatchers("/invoices/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
+                .antMatchers("/invoices/**", "/notifications/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
                 .antMatchers("/service/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
                 .antMatchers("/bankAccount/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
                 .anyRequest().authenticated()
@@ -91,6 +91,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web
                 .ignoring()
-                .antMatchers("/resources/**", "/static/**", "/js/**", "/css/**", "/images/**", "/webjars/**", "/fonts/**", "/websocket-example/**");
+                .antMatchers("/resources/**", "/static/**", "/js/**", "/css/**", "/images/**", "/webjars/**", "/fonts/**", "/admin-sock/**", "/user-sock/**");
     }
 }

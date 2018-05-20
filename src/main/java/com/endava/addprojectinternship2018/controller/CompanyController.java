@@ -55,8 +55,10 @@ public class CompanyController {
         model.addAttribute("companyName", currentCompany.getName());
         model.addAttribute("activeContracts",
                 contractService.countByCompanyAndStatus(currentCompanyId, ContractStatus.ACTIVE));
-        model.addAttribute("signedContracts",
+        model.addAttribute("onePartSignedContracts",
                 contractService.countByCompanyAndStatus(currentCompanyId, ContractStatus.SIGNED_BY_COMPANY));
+        model.addAttribute("anotherPartSignedContracts",
+                contractService.countByCompanyAndStatus(currentCompanyId, ContractStatus.SIGNED_BY_CUSTOMER));
         model.addAttribute("unsignedContracts",
                 contractService.countByCompanyAndStatus(currentCompanyId, ContractStatus.UNSIGNED));
         model.addAttribute("filterActiveContracts", new AdvancedFilter(ContractStatus.ACTIVE));

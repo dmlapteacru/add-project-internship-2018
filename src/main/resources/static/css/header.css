@@ -1,29 +1,13 @@
 body {
     margin: 0 auto;
 }
-/*.header_wrapper {*/
-    /*display: flex;*/
-    /*justify-content: space-between;*/
-    /*padding: 10px 10px 5px 10px;*/
-    /*background-color: #e8e8e8;*/
-    /*border-bottom: 1px solid #cccccc;*/
-    /*border-radius: 5px;*/
-/*}*/
+.navbar {
+    padding: 0;
+}
 .navbar-brand > img{
     width: 80px;
     height: 25px;
 }
-/*.header_wrapper {*/
-    /*!*position: fixed;*!*/
-    /*width:100%;*/
-    /*top: 0;*/
-/*}*/
-
-/*.panel-heading {*/
-    /*!*position: fixed;*!*/
-    /*width: 100%;*/
-    /*top: 52px;*/
-/*}*/
 .menu_company, .menu_customer {
     display: flex;
     justify-content: space-between;

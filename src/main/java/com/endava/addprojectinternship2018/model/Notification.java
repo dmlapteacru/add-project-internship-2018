@@ -46,4 +46,11 @@ public class Notification {
         this.content = content;
         this.userTo = userTo;
     }
+
+    public Notification(NotificationCase notificationCase, String content, String userTo, int idSearch) {
+        this.notificationCase = notificationCase;
+        this.content = content;
+        this.userTo = userTo;
+        this.idSearch = idSearch;
+    }
 }

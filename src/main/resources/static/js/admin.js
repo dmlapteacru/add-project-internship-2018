@@ -60,7 +60,7 @@ $("#delete_btn_confirm").click(function () {
                     $("#alert_success").slideToggle("slow");
                     setTimeout(function () {
                         $("#alert_success").slideToggle("slow");
-                    },5000);
+                    },3000);
                 }
             }
         )
@@ -76,7 +76,7 @@ $("#delete_btn_confirm").click(function () {
                 $("#alert_success").slideToggle("slow");
                 setTimeout(function () {
                     $("#alert_success").slideToggle("slow");
-                },5000);
+                },3000);
             }
         }
     )
@@ -412,6 +412,7 @@ $("#change_status_all_btn_read").click(function () {
                 $("#load_icon_wrapper").modal("hide");
                 $("#messages_btn_req").click();
                 $("#check_all_messages").click();
+                resetCheckBoxMessages();
             }
         }
     )
@@ -437,6 +438,7 @@ $("#change_status_all_btn_unread").click(function () {
                 $("#load_icon_wrapper").modal("hide");
                 $("#messages_btn_req").click();
                 $("#check_all_messages").click();
+                resetCheckBoxMessages();
             }
         }
     )
@@ -463,6 +465,7 @@ $("#messages_all_btn_delete").click(function () {
                 $("#load_icon_wrapper").modal("hide");
                 $("#messages_btn_req").click();
                 $("#check_all_messages").click();
+                resetCheckBoxMessages();
             }
         }
     )

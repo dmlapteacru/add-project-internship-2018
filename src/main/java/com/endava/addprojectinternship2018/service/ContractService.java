@@ -7,6 +7,7 @@ import com.endava.addprojectinternship2018.model.dto.ContractDto;
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.model.enums.Role;
 import com.endava.addprojectinternship2018.util.UserUtil;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,11 @@ public class ContractService {
     @Autowired
     private ProductDao productDao;
 
+    @Autowired
+    private WebSocketDistributeService webSocketDistributeService;
+
+    private static final Logger LOGGER = Logger.getLogger(ContractService.class);
+
     public List<Contract> getAllByCompanyName(String companyName) {
         return contractDao.findAllByCompanyName(companyName);
     }
@@ -48,15 +54,15 @@ public class ContractService {
     }
 
     public List<Contract> getAllByCompanyId(int companyId) {
-        return contractDao.findAllByCompanyId(companyId);
+        return contractDao.findAllByCompanyIdOrderByIssueDate(companyId);
     }
 
     public List<Contract> getAllByProductId(int productId) {
-        return contractDao.findAllByProductId(productId);
+        return contractDao.findAllByProductIdOrderByIssueDate(productId);
     }
 
     public List<Contract> getAllByCustomerId(int id) {
-        return contractDao.findAllByCustomerId(id);
+        return contractDao.findAllByCustomerIdOrderByIssueDate(id);
     }
 
     public Contract getById(int contractId) {
@@ -78,6 +84,17 @@ public class ContractService {
     @Transactional
     public void saveContract(ContractDto contractDto) {
         contractDao.save(convertContractDtoToContract(contractDto));
+        if (userUtil.getCurrentUser().getRole()==Role.CUSTOMER){
+            webSocketDistributeService.sendNewContractNotification(contractDto.getSelectedCompany().getUser().getUsername());
+        } else {
+            webSocketDistributeService.sendNewContractNotification(contractDto.getSelectedCustomer().getUser().getUsername());
+        }
+
+        LOGGER.info(String.format("%s: contract saved: %s - %s",
+                userUtil.getCurrentUser().getUsername(),
+                contractDto.getSelectedCompany().getName(),
+                contractDto.getSelectedCustomer().getFullName()
+                ));
     }
 
     @Transactional
@@ -196,14 +213,20 @@ public class ContractService {
                     newStatus = SIGNED_BY_CUSTOMER;
                 } else if (currentStatus == SIGNED_BY_COMPANY) {
                     newStatus = ACTIVE;
+                } else {
+                    newStatus = UNSIGNED;
                 }
+                webSocketDistributeService.sendSignContractNotification(currentContract.getCompany().getUser().getUsername(), contractId);
                 break;
             case COMPANY:
                 if (currentStatus == UNSIGNED) {
                     newStatus = SIGNED_BY_COMPANY;
                 } else if (currentStatus == SIGNED_BY_CUSTOMER) {
                     newStatus = ACTIVE;
+                } else {
+                    newStatus = UNSIGNED;
                 }
+                webSocketDistributeService.sendSignContractNotification(currentContract.getCustomer().getUser().getUsername(), contractId);
                 break;
         }
 
@@ -223,9 +246,11 @@ public class ContractService {
         LocalDate dateTo = (filter.getDateTo() == null ? LocalDate.of(4999,12,31) : filter.getDateTo());
 
         if (filter.getContractStatus() != null) {
-            return contractDao.findAllByCompanyIdAndStatusAndSumBetweenAndIssueDateBetween(currentCompanyId, filter.getContractStatus(), sumFrom, sumTo, dateFrom, dateTo);
+            return contractDao.findAllByCompanyIdAndStatusAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+                    (currentCompanyId, filter.getContractStatus(), sumFrom, sumTo, dateFrom, dateTo);
         } else {
-            return contractDao.findAllByCompanyIdAndSumBetweenAndIssueDateBetween(currentCompanyId, sumFrom, sumTo, dateFrom, dateTo);
+            return contractDao.findAllByCompanyIdAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+                    (currentCompanyId, sumFrom, sumTo, dateFrom, dateTo);
         }
     }
 
@@ -236,9 +261,15 @@ public class ContractService {
         LocalDate dateTo = (filter.getDateTo() == null ? LocalDate.of(4999,12,31) : filter.getDateTo());
 
         if (filter.getContractStatus() != null) {
-            return contractDao.findAllByCustomerIdAndStatusAndSumBetweenAndIssueDateBetween(currentCustomerId, filter.getContractStatus(), sumFrom, sumTo, dateFrom, dateTo);
+            return contractDao.findAllByCustomerIdAndStatusAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+                    (currentCustomerId, filter.getContractStatus(), sumFrom, sumTo, dateFrom, dateTo);
         } else {
-            return contractDao.findAllByCustomerIdAndSumBetweenAndIssueDateBetween(currentCustomerId, sumFrom, sumTo, dateFrom, dateTo);
+            return contractDao.findAllByCustomerIdAndSumBetweenAndIssueDateBetweenOrderByIssueDate
+                    (currentCustomerId, sumFrom, sumTo, dateFrom, dateTo);
         }
+    }
+
+    public Contract getLastContract(){
+        return contractDao.findFirstByOrderByIdDesc().get(0);
     }
 }

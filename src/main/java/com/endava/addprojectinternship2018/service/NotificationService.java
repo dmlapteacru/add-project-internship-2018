@@ -18,8 +18,8 @@ public class NotificationService {
         notificationDao.save(notification);
     }
 
-    public List<Notification> getAllByStatusUnread(){
-     return notificationDao.findAllByStatusOrderByDateAsc(NotificationStatus.UNREAD);
+    public List<Notification> getAllByStatusUnread(String userTo){
+     return notificationDao.findAllByStatusAndUserToOrderByDateAsc(NotificationStatus.UNREAD, userTo);
     }
 
     public void changeNotificationStatusOnRead(int id){
