@@ -126,6 +126,7 @@ public class InvoiceRestController {
             invoice.setIssueDate(dto.getIssueDate());
             invoice.setDueDate(dto.getDueDate());
             invoice.setStatus(dto.getStatus());
+            invoice.setSum(dto.getSum());
             invoice.setContract(contractService.getById(dto.getContractId()));
             invoiceService.save(invoice);
         }

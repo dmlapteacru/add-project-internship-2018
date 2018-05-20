@@ -14,7 +14,14 @@
     <script src="/js/table-filter.js"></script>
     <script th:src="@{/js/moment.js}"></script>
 
+    <style>
+        .row_issued_color{
+            background: #b8daff;
+        }
+    </style>
+
     <script>
+
 
         $(document).ready(function () {
             console.log("document ready")
@@ -163,6 +170,8 @@
                             $('#row' + ids[i] +" .btn-danger").remove();
                             $('#row' + ids[i]).find(".btn.btn-success").remove();
                             $('#row' + ids[i]).find("input[type='checkbox']").remove();
+                            $('#row'+ids[i]).removeClass('row_issued_color');
+                            $('#row'+ids[i]).addClass('bg-warning');
                         }
                         calculateTotalSum();
                     },
@@ -190,6 +199,8 @@
                         $('#row'+id +" .btn-danger").remove();
                         $('#row'+id).find(".btn.btn-success").remove();
                         $('#row'+id).find("input[type='checkbox']").remove();
+                        $('#row'+id).removeClass('row_issued_color');
+                        $('#row'+id).addClass('bg-warning');
                         calculateTotalSum();
                     },
                     error: function (errMsg, a, b) {
@@ -307,75 +318,77 @@
             </button>
         </div>
     </div>
-    <table class="table">
-        <thead >
-        <div>
-           <p class="form-control pt-3">Total Sum: <span id="total_sum"  >0.0</span> </p>
-        </div>
+    <!--<div class="table-responsive">-->
+        <table class="table">
+            <thead >
+            <div>
+                <p class="form-control pt-3">Total Sum: <span id="total_sum"  >0.0</span> </p>
+            </div>
 
-        <tr class="filters">
-            <th hidden="hidden"><input type="text" class="form-control" placeholder="Invoice_id" disabled ></th>
-            <th><input type="checkbox" onclick="selectAllCheckBoxes()" th:id="check_all" name="sel"/></th>
-            <th><input type="text" class="form-control" placeholder="Issue Date" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Expire Date" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
-            <!--<th><input type="text" class="form-control" placeholder="Status" disabled></th>-->
-            <th>
-                <select class="sel_status_invoice" disabled>
-                    <option selected value="Status_INV">Status</option>
-                    <option>PAID</option>
-                    <option>SENT</option>
-                    <option>OVERDUE</option>
-                    <option>ISSUED</option>
-                </select>
-            </th>
-            <th><input type="text" class="form-control" placeholder="Contract_id" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Full Name" disabled></th>
-            <th><input type="text" class="form-control" placeholder="" disabled></th>
-            <th><input type="text" class="form-control" placeholder="" disabled></th>
+            <tr class="filters">
+                <th hidden="hidden"><input type="text" class="form-control" placeholder="Invoice_id" disabled ></th>
+                <th><input type="checkbox" onclick="selectAllCheckBoxes()" th:id="check_all" name="sel"/></th>
+                <th><input type="text" class="form-control" placeholder="Issue Date" disabled></th>
+                <th><input type="text" class="form-control" placeholder="Expire Date" disabled></th>
+                <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
+                <th>
+                    <select class="sel_status_invoice" disabled>
+                        <option selected value="Status_INV">Status</option>
+                        <option>PAID</option>
+                        <option>SENT</option>
+                        <option>OVERDUE</option>
+                        <option>ISSUED</option>
+                    </select>
+                </th>
+                <th><input type="text" class="form-control" placeholder="Customer Name" disabled></th>
+                <th><input type="text" class="form-control" placeholder="Service Name" disabled></th>
+                <th><input type="text" class="form-control" placeholder="" disabled></th>
+                <th><input type="text" class="form-control" placeholder="" disabled></th>
 
-        </tr>
-        </thead>
+            </tr>
+            </thead>
 
-        <tbody class="filter_body">
-        <tr th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">
-            <td th:id="invoice_id_hidd" th:text="${invoice.getId()}" style="display: none;"></td>
-            <td>
-                <input th:if="${invoice.getStatus().name() == 'ISSUED'}" type="checkbox" th:id="${invoice.getId()}" name="sel"/></td>
-            <td th:id="${'issueDate'+invoice.getId()}"
-                th:text="${#temporals.format(invoice.getIssueDate(), 'dd-MM-yyyy')} "> Issue Date
-            </td>
-            <td th:id="${'dueDate'+invoice.getId()}" th:text="${#temporals.format(invoice.getDueDate(), 'dd-MM-yyyy')}">Expire Date</td>
-            <td th:id="${'sum'+invoice.getId()}" th:text="${invoice.getSum()}">Sum</td>
-            <td class="filter_status_invoice" th:id="${'status'+invoice.getId()}" th:text="${invoice.getStatus()}"
-                th:class="${invoice.getStatus() == 'ACTIVE'} ? 'success' : (${invoice.getStatus() == 'ISSUED'} ? 'warning' : 'red')"></td>
-            <td th:id="${'contract_id'+invoice.getId()}" th:text="${invoice.getContract().getId()}">Contract_id</td>
-            <td th:id="${'fullName'+invoice.getId()}" th:text="${invoice.getContract().getCustomer().getFullName()}">
-                Full Name
-            </td>
-            <td>
-                <a th:if="${invoice.getStatus().name() == 'ISSUED'}" th:id="${invoice.id}" onclick="deleteInvoice(this)" class="btn btn-danger">DELETE</a>
-            </td>
-            <td>
-                <button th:id="${invoice.getId()}" th:if="${invoice.getStatus().name() == 'ISSUED'}" onclick="sendInvoiceToCustomer(this)" class="btn  btn-success" >SEND</button>
-            </td>
-        </tr>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-                <button class="btn btn-warning" onclick="sendBulkInvoices()">BULK SEND</button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+            <tbody class="filter_body">
+            <!--<tr th:classappend="${(invoice.getStatus().name() == 'ISSUED')? 'bg-primary': (invoice.getStatus().name() == 'SENT') ? 'bg-warning': (invoice.getStatus().name() == 'PAID')?'bg-success':'bg-danger'}"  th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">-->
+            <tr th:classappend="|${(invoice.getStatus().name() == 'ISSUED') ? 'row_issued_color':''} ${(invoice.getStatus().name() == 'SENT') ? 'bg-warning':''} ${(invoice.getStatus().name() == 'PAID')?'bg-success':''} ${(invoice.getStatus().name() == 'OVERDUE')?'bg-danger':''} |"  th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">
+                <td th:id="invoice_id_hidd" th:text="${invoice.getId()}" style="display: none;"></td>
+                <td>
+                    <input th:if="${invoice.getStatus().name() == 'ISSUED'}" type="checkbox" th:id="${invoice.getId()}" name="sel"/></td>
+                <td th:id="${'issueDate'+invoice.getId()}"
+                    th:text="${#temporals.format(invoice.getIssueDate(), 'dd-MM-yyyy')} "> Issue Date
+                </td>
+                <td class="table-primary" th:id="${'dueDate'+invoice.getId()}" th:text="${#temporals.format(invoice.getDueDate(), 'dd-MM-yyyy')} ">Expire Date</td>
+                <td th:id="${'sum'+invoice.getId()}" th:text="${invoice.getSum()}">Sum</td>
+                <td class="filter_status_invoice" th:id="${'status'+invoice.getId()}" th:text="${invoice.getStatus()}"
+                    th:class="${invoice.getStatus() == 'ACTIVE'} ? 'success' : (${invoice.getStatus() == 'ISSUED'} ? 'warning' : 'red')"></td>
+                <td th:id="${'contract_id'+invoice.getId()}" th:text="${invoice.getContract().getCustomer().getFullName()}">Customer Name</td>
+                <td th:id="${'fullName'+invoice.getId()}" th:text="${invoice.getContract().getProduct().getName()}">
+                    Service Name
+                </td>
+                <td>
+                    <a th:if="${invoice.getStatus().name() == 'ISSUED'}" th:id="${invoice.id}" onclick="deleteInvoice(this)" class="btn btn-danger">DELETE</a>
+                </td>
+                <td>
+                    <button th:id="${invoice.getId()}" th:if="${invoice.getStatus().name() == 'ISSUED'}" onclick="sendInvoiceToCustomer(this)" class="btn  btn-success" >SEND</button>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                    <button class="btn btn-warning" onclick="sendBulkInvoices()">BULK SEND</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    <!--</div>-->
+
 
 </div>
 

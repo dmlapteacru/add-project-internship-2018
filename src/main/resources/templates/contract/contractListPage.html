@@ -103,10 +103,11 @@
             <td th:id="expireDate" th:text="${#temporals.format(contract.getExpireDate(),'dd.MM.yyyy')}">expire date
             </td>
             <td th:id="productName" th:text="${contract.getProduct().getName()}">service name</td>
-            <td th:id="sum" th:text="${#numbers.formatDecimal(contract.getSum(),1,2)+' MDL'}">sum</td>
+            <td th:id="sum" th:text="${#numbers.formatDecimal(contract.getSum(),1,2)+' MDL'}" th:value="${contract.getSum()}">sum</td>
             <td class="filter_status_contract" th:id="status" th:text="${contract.getStatus()}"
                 th:value="${contract.getStatus().name()}">Status
             </td>
+
             <td>
                 <div class="dropdown">
                     <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">
@@ -154,7 +155,6 @@
                             <input type="hidden" id="company_inv_in" th:value="${companyName}">
                             <input type="text" class="form-control" id="company_inv_out" readonly/>
                             <input type="text" class="form-control" id="contract_inv_ID" style="display: none"/>
-                            <!--<input type="hidden" class="form-control" id="companyIdA"/>-->
                         </div>
                     </div>
 
@@ -390,6 +390,15 @@
 <script src="/js/loadbalance.js"></script>
 <script>
 
+    $(document).ready(function () {
+        $('#createInvoiceDialog').on('hidden.bs.modal', function () {
+            console.log('modal is closing');
+            clearErrorsSecond();
+
+
+        })
+    })
+
     function deleteContract(btn) {
 
         var rowId = btn.id.substring(11);
@@ -439,7 +448,7 @@
         $('#status_inv_out').val($('#status_inv_in').val());
         $('#customer_inv_name').val(row.find("#customer").text());
         $('#product_inv').val(row.find("#productName").text());
-        $('#sum_inv').val(parseFloat(row.find("#sum").text()));
+        $('#sum_inv').val(row.find("#sum").attr('value'));
         $('#contract_inv_ID').val(rowId);
 
         console.log('Contract ID: ' + $("#contract_inv_ID").val());
@@ -461,6 +470,7 @@
         var expireDate = $("#expire_inv_date").val();
         var contractID = $("#contract_inv_ID").val();
         var sum = $("#sum_inv").val();
+        // var sum = parseFloat(sum2);
         var status = $("#status_inv_out").val();
 
         var data = {
@@ -488,7 +498,7 @@
                 if (response.status === 'FAIL') {
                     console.log('FAILED !!!');
                     var allErrors = response.errorMessageList;
-                    for (i = 0; i < allErrors.length; i++) {
+                    for (var i= 0; i < allErrors.length; i++) {
                         var currFieldName = allErrors[i].fieldName;
                         var currErrorMessage = allErrors[i].message;
                         $('#' + currFieldName).parent().addClass('has-error');
@@ -497,7 +507,7 @@
                     }
                 } else {
                     $('#createInvoiceDialog').modal('hide');
-                    $('#alertMessage').text('New contract was added successful');
+                    $('#alertMessage').text('New invoice was added successful');
                     location.reload();
                     $('#modalAlert').modal('show');
                 }
@@ -679,10 +689,13 @@
     }
 
     function clearErrorsSecond() {
-        $('#new_expireDate').focus(function () {
+        // $('#expire_inv_date').focus(function () {
+
+            $('#customer_inv_nameError').hide();
             $('#expire_inv_dateError').hide();
+            $('#customer_inv_name').parent().removeClass('has-error');
             $('#expire_inv_date').parent().removeClass('has-error');
-        })
+        // })
     }
 
 
