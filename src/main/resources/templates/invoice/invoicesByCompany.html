@@ -9,8 +9,12 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/header.css"/>
     <link rel="stylesheet" href="/css/table-filter.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
+    <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js" integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe" crossorigin="anonymous"></script>
     <script src="/js/table-filter.js"></script>
     <script th:src="@{/js/moment.js}"></script>
 
@@ -21,7 +25,6 @@
     </style>
 
     <script>
-
 
         $(document).ready(function () {
             console.log("document ready")
@@ -318,32 +321,32 @@
             </button>
         </div>
     </div>
-    <!--<div class="table-responsive">-->
-        <table class="table">
-            <thead >
-            <div>
-                <p class="form-control pt-3">Total Sum: <span id="total_sum"  >0.0</span> </p>
-            </div>
+    <table class="table">
+        <thead >
+        <div>
+           <p class="form-control pt-3">Total Sum: <span id="total_sum"  >0.0</span> </p>
+        </div>
 
-            <tr class="filters">
-                <th hidden="hidden"><input type="text" class="form-control" placeholder="Invoice_id" disabled ></th>
-                <th><input type="checkbox" onclick="selectAllCheckBoxes()" th:id="check_all" name="sel"/></th>
-                <th><input type="text" class="form-control" placeholder="Issue Date" disabled></th>
-                <th><input type="text" class="form-control" placeholder="Expire Date" disabled></th>
-                <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
-                <th>
-                    <select class="sel_status_invoice" disabled>
-                        <option selected value="Status_INV">Status</option>
-                        <option>PAID</option>
-                        <option>SENT</option>
-                        <option>OVERDUE</option>
-                        <option>ISSUED</option>
-                    </select>
-                </th>
-                <th><input type="text" class="form-control" placeholder="Customer Name" disabled></th>
-                <th><input type="text" class="form-control" placeholder="Service Name" disabled></th>
-                <th><input type="text" class="form-control" placeholder="" disabled></th>
-                <th><input type="text" class="form-control" placeholder="" disabled></th>
+        <tr class="filters">
+            <th hidden="hidden"><input type="text" class="form-control" placeholder="Invoice_id" disabled ></th>
+            <th><input type="checkbox" onclick="selectAllCheckBoxes()" th:id="check_all" name="sel"/></th>
+            <th><input type="text" class="form-control" placeholder="Issue Date" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Expire Date" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
+            <!--<th><input type="text" class="form-control" placeholder="Status" disabled></th>-->
+            <th>
+                <select class="sel_status_invoice" disabled>
+                    <option selected value="Status_INV">Status</option>
+                    <option>PAID</option>
+                    <option>SENT</option>
+                    <option>OVERDUE</option>
+                    <option>ISSUED</option>
+                </select>
+            </th>
+            <th><input type="text" class="form-control" placeholder="Customer Name" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Service Name" disabled></th>
+            <th><input type="text" class="form-control" placeholder="" disabled></th>
+            <th><input type="text" class="form-control" placeholder="" disabled></th>
 
             </tr>
             </thead>
@@ -393,6 +396,8 @@
 </div>
 
 <script src="/js/loadbalance.js"></script>
+<script src="/js/user-websock.js"></script>
+<script src="/js/customer-sock-distribute.js"></script>
 <script type="text/javascript">
 
 </script>

@@ -30,7 +30,7 @@ public class AdminMessage {
     @Column
     @NotNull
     @Pattern(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,3}$")
-    private String user_email;
+    private String userEmail;
 
     @Column
     @NotNull
@@ -44,9 +44,9 @@ public class AdminMessage {
     @Enumerated(value = EnumType.STRING)
     private AdminMessagesStatus status = AdminMessagesStatus.UNREAD;
 
-    public AdminMessage(String message, String user_email, String subject) {
+    public AdminMessage(String message, String userEmail, String subject) {
         this.message = message;
-        this.user_email = user_email;
+        this.userEmail = userEmail;
         this.subject = subject;
     }
 }

@@ -40,6 +40,9 @@ public class ContractService {
     @Autowired
     private ProductDao productDao;
 
+    @Autowired
+    private WebSocketDistributeService webSocketDistributeService;
+
     private static final Logger LOGGER = Logger.getLogger(ContractService.class);
 
     public List<Contract> getAllByCompanyName(String companyName) {
@@ -81,6 +84,12 @@ public class ContractService {
     @Transactional
     public void saveContract(ContractDto contractDto) {
         contractDao.save(convertContractDtoToContract(contractDto));
+        if (userUtil.getCurrentUser().getRole()==Role.CUSTOMER){
+            webSocketDistributeService.sendNewContractNotification(contractDto.getSelectedCompany().getUser().getUsername());
+        } else {
+            webSocketDistributeService.sendNewContractNotification(contractDto.getSelectedCustomer().getUser().getUsername());
+        }
+
         LOGGER.info(String.format("%s: contract saved: %s - %s",
                 userUtil.getCurrentUser().getUsername(),
                 contractDto.getSelectedCompany().getName(),
@@ -207,6 +216,7 @@ public class ContractService {
                 } else {
                     newStatus = UNSIGNED;
                 }
+                webSocketDistributeService.sendSignContractNotification(currentContract.getCompany().getUser().getUsername(), contractId);
                 break;
             case COMPANY:
                 if (currentStatus == UNSIGNED) {
@@ -216,6 +226,7 @@ public class ContractService {
                 } else {
                     newStatus = UNSIGNED;
                 }
+                webSocketDistributeService.sendSignContractNotification(currentContract.getCustomer().getUser().getUsername(), contractId);
                 break;
         }
 
@@ -256,5 +267,9 @@ public class ContractService {
             return contractDao.findAllByCustomerIdAndSumBetweenAndIssueDateBetweenOrderByIssueDate
                     (currentCustomerId, sumFrom, sumTo, dateFrom, dateTo);
         }
+    }
+
+    public Contract getLastContract(){
+        return contractDao.findFirstByOrderByIdDesc().get(0);
     }
 }

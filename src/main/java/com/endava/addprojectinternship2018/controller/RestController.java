@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -26,7 +28,9 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @org.springframework.web.bind.annotation.RestController
 public class RestController {
@@ -37,6 +41,10 @@ public class RestController {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private WebSocketDistributeService webSocketService;
+
     @Autowired
     private InvoiceService invoiceService;
 
@@ -64,16 +72,12 @@ public class RestController {
     @Autowired
     private CategoryService categoryService;
 
-    @Autowired
-    private PasswordTokenService passwordTokenService;
-
-    @Autowired
-    private AdminMessageService adminMessageService;
 
     @Autowired
     private Validator validator;
 
     private static final Logger LOGGER = Logger.getLogger(RestController.class);
+
 
     //  -----   REST Company
     @GetMapping("/rest/getCompanyByEmail/{name}")
@@ -92,46 +96,12 @@ public class RestController {
         return companyService.getCompanyByName(companyName).get();
     }
 
-    @RequestMapping(value = "/admin/services", method = RequestMethod.GET)
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
-    }
 
-    @RequestMapping(value = "/newUserPassword", method = RequestMethod.PUT)
-    public String setNewPass(@RequestBody UserDto user) {
-        userService.changeUserPassword(user);
-        return "OK";
-    }
-
-    @RequestMapping(value = "/admin/categories", method = RequestMethod.GET)
-    public List<Category> getAllCategory() {
-        return categoryService.getAllCategory();
-    }
-
-    @RequestMapping(value = "/categories", method = RequestMethod.GET)
+    @RequestMapping(value = "/categories", method = GET)
     public List<Category> getAllCategories() {
         return categoryService.getAllCategory();
     }
 
-    @RequestMapping(value = "/admin/newCategory", method = RequestMethod.PUT)
-    public ResponseEntity<?> saveNewCategory(@RequestBody Category category, BindingResult error) {
-        validator.validate(category, error);
-        if (error.hasErrors()) {
-            return new ResponseEntity<>(error.getFieldError().getCode(), HttpStatus.BAD_REQUEST);
-        }
-        categoryService.saveCategory(category);
-        LOGGER.info(String.format("admin has created new category %s:%s", category.getId(), category.getName()));
-        return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/admin/deleteCategory/{id}", method = RequestMethod.DELETE)
-    public String deleteCategory(@PathVariable Integer id) {
-        LOGGER.info(String.format("admin is trying to delete category with id %s", id));
-        String categoryName = categoryService.getCategoryById(id).getName();
-        categoryService.deleteCategory(id);
-        LOGGER.info(String.format("category %s:%s was deleted", id, categoryName));
-        return "OK";
-    }
 
     @PostMapping(value = "/contractRest/newContract")
     public @ResponseBody
@@ -209,6 +179,7 @@ public class RestController {
             contractDto.setExpireDate(contractDtoTest.getExpireDate());
             contractDto.setStatus(ContractStatus.valueOf(contractDtoTest.getStatus()));
             contractService.saveContract(contractDto);
+
             LOGGER.info(String.format("%s: creating new contract... SUCCESS", currentUsername));
         }
 
@@ -255,12 +226,6 @@ public class RestController {
     @PostMapping(value = "/contractRest/signContract")
     public String signContract(@RequestParam(name = "contractId") int contractId) {
         return contractService.signContract(contractId);
-    }
-
-    @RequestMapping(value = "/resetPassword", method = POST)
-    public String resetPassword(@RequestBody PasswordToken passwordToken) {
-        passwordTokenService.save(passwordToken);
-        return "OK";
     }
 
     @RequestMapping(value = "/companyRest/newService", method = POST)
@@ -323,170 +288,7 @@ public class RestController {
         return response;
     }
 
-    @RequestMapping(value = "/admin/messages", method = RequestMethod.GET)
-    public List<AdminMessage> showMessages() {
-        return adminMessageService.getAllMessages();
-    }
-
-    @RequestMapping(value = "/admin/messages/unread", method = RequestMethod.GET)
-    public List<AdminMessage> showMessagesByStatusUnread() {
-        return adminMessageService.getAllMessagesByStatusUnread();
-    }
-
-    @RequestMapping(value = "/admin/messages/read", method = RequestMethod.GET)
-    public List<AdminMessage> showMessagesByStatusRead() {
-        return adminMessageService.getAllMessagesByStatusRead();
-    }
-
-    @RequestMapping(value = "/message/send", method = POST)
-    public String addNewMessage(@RequestBody AdminMessage adminMessage) {
-        adminMessageService.save(adminMessage);
-        return "OK";
-    }
-
-    @RequestMapping(value = "/admin/message/changeStatus/{id}", method = RequestMethod.PUT)
-    public String changeMessageStatus(@PathVariable int id) {
-        adminMessageService.changeMessageStatus(id);
-        return "OK";
-    }
-
-    @RequestMapping(value = "/admin/message/changeStatus/read", method = RequestMethod.PUT)
-    public String changeMessageStatusOnRead(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList) {
-        adminMessageService.changeMessageStatusOnRead(changeMessageStatusDtoList);
-        return "OK";
-    }
-
-    @RequestMapping(value = "/admin/message/changeStatus/unread", method = RequestMethod.PUT)
-    public String changeMessageStatusOnUnRead(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList) {
-        adminMessageService.changeMessageStatusOnUnRead(changeMessageStatusDtoList);
-        return "OK";
-    }
-
-    @RequestMapping(value = "/admin/message/delete/{id}", method = RequestMethod.DELETE)
-    public String deleteMessage(@PathVariable int id) {
-        adminMessageService.deleteById(id);
-        return "OK";
-    }
-
-    @RequestMapping(value = "/admin/message/bulkDelete", method = RequestMethod.DELETE)
-    public String deleteMessage(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList) {
-        adminMessageService.deleteMessages(changeMessageStatusDtoList);
-        return "OK";
-    }
-
-    @RequestMapping(value = "/admin/changeUserStatus/active", method = POST)
-    public String changeUserStatusOnActive(@RequestBody List<ChangeUserStatusDto> changeUserStatusDto) {
-        userService.changeUserStatusOnActive(changeUserStatusDto);
-        return "OK";
-    }
-
-    @RequestMapping(value = "/admin/changeUserStatus/inactive", method = POST)
-    public String changeUserStatusOnInactive(@RequestBody List<ChangeUserStatusDto> changeUserStatusDto) {
-        userService.changeUserStatusOnInactive(changeUserStatusDto);
-        return "OK";
-    }
-
-    @RequestMapping(value = "/bankAccount/create", method = POST)
-    public ResponseEntity<UserBankAccountDto> newAccount() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        HttpEntity<String> request = new HttpEntity<>("param", headers);
-        UserBankAccountDto response = restTemplate.postForObject(bankIP + "/bankaccount/create", request, UserBankAccountDto.class);
-        userBankAccountService.save(response);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/bankAccount/balance", method = POST)
-    public String getBalance() {
-        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
-        headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
-        HttpEntity<String> request = new HttpEntity<>("param", headers);
-        String response = restTemplate.postForObject(bankIP + "/bankaccount/balance", request, String.class);
-        return response;
-    }
-
-    @RequestMapping(value = "/bankAccount/addmoney", method = POST)
-    public ResponseEntity<?> addMoney(@RequestParam Double sum) {
-        if (sum == null || sum < 0.01) {
-            return new ResponseEntity<>("Must be greater than 0.01 MDL.", HttpStatus.BAD_REQUEST);
-        }
-        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
-        headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
-        Map<String, Double> body = new HashMap<>();
-        body.put("sum", sum);
-        HttpEntity<Map> request = new HttpEntity<>(body, headers);
-        restTemplate.postForObject(bankIP + "/bankaccount/addmoney", request, String.class);
-        return new ResponseEntity<>("Money added.", HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/bankAccount/payinvoice", method = POST)
-    public ResponseEntity<?> payInvoice(@RequestParam(name = "bal") Double balance, @RequestBody PaymentDto paymentDto, BindingResult error) {
-        validator.validateInvoicePayment(balance, paymentDto, error);
-        if (error.hasErrors()) {
-            return new ResponseEntity<>(error.getFieldError().getCode(), HttpStatus.BAD_REQUEST);
-        }
-        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
-        headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
-        invoiceService.setInvoiceAsPaid(paymentDto.getCorrespondentCount().intValue());
-        paymentDto.setDescription(paymentDto.getDescription() + invoiceService.setInvoiceDescription(paymentDto.getCorrespondentCount().intValue()).getFullDescription());
-        paymentDto.setCorrespondentCount(companyService.getCompanyByInvoiceId(paymentDto.getCorrespondentCount().intValue()).getCountNumber());
-        HttpEntity<PaymentDto> request = new HttpEntity<>(paymentDto, headers);
-        restTemplate.postForObject(bankIP + "/sendmoney", request, String.class);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/bankAccount/payinvoice/bulk", method = POST)
-    public ResponseEntity<?> payInvoice(@RequestParam(name = "bal") Double balance, @RequestBody List<PaymentDto> paymentDtoList, BindingResult error) {
-        validator.validateBulkInvoicePayment(balance, paymentDtoList, error);
-        if (error.hasErrors()) {
-            return new ResponseEntity<>("Not enough money.", HttpStatus.BAD_REQUEST);
-        }
-        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
-        headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
-        for (PaymentDto p : paymentDtoList
-                ) {
-            invoiceService.setInvoiceAsPaid(p.getCorrespondentCount().intValue());
-            p.setDescription(p.getDescription() +
-                    invoiceService.setInvoiceDescription(p.getCorrespondentCount().intValue())
-                            .getFullDescription());
-            p.setCorrespondentCount(companyService.getCompanyByInvoiceId(p.getCorrespondentCount().intValue())
-                    .getCountNumber());
-        }
-//        HttpEntity<PaymentDto> request = new HttpEntity<>(paymentDto, headers);
-//        restTemplate.postForObject( bankIP +"/sendmoney", request , String.class );
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/bankAccount/statement", method = POST)
-    public ResponseEntity<?> getStatement(@RequestBody StatementDateReqDto dateReqDto, BindingResult error) {
-        validator.validateStatementDates(dateReqDto, error);
-        if (error.hasErrors()) {
-            return new ResponseEntity<>(error.getFieldError().getCode(), HttpStatus.BAD_REQUEST);
-        }
-        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
-        headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
-        HttpEntity<StatementDateReqDto> request = new HttpEntity<>(dateReqDto, headers);
-        ResponseEntity<List<StatementDto>> response = restTemplate.exchange(bankIP + "/statement/statement", HttpMethod.POST, request, new ParameterizedTypeReference<List<StatementDto>>() {
-        });
-        return new ResponseEntity<>(response.getBody(), HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "servicesRest/pdfExport", method = RequestMethod.GET,
+    @RequestMapping(value = "servicesRest/pdfExport", method = GET,
             produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<InputStreamResource> citiesReport() throws IOException {
 

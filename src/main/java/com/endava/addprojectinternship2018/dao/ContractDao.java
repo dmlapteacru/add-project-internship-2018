@@ -45,5 +45,6 @@ public interface ContractDao extends JpaRepository<Contract, Integer> {
     List<Contract> findAllByCompanyIdAndStatusAndSumBetweenAndIssueDateBetweenOrderByIssueDate
             (int id, ContractStatus status, double sumFrom, double sumTo, LocalDate dateFrom, LocalDate dateTo);
 
+    List<Contract> findFirstByOrderByIdDesc();
 }
 

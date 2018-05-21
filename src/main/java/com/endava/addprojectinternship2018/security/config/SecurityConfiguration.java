@@ -56,11 +56,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.authorizeRequests()
-                .antMatchers("/login", "/registration/**", "/", "/resetPassword","/reset/password", "/newUserPassword", "/email", "/message/send").permitAll()
+                .antMatchers("/login","/test", "/registration/**", "/", "/resetPassword","/reset/password", "/newUserPassword", "/email", "/message/send").permitAll()
                 .antMatchers("/admin/**").access("hasAuthority('ADMIN')")
                 .antMatchers("/customer/**").access("hasAuthority('CUSTOMER')")
                 .antMatchers("/company/**").access("hasAuthority('COMPANY')")
-                .antMatchers("/invoices/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
+                .antMatchers("/invoices/**", "/notifications/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
                 .antMatchers("/service/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
                 .antMatchers("/bankAccount/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
                 .anyRequest().authenticated()
@@ -78,16 +78,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 "/css/**",
                 "/js/**")
                 .addResourceLocations(
-                        "classpath:/META-INF/resources/webjars/",
+                        "/webjars/",
                         "classpath:/static/img/",
                         "classpath:/static/css/",
                         "classpath:/static/js/");
+        registry
+                .addResourceHandler("/webjars/**")
+                .addResourceLocations("/webjars/");
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
         web
                 .ignoring()
-                .antMatchers("/resources/**", "/static/**", "/js/**", "/css/**", "/images/**");
+                .antMatchers("/resources/**", "/static/**", "/js/**", "/css/**", "/images/**", "/webjars/**", "/fonts/**", "/admin-sock/**", "/user-sock/**");
     }
 }

@@ -1,6 +1,6 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.model.PasswordToken;
+
 import com.endava.addprojectinternship2018.service.PasswordTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +13,7 @@ public class PasswordResetController {
 
     @Autowired
     private PasswordTokenService passwordTokenService;
+
 
     @RequestMapping(value = "/reset/password", method = RequestMethod.GET)
     public String resetPassword(@RequestParam String username, @RequestParam String token) throws Exception{

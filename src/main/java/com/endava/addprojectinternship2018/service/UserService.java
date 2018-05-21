@@ -93,7 +93,6 @@ public class UserService {
 
     public void changeUserPassword(UserDto user){
         User oldUser = getUserByUsername(user.getUsername()).get();
-        changeUserStatus(oldUser.getUsername());
         oldUser.setPassword(passwordEncoder.encode(user.getPassword()));
         userDao.save(oldUser);
         passwordTokenService.deleteToken(user.getUsername());

@@ -9,8 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="/css/header.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
 </head>
 <body>
 <div class="header_wrapper" th:fragment="header">
@@ -35,7 +37,24 @@
             </ul>
             <ul class="nav navbar-nav navbar-right" sec:authorize="hasAuthority('CUSTOMER')">
                 <li style="display: flex; flex-direction: column; justify-content:center; color: #cccccc;">
-                    <span id="cus" style="padding: 15px 15px">Hello, <span sec:authentication="name" style="margin-right: 10px;"></span> Balance: <span class="balance"></span>MDL</span>
+                    <span id="cus" style="padding: 15px 15px">Hello, <span sec:authentication="name" style="margin-right: 10px;" id="user"></span> Balance: <span class="balance"></span><span id="mdl">MDL</span></span>
+                </li>
+                <li style="padding: 14px 15px;flex-direction: column; justify-content:center;">
+                    <div class="notification_wrapper">
+                        <div class="notification">
+                            <div id="not_icon" class="notification_icon">
+                                <span id="not_count" value="0"></span>
+                            </div>
+                            <div class="notification_link">
+                                <a id="show_not_link_down">Messages <i class="fas fa-angle-down"></i>
+                                </a>
+                                <div class="notification_body">
+                                    <div id="notification_">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </li>
                 <li><a th:href="@{/contact/admin}" class="menu_item"> Contact Admin </a></li>
                 <li><a th:href="@{/customer/profile}" class="menu_item"> Personal cabinet </a></li>
@@ -43,7 +62,24 @@
             </ul>
             <ul class="nav navbar-nav navbar-right" sec:authorize="hasAuthority('COMPANY')">
                 <li style="display: flex; flex-direction: column; justify-content:center; color: #cccccc;">
-                    <span style="padding: 15px 15px">Hello, <span sec:authentication="name" style="margin-right: 10px;"></span> Balance: <span class="balance"></span>MDL</span>
+                    <span style="padding: 15px 15px">Hello, <span sec:authentication="name" style="margin-right: 10px;" id="user"></span> Balance: <span class="balance"></span><span id="mdl">MDL</span></span>
+                </li>
+                <li style="padding: 14px 15px;flex-direction: column; justify-content:center;">
+                    <div class="notification_wrapper">
+                        <div class="notification">
+                            <div id="not_icon" class="notification_icon">
+                                <span id="not_count" value="0"></span>
+                            </div>
+                            <div class="notification_link">
+                                <a id="show_not_link_down">Messages <i class="fas fa-angle-down"></i>
+                                </a>
+                                <div class="notification_body">
+                                    <div id="notification_">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </li>
                 <li><a th:href="@{/contact/admin}" class="menu_item"> Contact Admin </a></li>
                 <li><a th:href="@{/company/profile}" class="menu_item"> Personal cabinet </a></li>

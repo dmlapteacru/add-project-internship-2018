@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.*;
@@ -36,6 +37,9 @@ public class InvoiceService {
 
     @Autowired
     private InvoiceTransactionDao invoiceTransactionDao;
+
+    @Autowired
+    private WebSocketDistributeService webSocketDistributeService;
 
     private static final Logger LOGGER = Logger.getLogger(InvoiceService.class);
 
@@ -133,6 +137,8 @@ public class InvoiceService {
         if (invoice.getStatus() == InvoiceStatus.ISSUED) {
             invoice.setStatus(SENT);
             invoiceDao.save(invoice);
+            webSocketDistributeService.sendNewInvoiceNotification(invoice.getContract().getCustomer().getUser().getUsername(),
+                    invoiceId);
         } else System.out.println("Status not corresponding to ISSUED !!!");
     }
 
@@ -145,6 +151,8 @@ public class InvoiceService {
         Invoice invoice = invoiceDao.findById(id).get();
         invoice.setStatus(PAID);
         invoiceDao.save(invoice);
+        webSocketDistributeService.sendNewInvoicePaidNotification(invoice.getContract().getCompany().getUser().getUsername(),
+                id);
     }
 
     public InvoiceDescriptionPaymentDto setInvoiceDescription(int id){
@@ -196,5 +204,11 @@ public class InvoiceService {
 
     public List<Invoice> getInvoiceInPeriodService(int contract_id, LocalDate issueDate){
         return invoiceDao.findInvoiceInPeriod(contract_id, issueDate);
+    }
+
+    public void setInvoiceBulkAsPaid(List<Integer> idList) {
+        for (Integer i: idList){
+            setInvoiceAsPaid(i);
+        }
     }
 }
