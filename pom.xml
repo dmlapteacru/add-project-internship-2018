@@ -4,8 +4,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.endava</groupId>
-    <artifactId>add-project-internship-2018</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>ServiceSystem</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <name>add-project-internship-2018</name>
