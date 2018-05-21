@@ -57,7 +57,7 @@ public class BankRestController {
     @Autowired
     private Validator validator;
 
-    private static final Logger LOGGER = Logger.getLogger(com.endava.addprojectinternship2018.controller.RestController.class);
+    private static final Logger LOGGER = Logger.getLogger(com.endava.addprojectinternship2018.controller.BankRestController.class);
 
     @RequestMapping(value = "/bankAccount/create", method = POST)
     public ResponseEntity<UserBankAccountDto> newAccount() throws ConnectException {
