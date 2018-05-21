@@ -30,37 +30,50 @@
         <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalContract"
            class="btn btn-info btn-sm" role="button" th:id="${companyId}"
            onclick="createNewContract(this)">Create new contract</a>
-        <form class="form-inline pull-right"
+        <form class="pull-right"
               th:object="${filter}"
               th:action="${companyId==0} ? @{/customer/contracts/filtered} : @{/company/contracts/filtered}"
               method="post">
-            <div class="form-group">
-                <select id="adv_filter_status" class="form-control input-sm" th:field="*{contractStatus}">
-                    <option value="">--all--</option>
-                    <option th:each="currStatus : ${statusListForFilter}"
-                            th:value="${currStatus.name()}"
-                            th:text="${currStatus.toString()}">
-                    </option>
-                </select>
-            </div>
-            <div class="form-group">
-                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumFrom}"
-                       placeholder="sum from" required/>
-                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumTo}"
-                       placeholder="sum to" required/>
-            </div>
-            <div class="form-group">
-                <input type="date" id="adv_filter_date_from" class="form-control input-sm col-sm-2"
-                       th:field="*{dateFrom}"/>
-                <input type="date" id="adv_filter_date_to" class="form-control input-sm col-sm-2"
-                       th:field="*{dateTo}"/>
-            </div>
+            <div class="form-row">
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_status">status</label>
+                    <select id="adv_filter_status" class="form-control input-sm" th:field="*{contractStatus}">
+                        <option value="">--all--</option>
+                        <option th:each="currStatus : ${statusListForFilter}"
+                                th:value="${currStatus.name()}"
+                                th:text="${currStatus.toString()}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_sumFrom">sum from</label>
+                    <input class="form-control input-sm" id="adv_filter_sumFrom" type="number" th:field="*{sumFrom}"
+                           placeholder="sum from" required/>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_sumTo">sum from</label>
+                    <input class="form-control input-sm" id="adv_filter_sumTo" type="number" th:field="*{sumTo}"
+                           placeholder="sum to" required/>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_date_from">date from</label>
+                    <input type="date" id="adv_filter_date_from" class="form-control input-sm col-sm-2"
+                           th:field="*{dateFrom}"/>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_date_to">date to</label>
+                    <input type="date" id="adv_filter_date_to" class="form-control input-sm col-sm-2"
+                           th:field="*{dateTo}"/>
+                </div>
 
-            <button type="submit" class="btn btn-info btn-sm">apply
-                <span class="glyphicon glyphicon-filter"></span>
-            </button>
-            <a th:href="${companyId==0} ? @{/customer/contracts} : @{/company/contracts}"
-               class="btn btn-default btn-sm">clear</a>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-info btn-sm">apply
+                        <span class="glyphicon glyphicon-filter"></span>
+                    </button>
+                    <a th:href="${companyId==0} ? @{/customer/contracts} : @{/company/contracts}"
+                       class="btn btn-default btn-sm">clear</a>
+                </div>
+            </div>
         </form>
     </div>
 </div>
@@ -167,7 +180,8 @@
                         <label class="col-sm-3 control-label">Customer</label>
                         <div class="col-sm-6">
                             <input type="text" class="form-control" id="customer_inv_name" value="" readonly/>
-                            <p class="error-message" id="customer_inv_nameError" style="display: none"> validation error</p>
+                            <p class="error-message" id="customer_inv_nameError" style="display: none"> validation
+                                error</p>
                         </div>
                     </div>
 
@@ -175,7 +189,8 @@
                         <label class="col-sm-3 control-label">Issue date</label>
                         <div class="col-sm-6">
                             <input type="date" class="form-control" id="issue_inv_date" required="required"/>
-                            <p class="error-message" id="issue_inv_dateError" style="display: none"> validation error</p>
+                            <p class="error-message" id="issue_inv_dateError" style="display: none"> validation
+                                error</p>
                         </div>
                     </div>
 
@@ -213,7 +228,9 @@
 
                     <div class="form-group">
                         <div class="col-sm-6 col-xs-offset-3">
-                            <button id="save_btn" onclick="saveInvoiceButton()" type="button" class="btn btn-success">Save</button>
+                            <button id="save_btn" onclick="saveInvoiceButton()" type="button" class="btn btn-success">
+                                Save
+                            </button>
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                         </div>
                     </div>
@@ -276,9 +293,11 @@
             </div>
             <div class="modal-footer modal_btn">
                 <button id="btn_sign_contract" type="button"
-                        class="btn btn-primary" onclick="signContract()">Sign</button>
+                        class="btn btn-primary" onclick="signContract()">Sign
+                </button>
                 <button id="btn_unsign_contract" type="button"
-                        class="btn btn-primary" onclick="signContract()">Unsign</button>
+                        class="btn btn-primary" onclick="signContract()">Unsign
+                </button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -673,25 +692,36 @@
         $('#new_issueDate').focus(function () {
             $('#new_issueDate').parent().removeClass('has-error');
             $('#new_issueDateError').hide();
-        })
+        });
         $('#new_expireDate').focus(function () {
             $('#new_expireDateError').hide();
             $('#new_expireDate').parent().removeClass('has-error');
-        })
+        });
         $('#new_customerSelect').focus(function () {
             $('#new_customerSelectError').hide();
             $('#new_customerSelect').parent().removeClass('has-error');
             $('#new_contractError').hide();
-        })
+        });
         $('#new_productSelect').focus(function () {
             $('#new_productSelectError').hide();
             $('#new_productSelect').parent().removeClass('has-error');
             $('#new_contractError').hide();
-        })
+        });
         $('#new_sum').focus(function () {
             $('#new_sumError').hide();
             $('#new_sum').parent().removeClass('has-error');
-        })
+        });
+        $('#new_expireDateError').hide();
+        $('#new_expireDate').parent().removeClass('has-error');
+        $('#new_expireDateError').hide();
+        $('#new_expireDate').parent().removeClass('has-error');
+        $('#new_customerSelectError').hide();
+        $('#new_customerSelect').parent().removeClass('has-error');
+        $('#new_contractError').hide();
+        $('#new_productSelect').parent().removeClass('has-error');
+        $('#new_contractError').hide();
+        $('#new_sumError').hide();
+        $('#new_sum').parent().removeClass('has-error');
     }
 
     function clearErrorsSecond() {

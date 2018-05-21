@@ -1,6 +1,7 @@
 package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.ProductDao;
+import com.endava.addprojectinternship2018.model.Company;
 import com.endava.addprojectinternship2018.model.Product;
 import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
 import com.endava.addprojectinternship2018.model.dto.ProductDto;
@@ -18,6 +19,8 @@ import javax.validation.constraints.NotNull;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,7 +43,7 @@ public class ProductService {
     }
 
     public List<Product> getAllProducts() {
-        return productDao.findAll();
+        return productDao.findAllByOrderByName();
     }
 
     public long countAll() {
@@ -134,9 +137,16 @@ public class ProductService {
         return productDao.findAllByPriceBetween(priceFrom, priceTo);
     }
 
-    public ByteArrayInputStream getPriceList() {
+    public ByteArrayInputStream getPriceList(boolean areAll, List<Integer> companyIds) {
 
-        List<Product> products = getAllProducts();
+        List<Product> products = new LinkedList<>();
+        if (areAll) {
+            products.addAll(getAllProducts());
+        } else {
+            for (int companyId : companyIds) {
+                products.addAll(getAllByCompanyId(companyId));
+            }
+        }
 
         Document document = new Document();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -144,7 +154,7 @@ public class ProductService {
         try {
 
             PdfPTable table = new PdfPTable(4);
-            table.setWidthPercentage(60);
+            table.setWidthPercentage(80);
             table.setWidths(new int[]{4, 4, 3, 10});
 
             Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);

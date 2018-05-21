@@ -27,25 +27,48 @@
 <div class="panel panel-default panel-no-border">
     <div class="panel-body">
         <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalService"
-           class="btn btn-info btn-sm" role="button" onclick="getCategories()">Create new service</a>
-        <a sec:authorize="hasAuthority('CUSTOMER')" th:href="@{/servicesRest/pdfExport}"
-           class="btn btn-info btn-sm" role="button">Download as PDF</a>
-        <form class="form-inline pull-right"
-              th:object="${filter}"
-              th:action="${ownerType=='customer'} ? @{/customer/services/filtered} : @{/company/services/filtered}"
-              method="post">
-            <div class="form-group">
-                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumFrom}"
-                       placeholder="sum from" required/>
-                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumTo}"
-                       placeholder="sum to" required/>
+           class="btn btn-info btn-sm pull-left" role="button" onclick="getCategories()">Create new service</a>
+        <div sec:authorize="hasAuthority('CUSTOMER')" class="dropdown pull-left">
+            <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="priceListMenu" data-toggle="dropdown">
+                Download price-list
+                <span class="caret"></span></button>
+            <ul class="dropdown-menu dropdown-menu-left" role="menu" aria-labelledby="priceListMenu">
+                <li role="presentation">
+                    <a role="menuitem" tabindex="-1"
+                       th:href="@{/productRest/pdfExport(companyId=0)}">of all companies</a>
+                </li>
+                <!--<li role="presentation">-->
+                <!--<a role="menuitem" tabindex="-1"-->
+                <!--onclick="selectCompanyForPriceList()">select a company</a>-->
+                <!--</li>-->
+            </ul>
+        </div>
+
+        <form class="pull-right" th:object="${filter}" method="post"
+              th:action="${ownerType=='customer'} ? @{/customer/services/filtered} : @{/company/services/filtered}">
+            <div class="form-row">
+                <div class="col-md-3 mb-3">
+                    <label for="adv_filter_sumFrom">sum from</label>
+                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumFrom" type="number"
+                           th:field="*{sumFrom}"
+                           placeholder="sum from" required/>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="adv_filter_sumTo">sum to</label>
+                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumTo" type="number"
+                           th:field="*{sumTo}"
+                           placeholder="sum to" required/>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <button type="submit" class="btn btn-info btn-sm">apply
+                        <span class="glyphicon glyphicon-filter"></span>
+                    </button>
+                    <a th:href="${ownerType=='customer'} ? @{/customer/services} : @{/company/services}"
+                       class="btn btn-default btn-sm">clear</a>
+                </div>
             </div>
-            <button type="submit" class="btn btn-info btn-sm">apply
-                <span class="glyphicon glyphicon-filter"></span>
-            </button>
-            <a th:href="${ownerType=='customer'} ? @{/customer/services} : @{/company/services}"
-               class="btn btn-default btn-sm">clear</a>
         </form>
+
     </div>
 </div>
 
@@ -138,7 +161,8 @@
                     </div>
                     <div class="form-group">
                         <label>Price</label>
-                        <input id="new_service_price" class="form-control" type="number" min="0" step="0.01" value="0.00"
+                        <input id="new_service_price" class="form-control" type="number" min="0" step="0.01"
+                               value="0.00"
                                required="required"/>
                         <p id="new_service_priceError" style="color: red;display: none"> validation error</p>
                     </div>
@@ -254,6 +278,29 @@
                 <h4 id="alertMessage"></h4>
             </div>
             <div class="modal-footer modal_btn">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalCompanies" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Select companies for price-list</h4>
+            </div>
+            <div class="modal-body">
+                <label for="select_companies_for_pricelist">Multiple select (hold shift to select more than
+                    one):</label>
+                <select multiple class="form-control lg" id="select_companies_for_pricelist">
+
+                </select>
+            </div>
+            <div class="modal-footer modal_btn">
+                <button type="button" class="btn btn-info" onclick="getPriceListAsPDF()">OK</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -428,6 +475,53 @@
             $('#select_category').parent().removeClass('has-error');
             $('#select_categoryError').hide();
         });
+        $('#new_issueDate').parent().removeClass('has-error');
+        $('#new_issueDateError').hide();
+        $('#new_expireDate').parent().removeClass('has-error');
+        $('#new_expireDateError').hide();
+        $('#new_service_name').parent().removeClass('has-error');
+        $('#new_service_nameError').hide();
+        $('#new_service_price').parent().removeClass('has-error');
+        $('#new_service_priceError').hide();
+        $('#new_service_desc').parent().removeClass('has-error');
+        $('#new_service_descError').hide();
+        $('#select_category').parent().removeClass('has-error');
+        $('#select_categoryError').hide();
+    }
+
+    function selectCompanyForPriceList() {
+        loadAllCompanies();
+        $('#modalCompanies').modal('show');
+    }
+
+    function loadAllCompanies() {
+        $('#select_companies_for_pricelist').find('option').each(function () {
+            $(this).remove();
+        });
+        $.ajax(
+            {
+                url: "/companyRest/getAllIdAndName",
+                type: "GET",
+                success: function (result) {
+                    $.each(result, function (key, value) {
+                        $("#select_companies_for_pricelist").append("<option value='" + value.id + "'>" + value.name + "</option>")
+                    });
+                }
+            }
+        );
+    }
+
+    function getPriceListAsPDF() {
+        $('#modalCompanies').modal('hide');
+        $.ajax(
+            {
+                url: "/productRest/pdfExport?companyId=0",
+                type: "GET",
+                success: function (result) {
+
+                }
+            }
+        );
     }
 
 </script>

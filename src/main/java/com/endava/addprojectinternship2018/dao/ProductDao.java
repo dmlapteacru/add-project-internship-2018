@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface ProductDao extends JpaRepository<Product, Integer> {
 
-    List<Product> findAll();
+    List<Product> findAllByOrderByName();
 
     List<Product> findAllByCategoryId(int id);
 
