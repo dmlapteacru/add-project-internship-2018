@@ -14,7 +14,7 @@ public class AdminPanelController {
     @Autowired
     private UserService userService;
 
-    private static final Logger LOGGER = Logger.getLogger(RestController.class);
+    private static final Logger LOGGER = Logger.getLogger(AdminPanelController.class);
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public String adminMain(Model model){

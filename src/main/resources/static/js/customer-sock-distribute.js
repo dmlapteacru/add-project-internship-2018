@@ -87,16 +87,16 @@ $(document).ready(function () {
     var parInvPaid = url.searchParams.get("invoice-paid");
 
     if (parContr!=null){
-        $("#row" + parContr).addClass("warning");
+        $("#row" + parContr).addClass("info");
     }
     if (parInv!=null){
-        $("#row" + parInv).addClass("warning");
+        $("#row" + parInv).addClass("info");
     }
     if (parContrSgn!=null){
-        $("#row" + parContrSgn).addClass("warning");
+        $("#row" + parContrSgn).addClass("info");
     }
     if (parInvPaid!=null){
-        $("#row" + parInvPaid).addClass("warning");
+        $("#row" + parInvPaid).addClass("info");
     }
 
 });
