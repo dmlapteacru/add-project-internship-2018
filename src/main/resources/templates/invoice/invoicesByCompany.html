@@ -327,25 +327,26 @@
            <p class="form-control pt-3">Total Sum: <span id="total_sum"  >0.0</span> </p>
         </div>
 
-            <tr class="filters">
-                <th hidden="hidden"><input type="text" class="form-control" placeholder="Invoice_id" disabled ></th>
-                <th><input type="checkbox" onclick="selectAllCheckBoxes()" th:id="check_all" name="sel"/></th>
-                <th><input type="text" class="form-control" placeholder="Issue Date" disabled></th>
-                <th><input type="text" class="form-control" placeholder="Expire Date" disabled></th>
-                <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
-                <th>
-                    <select class="sel_status_invoice" disabled>
-                        <option selected value="Status_INV">Status</option>
-                        <option>PAID</option>
-                        <option>SENT</option>
-                        <option>OVERDUE</option>
-                        <option>ISSUED</option>
-                    </select>
-                </th>
-                <th><input type="text" class="form-control" placeholder="Customer Name" disabled></th>
-                <th><input type="text" class="form-control" placeholder="Service Name" disabled></th>
-                <th><input type="text" class="form-control" placeholder="" disabled></th>
-                <th><input type="text" class="form-control" placeholder="" disabled></th>
+        <tr class="filters">
+            <th hidden="hidden"><input type="text" class="form-control" placeholder="Invoice_id" disabled ></th>
+            <th><input type="checkbox" onclick="selectAllCheckBoxes()" th:id="check_all" name="sel"/></th>
+            <th><input type="text" class="form-control" placeholder="Issue Date" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Expire Date" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
+            <!--<th><input type="text" class="form-control" placeholder="Status" disabled></th>-->
+            <th>
+                <select class="sel_status_invoice" disabled>
+                    <option selected value="Status_INV">Status</option>
+                    <option>PAID</option>
+                    <option>SENT</option>
+                    <option>OVERDUE</option>
+                    <option>ISSUED</option>
+                </select>
+            </th>
+            <th><input type="text" class="form-control" placeholder="Customer Name" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Service Name" disabled></th>
+            <th><input type="text" class="form-control" placeholder="" disabled></th>
+            <th><input type="text" class="form-control" placeholder="" disabled></th>
 
             </tr>
             </thead>
