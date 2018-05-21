@@ -214,7 +214,7 @@
                         $('#row'+id).find(".btn.btn-success").remove();
                         $('#row'+id).find("input[type='checkbox']").remove();
                         $('#row'+id).removeClass('row_issued_color');
-                        $('#row'+id).addClass('bg-warning');
+                        $('#row'+id).addClass('row_sent_color');
                         calculateTotalSum();
                     },
                     error: function (errMsg, a, b) {
