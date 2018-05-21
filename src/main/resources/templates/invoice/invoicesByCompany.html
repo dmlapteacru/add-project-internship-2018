@@ -20,7 +20,16 @@
 
     <style>
         .row_issued_color{
-            background: #b8daff;
+            background: #c8f8ff;
+        }
+        .row_sent_color{
+            background: #fff0a8;
+        }
+        .row_paid_color{
+            background: #a4ffb0;
+        }
+        .row_overdue_color{
+            background: #ffacb3;
         }
     </style>
 
@@ -154,6 +163,8 @@
 
         function sendBulkInvoices() {
             var selectedRows = $('table.table tbody input[type=checkbox]:checked');
+            if(selectedRows.length == 0){$("#modalBulkNoInvoiceSelected").modal();}
+
             console.log('selectedRows:', selectedRows);
             var ids = [];
             for(var i = 0; i < selectedRows.length; i++){
@@ -311,6 +322,21 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modalBulkNoInvoiceSelected" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">No one INVOICE is selected</h4>
+            </div>
+            <div class="modal-footer modal_btn">
+                <button type="button" style="display: none;" class="btn"></button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!--<div class="container">-->
 
 <div class="panel panel-primary filterable">
@@ -353,7 +379,7 @@
 
             <tbody class="filter_body">
             <!--<tr th:classappend="${(invoice.getStatus().name() == 'ISSUED')? 'bg-primary': (invoice.getStatus().name() == 'SENT') ? 'bg-warning': (invoice.getStatus().name() == 'PAID')?'bg-success':'bg-danger'}"  th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">-->
-            <tr th:classappend="|${(invoice.getStatus().name() == 'ISSUED') ? 'row_issued_color':''} ${(invoice.getStatus().name() == 'SENT') ? 'bg-warning':''} ${(invoice.getStatus().name() == 'PAID')?'bg-success':''} ${(invoice.getStatus().name() == 'OVERDUE')?'bg-danger':''} |"  th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">
+            <tr th:classappend="|${(invoice.getStatus().name() == 'ISSUED') ? 'row_issued_color':''} ${(invoice.getStatus().name() == 'SENT') ? 'row_sent_color':''} ${(invoice.getStatus().name() == 'PAID')?'row_paid_color':''} ${(invoice.getStatus().name() == 'OVERDUE')?'row_overdue_color':''} |"  th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">
                 <td th:id="invoice_id_hidd" th:text="${invoice.getId()}" style="display: none;"></td>
                 <td>
                     <input th:if="${invoice.getStatus().name() == 'ISSUED'}" type="checkbox" th:id="${invoice.getId()}" name="sel"/></td>
@@ -369,10 +395,10 @@
                     Service Name
                 </td>
                 <td>
-                    <a th:if="${invoice.getStatus().name() == 'ISSUED'}" th:id="${invoice.id}" onclick="deleteInvoice(this)" class="btn btn-danger">DELETE</a>
+                    <a th:if="${invoice.getStatus().name() == 'ISSUED'}" th:id="${invoice.id}" onclick="deleteInvoice(this)" class="btn btn-sm btn-danger">DELETE</a>
                 </td>
                 <td>
-                    <button th:id="${invoice.getId()}" th:if="${invoice.getStatus().name() == 'ISSUED'}" onclick="sendInvoiceToCustomer(this)" class="btn  btn-success" >SEND</button>
+                    <button th:id="${invoice.getId()}" th:if="${invoice.getStatus().name() == 'ISSUED'}" onclick="sendInvoiceToCustomer(this)" class="btn btn-sm btn-success" >SEND</button>
                 </td>
             </tr>
             <tr>

@@ -725,13 +725,22 @@
     }
 
     function clearErrorsSecond() {
-        // $('#expire_inv_date').focus(function () {
+
+            $('#customer_inv_name').focus(function () {
+                $('#customer_inv_name').parent().removeClass('has-error');
+                $('#customer_inv_nameError').hide();
+            })
+
+            $('#expire_inv_date').focus(function () {
+                $('#expire_inv_date').parent().removeClass('has-error');
+                $('#expire_inv_dateError').hide();
+            })
 
             $('#customer_inv_nameError').hide();
             $('#expire_inv_dateError').hide();
             $('#customer_inv_name').parent().removeClass('has-error');
             $('#expire_inv_date').parent().removeClass('has-error');
-        // })
+
     }
 
 
