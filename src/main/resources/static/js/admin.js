@@ -60,7 +60,7 @@ $("#delete_btn_confirm").click(function () {
                     $("#alert_success").slideToggle("slow");
                     setTimeout(function () {
                         $("#alert_success").slideToggle("slow");
-                    },5000);
+                    },3000);
                 }
             }
         )
@@ -76,7 +76,7 @@ $("#delete_btn_confirm").click(function () {
                 $("#alert_success").slideToggle("slow");
                 setTimeout(function () {
                     $("#alert_success").slideToggle("slow");
-                },5000);
+                },3000);
             }
         }
     )
@@ -190,7 +190,7 @@ function loadMessages(data) {
                 .append('<tr id="' + messageID + '" class="unread_message_bold">' +
                     '<td><input type="checkbox" class="checkbox_mess_element" onclick="checkBTN(this)"/></td></td><td><span class="circle circle_active" onclick="changeMessageStatus(this)"></span></td></tr>');
             $("#table-messages tr[id="+ "" + messageID + "]")
-                .append("<td onclick='showMessage(this)'>" + object.user_email + "</td>");
+                .append("<td onclick='showMessage(this)'>" + object.userEmail + "</td>");
 
             $("#table-messages tr[id="+ "" + messageID + "]")
                 .append("<td onclick='showMessage(this)'>" + object.subject + " <div style='display: none;' id='mess"+messageID+"'>" + object.message +"</div></td>");
@@ -199,7 +199,7 @@ function loadMessages(data) {
                 .append('<tr id="' + messageID + '">' +
                     '<td><input type="checkbox" class="checkbox_mess_element" onclick="checkBTN(this)"/></td><td><span class="circle circle_inactive" onclick="changeMessageStatus(this)"></span></td></tr>');
             $("#table-messages tr[id="+ "" + messageID + "]")
-                .append("<td onclick='showMessage(this)'>" + object.user_email + "</td>");
+                .append("<td onclick='showMessage(this)'>" + object.userEmail + "</td>");
 
             $("#table-messages tr[id="+ "" + messageID + "]")
                 .append("<td onclick='showMessage(this)'>" + object.subject + " <div style='display: none;' id='mess"+messageID+"'>" + object.message + "</div></td>");
@@ -213,10 +213,10 @@ function loadMessages(data) {
 }
 function setTitleForMessageCircles() {
     $.each($(".circle_active"),function () {
-        $(this).append("<span>Mark as unread</span>");
+        $(this).append("<span>Mark as read</span>");
     });
     $.each($(".circle_inactive"),function () {
-        $(this).append("<span>Mark as read</span>");
+        $(this).append("<span>Mark as unread</span>");
     });
 }
 
@@ -235,6 +235,7 @@ function changeMessageStatus(circle) {
 function showMessage(col) {
     $("#mess"+$(col).parent().attr("id")).slideToggle("slow");
 
+    $(col).parent().removeClass("act");
     if ($(col).parent().hasClass("unread_message_bold")) {
         changeMessageStatus($(col).parent().find("td > span.circle"));
     }
@@ -411,6 +412,7 @@ $("#change_status_all_btn_read").click(function () {
                 $("#load_icon_wrapper").modal("hide");
                 $("#messages_btn_req").click();
                 $("#check_all_messages").click();
+                resetCheckBoxMessages();
             }
         }
     )
@@ -436,6 +438,7 @@ $("#change_status_all_btn_unread").click(function () {
                 $("#load_icon_wrapper").modal("hide");
                 $("#messages_btn_req").click();
                 $("#check_all_messages").click();
+                resetCheckBoxMessages();
             }
         }
     )
@@ -462,6 +465,7 @@ $("#messages_all_btn_delete").click(function () {
                 $("#load_icon_wrapper").modal("hide");
                 $("#messages_btn_req").click();
                 $("#check_all_messages").click();
+                resetCheckBoxMessages();
             }
         }
     )

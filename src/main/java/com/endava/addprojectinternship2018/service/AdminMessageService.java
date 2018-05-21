@@ -20,11 +20,15 @@ public class AdminMessageService {
     @Autowired
     private AdminMessageDao adminMessageDao;
 
+    @Autowired
+    private WebSocketDistributeService webSocketDistributeService;
+
     public void save(AdminMessage adminMessage){
         if (adminMessage != null){
             Date date = new Date();
             adminMessage.setDate(date);
             adminMessageDao.save(adminMessage);
+            webSocketDistributeService.sendNewAdminMessageNotification(adminMessage.getUserEmail(), getFirstAdminMessageByEmailOrderByDate(adminMessage.getUserEmail()).getId());
         }
     }
     public void deleteById(int id){
@@ -74,4 +78,12 @@ public class AdminMessageService {
         }
         adminMessageDao.deleteAllByIdIn(idList);
     }
+
+    public AdminMessage getAdminMessageByEmail(String email){
+        return adminMessageDao.findByUserEmail(email);
+    }
+    public AdminMessage getFirstAdminMessageByEmailOrderByDate(String email){
+        return adminMessageDao.findFirstByUserEmailOrderByDateDesc(email);
+    }
+
 }

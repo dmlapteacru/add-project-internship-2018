@@ -9,10 +9,12 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/header.css"/>
     <link rel="stylesheet" type="text/css" href="/css/bank.css"/>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
+    <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js" integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe" crossorigin="anonymous"></script>
-
 </head>
 
 <body>
@@ -43,12 +45,9 @@
                         <span class="currency">MDL</span>
                     </div>
                     <span class="additional_info">Available balance</span>
-                    <div class="btn_add_money_wrapper">
-                        <button class="btn_add_money_toggle">Add money <i class="fas fa-sort-down"></i><i class="fas fa-caret-up inactive"></i></button>
-                    </div>
                     <form th:if="${company.countNumber != null}" class="add_money">
                         <div>
-                            <input id="money_sum" pattern="[0-9].{1,}" title="Must be numbers" type="number"/>
+                            <input id="money_sum" pattern="[0-9].{1,}" title="Must be numbers" type="number" value="0.0"/>
                             <br/>
                             <button id="btn_add_money_req" class="btn btn-success" type="button">ADD MONEY</button>
                         </div>
@@ -102,5 +101,7 @@
 </div>
 <script src="/js/loadbalance.js"></script>
 <script src="/js/bank.js"></script>
+<script src="/js/user-websock.js"></script>
+<script src="/js/customer-sock-distribute.js"></script>
 </body>
 </html>
