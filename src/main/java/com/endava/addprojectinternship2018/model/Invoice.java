@@ -1,12 +1,14 @@
 package com.endava.addprojectinternship2018.model;
 
+import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
+import com.endava.addprojectinternship2018.util.LocalDateConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.joda.time.LocalDate;
 
 import javax.persistence.*;
-import java.security.PrivateKey;
+import javax.validation.constraints.DecimalMin;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "INVOICE")
@@ -19,13 +21,13 @@ public class Invoice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column
+    @DecimalMin("0.0")
     private double sum;
 
-    @Column
+    @Convert(converter = LocalDateConverter.class)
     private LocalDate issueDate;
 
-    @Column
+    @Convert(converter = LocalDateConverter.class)
     private LocalDate dueDate;
 
     @Column
@@ -42,4 +44,11 @@ public class Invoice {
         this.dueDate = dueDate;
     }
 
+    public Invoice(double sum, LocalDate issueDate, LocalDate dueDate, InvoiceStatus status, Contract contract) {
+        this.sum = sum;
+        this.issueDate = issueDate;
+        this.dueDate = dueDate;
+        this.status = status;
+        this.contract = contract;
+    }
 }

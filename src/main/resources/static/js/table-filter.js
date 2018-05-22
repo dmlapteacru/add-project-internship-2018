@@ -1,0 +1,122 @@
+$(document).ready(function(){
+    $('.filterable .btn-filter').click(function(){
+        var $panel = $(this).parents('.filterable'),
+            $filters = $panel.find('.filters input[type="text"]'),
+            $selectors = $panel.find('.filters select'),
+            $tbody = $panel.find('.table tbody');
+        if ($filters.prop('disabled') == true || $selectors.prop('disabled') == true) {
+            $filters.prop('disabled', false);
+            $selectors.prop('disabled', false);
+        } else {
+            $(".filter_body").append($rows);
+            $selectors.val('Roles').prop('disabled', true);
+            $(".sel_status").val('Status').prop('disabled', true);
+            $(".sel_status_contract").val('Status').prop('disabled', true);
+            $(".sel_status_invoice").val('Status_INV').prop('disabled', true);
+            $(".sel_category").val('Category').prop('disabled', true);
+            $filters.val('').prop('disabled', true);
+            $tbody.find('.no-result').remove();
+            $tbody.find('tr').show();
+        }
+    });
+
+    var $rows = $(".filter_body tr");
+
+    $(".sel_roles").change(function () {
+        $(".filter_body").append($rows);
+        $(".sel_roles option:selected").each(function () {
+            if ($(this).val()=="Roles"){
+                $(".filter_body").append($rows);
+            } else {
+                var $choice = $(this).val().toUpperCase();
+                $(".filter_body td[class='filter_role']").filter(function () {
+                    return $(this).text().indexOf($choice) === -1;
+                }).parent().remove();
+            }
+        });
+    });
+    $(".sel_category").change(function () {
+        $(".filter_body").append($rows);
+        $(".sel_category option:selected").each(function () {
+            if ($(this).val()=="Category"){
+                $(".filter_body").append($rows);
+            } else {
+                var $choice = $(this).val();
+                $(".filter_body td[class='filter_category']").filter(function () {
+                    return $(this).text().indexOf($choice) === -1;
+                }).parent().remove();
+            }
+        });
+    });
+    $(".sel_status_contract").change(function () {
+        $(".filter_body").append($rows);
+        $(".sel_status_contract option:selected").each(function () {
+            if ($(this).val()=="Status"){
+                $(".filter_body").append($rows);
+            } else {
+                var $choice = $(this).val();
+                $(".filter_body td[class='filter_status_contract']").filter(function () {
+                    return $(this).text().indexOf($choice) === -1;
+                }).parent().remove();
+            }
+        });
+    });
+    $(".sel_status_invoice").change(function () {
+        $(".filter_body").append($rows);
+        $(".sel_status_invoice option:selected").each(function () {
+            if ($(this).val()=="Status_INV"){
+                $(".filter_body").append($rows);
+            } else {
+                var $choice = $(this).val().toUpperCase();
+                $(".filter_body td[class='filter_status_invoice']").filter(function () {
+                    return $(this).text().indexOf($choice) === -1;
+                }).parent().remove();
+            }
+        });
+    });
+
+    $(".sel_status").change(function () {
+        $(".filter_body").append($rows);
+        $(".sel_status option:selected").each(function () {
+            if ($(this).val()=="Status"){
+                $(".filter_body").append($rows);
+            } else if ($(this).text() == "ACTIVE") {
+                var $fl =  $(".filter_body td[class='filter_status']").filter(function () {
+                    return $(this).text().indexOf("INACTIVE") !== -1;
+                }).parent().remove();
+            } else {
+                var $choice = $(this).val().toUpperCase();
+                $(".filter_body td[class='filter_status']").filter(function () {
+                    return $(this).text().indexOf($choice) === -1;
+                }).parent().remove();
+            }
+        });
+    });
+
+    $('.filterable .filters input').keyup(function(e){
+        /* Ignore tab key */
+        var code = e.keyCode || e.which;
+        if (code == '9') return;
+        /* Useful DOM data and selectors */
+        var $input = $(this),
+            inputContent = $input.val().toLowerCase(),
+            $panel = $input.parents('.filterable'),
+            column = $panel.find('.filters th').index($input.parents('th')),
+            $table = $panel.find('.table'),
+            $rows = $table.find('tbody tr');
+        /* Dirtiest filter function ever ;) */
+        var $filteredRows = $rows.filter(function(){
+            var value = $(this).find('td').eq(column).text().toLowerCase();
+            return value.indexOf(inputContent) === -1;
+        });
+        /* Clean previous no-result if exist */
+        $table.find('tbody .no-result').remove();
+        /* Show all rows, hide filtered ones (never do that outside of a demo ! xD) */
+        $rows.show();
+        $filteredRows.hide();
+        /* Prepend no-result row if all rows are filtered */
+        if ($filteredRows.length === $rows.length) {
+            $table.find('tbody').prepend($('<tr class="no-result text-center"><td colspan="'+ $table.find('.filters th').length +'">No result found</td></tr>'));
+        }
+    });
+});

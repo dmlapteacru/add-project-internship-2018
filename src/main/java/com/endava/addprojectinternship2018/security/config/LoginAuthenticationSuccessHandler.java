@@ -14,32 +14,30 @@ import java.util.Set;
 public class LoginAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private static final String DEFAULT_URL_ADMIN = "/admin";
-    private static final String DEFAULT_URL_COMPANY = "/company";
-    private static final String DEFAULT_URL_CUSTOMER = "/customer";
+    private static final String DEFAULT_URL_COMPANY = "/company/home";
+    private static final String DEFAULT_URL_CUSTOMER = "/customer/home";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException {
         Set<String> setOfAuthorities = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-        if (setOfAuthorities.contains("ADMIN")){
+        if (setOfAuthorities.contains("ADMIN")) {
             getRedirectStrategy().sendRedirect(request, response, DEFAULT_URL_ADMIN);
+        } else if (setOfAuthorities.contains("COMPANY")) {
+            getRedirectStrategy().sendRedirect(request, response, DEFAULT_URL_COMPANY);
         } else
-            if (setOfAuthorities.contains("COMPANY")){
-                getRedirectStrategy().sendRedirect(request, response, DEFAULT_URL_COMPANY);
-            } else
-                getRedirectStrategy().sendRedirect(request, response, DEFAULT_URL_CUSTOMER);
+            getRedirectStrategy().sendRedirect(request, response, DEFAULT_URL_CUSTOMER);
     }
 
 
     public String authenticatedRedirectDefaultPage(Authentication authentication) {
-            Set<String> setOfAuthorities = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-            if (setOfAuthorities.contains("ADMIN")){
-                return "/admin";
-            } else
-            if (setOfAuthorities.contains("COMPANY")){
-                return "/company";
-            } else
-                    return "/customer";
+        Set<String> setOfAuthorities = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
+        if (setOfAuthorities.contains("ADMIN")) {
+            return DEFAULT_URL_ADMIN;
+        } else if (setOfAuthorities.contains("COMPANY")) {
+            return DEFAULT_URL_COMPANY;
+        } else
+            return DEFAULT_URL_CUSTOMER;
     }
 }

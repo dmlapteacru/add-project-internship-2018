@@ -1,23 +1,22 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.model.Contract;
-import com.endava.addprojectinternship2018.model.Customer;
-import com.endava.addprojectinternship2018.model.Invoice;
-import com.endava.addprojectinternship2018.model.User;
-import com.endava.addprojectinternship2018.service.ContractService;
-import com.endava.addprojectinternship2018.service.CustomerService;
-import com.endava.addprojectinternship2018.service.InvoiceService;
-import com.endava.addprojectinternship2018.service.user.UserService;
+import com.endava.addprojectinternship2018.model.*;
+import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
+import com.endava.addprojectinternship2018.model.dto.ContractDto;
+import com.endava.addprojectinternship2018.model.dto.CustomerDto;
+import com.endava.addprojectinternship2018.model.enums.ContractStatus;
+import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
+import com.endava.addprojectinternship2018.service.*;
 import com.endava.addprojectinternship2018.util.UserUtil;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,77 +25,194 @@ import java.util.Optional;
 public class CustomerController {
 
     @Autowired
-    private CustomerService customerService;
+    private InvoiceService invoiceService;
+
+    @Autowired
+    private UserUtil userUtil;
 
     @Autowired
     private UserService userService;
 
     @Autowired
-    private ContractService contractService;
+    private CustomerService customerService;
 
     @Autowired
-    private InvoiceService invoiceService;
+    private ProductService productService;
 
-    @GetMapping(value = "")
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private ContractService contractService;
+
+    private static final Logger LOGGER = Logger.getLogger(CustomerController.class);
+
+    @GetMapping(value = "home")
     public String getHomePage(Model model) {
-        if (UserUtil.getCurrentCustomer() == null) {
-            return "error";
-        }
-        model.addAttribute("customer", UserUtil.getCurrentCustomer());
+
+        Customer currentCustomer = userUtil.getCurrentCustomer();
+        int currentCustomerId = currentCustomer.getId();
+        model.addAttribute("customerName", currentCustomer.getFullName());
+        model.addAttribute("activeContracts",
+                contractService.countByCustomerAndStatus(currentCustomerId, ContractStatus.ACTIVE));
+        model.addAttribute("onePartSignedContracts",
+                contractService.countByCustomerAndStatus(currentCustomerId, ContractStatus.SIGNED_BY_CUSTOMER));
+        model.addAttribute("anotherPartSignedContracts",
+                contractService.countByCompanyAndStatus(currentCustomerId, ContractStatus.SIGNED_BY_COMPANY));
+        model.addAttribute("unsignedContracts",
+                contractService.countByCustomerAndStatus(currentCustomerId, ContractStatus.UNSIGNED));
+        model.addAttribute("filterActiveContracts", new AdvancedFilter(ContractStatus.ACTIVE));
+        model.addAttribute("filterSignedContracts", new AdvancedFilter(ContractStatus.SIGNED_BY_CUSTOMER));
+        model.addAttribute("filterUnsignedContracts", new AdvancedFilter(ContractStatus.UNSIGNED));
+
+        model.addAttribute("totalServices", productService.countAll());
+
+        model.addAttribute("filterSentInvoices", new AdvancedFilter(InvoiceStatus.SENT));
+        model.addAttribute("filterPaidInvoices", new AdvancedFilter(InvoiceStatus.PAID));
+        model.addAttribute("filterOverdueInvoices", new AdvancedFilter(InvoiceStatus.OVERDUE));
+        model.addAttribute("sentInvoices", invoiceService.countByCustomerIdAndStatus(currentCustomerId, InvoiceStatus.SENT));
+        model.addAttribute("paidInvoices", invoiceService.countByCustomerIdAndStatus(currentCustomerId, InvoiceStatus.PAID));
+        model.addAttribute("overdueInvoices", invoiceService.countByCustomerIdAndStatus(currentCustomerId, InvoiceStatus.OVERDUE));
+
         return "customer/homePage";
+    }
+
+    @GetMapping(value = "profile")
+    public String getProfilePage(Model model) {
+        CustomerDto customerDto = customerService.convertCustomerToCustomerDto(userUtil.getCurrentCustomer());
+        customerDto.setUserDto(userService.convertUserToUserDto(userUtil.getCurrentUser()));
+        model.addAttribute("customerDto", customerDto);
+        model.addAttribute("update", true);
+        return "registration/customer";
+    }
+
+    @PostMapping(value = "updateProfile")
+    public String updateProfile(@ModelAttribute("customerDto") @Valid CustomerDto customerDto,
+                                BindingResult result,
+                                Model model) {
+        model.addAttribute("update", true);
+        if (result.hasErrors()) {
+            return "registration/customer";
+        }
+
+        Optional<Customer> foundCustomer = customerService.getCustomerByEmail(customerDto.getEmail());
+        if (foundCustomer.isPresent()) {
+            if (foundCustomer.get().getId() != customerDto.getCustomerId()) {
+                result.rejectValue("email", "email.error", "Email is not unique");
+                return "registration/customer";
+            }
+        }
+
+        customerService.saveCustomer(customerDto);
+
+        LOGGER.info(String.format("Customer %s:%s updated profile", customerDto.getCustomerId(), customerDto.getLastName()));
+
+        return "redirect:/customer/home";
     }
 
     @GetMapping(value = "contracts")
     public String getContractsPage(Model model) {
 
-        Customer currentCustomer = getCurrentCustomer();
-        if (currentCustomer == null) {
-            return "customer/error";
-        }
-        model.addAttribute("customer", currentCustomer);
+        int currentCustomerId = userUtil.getCurrentCustomer().getId();
+        model.addAttribute("contractList", contractService.getAllByCustomerId(currentCustomerId));
+        model.addAttribute("customerId", currentCustomerId);
+        model.addAttribute("companyId", 0);
+        model.addAttribute("statusListForFilter", Arrays.asList(ContractStatus.values()));
+        model.addAttribute("filter", new AdvancedFilter());
 
-        List<Contract> contracts = contractService.getContractsByCustomerId(currentCustomer.getId());
-        model.addAttribute("customerContracts", contracts);
+        LOGGER.info(String.format("customer %s:%s accessed contracts page", currentCustomerId, userUtil.getCurrentCustomer().getFullName()));
 
-        return "customer/contractsPage";
+        return "contract/contractListPage";
+
+    }
+
+    @PostMapping(value = "contracts/filtered")
+    public String getCustomerContractsFiltered(@ModelAttribute(name = "filter") AdvancedFilter filter, Model model) {
+
+        int currentCustomerId = userUtil.getCurrentCustomer().getId();
+        model.addAttribute("contractList", contractService.getAllByCustomerIdFiltered(currentCustomerId, filter));
+        model.addAttribute("customerId", currentCustomerId);
+        model.addAttribute("companyId", 0);
+        model.addAttribute("statusListForFilter", Arrays.asList(ContractStatus.values()));
+        model.addAttribute("filter", filter);
+
+        return "contract/contractListPage";
+    }
+
+    @GetMapping(value = "services")
+    public String getProductList(Model model) {
+
+        Customer currentCustomer = userUtil.getCurrentCustomer();
+        model.addAttribute("categoryList", categoryService.getAllCategory());
+        model.addAttribute("products", productService.getAllProducts());
+        model.addAttribute("customerId", currentCustomer.getId());
+        model.addAttribute("customerName", currentCustomer.getFullName());
+        model.addAttribute("ownerType", "customer");
+        model.addAttribute("filter", new AdvancedFilter());
+
+        return "product/productListPage";
+    }
+
+    @PostMapping(value = "services/filtered")
+    public String getProductListFiltered(@ModelAttribute(name = "filter") AdvancedFilter filter, Model model) {
+
+        Customer currentCustomer = userUtil.getCurrentCustomer();
+        model.addAttribute("categoryList", categoryService.getAllCategory());
+        model.addAttribute("products", productService.getAllFiltered(filter));
+        model.addAttribute("customerId", currentCustomer.getId());
+        model.addAttribute("customerName", currentCustomer.getFullName());
+        model.addAttribute("ownerType", "customer");
+        model.addAttribute("filter", filter);
+
+        return "product/productListPage";
+    }
+
+    @Deprecated
+    @GetMapping(value = "services/newcontract")
+    public String getProductsPageSignContract(@RequestParam(name = "customerId") int customerId,
+                                              @RequestParam(name = "companyId") int companyId,
+                                              @RequestParam(name = "productId") int productId,
+                                              Model model) {
+        ContractDto contractDto = contractService.createNewContractDto(customerId, companyId, productId);
+        int currentCustomerId = userUtil.getCurrentCustomer().getId();
+        List<Product> productList = productService.getAllProducts();
+        List<Category> categoryList = categoryService.getAllCategory();
+        model.addAttribute("contractDto", contractDto);
+        model.addAttribute("categoryList", categoryList);
+        model.addAttribute("products", productList);
+        model.addAttribute("customerId", currentCustomerId);
+        model.addAttribute("update", false);
+        return "product/productListPage";
     }
 
     @GetMapping(value = "invoices")
     public String getInvoicesPage(Model model) {
-        if (getCurrentCustomer() == null) {
-            return "customer/error";
-        }
-        List<Invoice> invoices = invoiceService.getInvoicesByCustomerId(getCurrentCustomer().getId());
-        model.addAttribute("customer", invoices);
-        return "customer/invoicesPage";
+
+        int currentCustomerId = userUtil.getCurrentCustomer().getId();
+        model.addAttribute("invoices", invoiceService.getAllByCustomerId(currentCustomerId));
+        model.addAttribute("filter", new AdvancedFilter());
+
+        model.addAttribute("statusListForFilter", invoiceService.getStatusesForCustomer());
+
+        return "invoice/invoiceListPage";
+    }
+
+    @PostMapping(value = "invoices/filtered")
+    public String getInvoicesFiltered(@ModelAttribute(name = "filter") AdvancedFilter filter, Model model) {
+
+        int currentCustomerId = userUtil.getCurrentCustomer().getId();
+        model.addAttribute("invoices", invoiceService.getInvoicesByCustomerIdFiltered(currentCustomerId, filter));
+        model.addAttribute("filter", filter);
+
+        model.addAttribute("statusListForFilter", invoiceService.getStatusesForCustomer());
+
+        return "invoice/invoiceListPage";
     }
 
     @GetMapping(value = "bank")
     public String getBankPage(Model model) {
+        model.addAttribute("customer", userUtil.getCurrentCustomer());
         return "customer/bankPage";
-    }
-
-    private Customer getCurrentCustomer() {
-        Customer result = null;
-        Optional<User> userOptional = userService.getUserByUsername(getPrincipal());
-        if (userOptional.isPresent()) {
-            Optional<Customer> customerOptional = customerService.getCustomerByUserId(userOptional.get().getId());
-            if (customerOptional.isPresent()) {
-                result = customerOptional.get();
-            }
-        }
-        return result;
-    }
-
-    private String getPrincipal() {
-        String userName;
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            userName = ((UserDetails) principal).getUsername();
-        } else {
-            userName = principal.toString();
-        }
-        return userName;
     }
 
 }

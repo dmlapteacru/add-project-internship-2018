@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Customer contracts list</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/header.css"/>
+    <link rel="stylesheet" href="/css/table-filter.css">
+    <link rel="stylesheet" href="/css/alert.css">
+    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
+    <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js" integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe" crossorigin="anonymous"></script>
+    <script src="/js/table-filter.js"></script>
+</head>
+
+<body>
+<div th:replace="fragments/header :: header"></div>
+<div class="modal fade" id="load_icon_wrapper" data-backdrop="static" data-keyboard="false">
+    <img id="load" src="/img/load_icon.gif"/>
+</div>
+
+<div class="panel panel-default panel-no-border">
+    <div class="panel-body">
+        <form class="pull-right"
+              th:object="${filter}"
+              th:action="@{/customer/invoices/filtered}"
+              method="post">
+            <div class="form-row">
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_status">status</label>
+                    <select id="adv_filter_status" class="form-control input-sm" th:field="*{invoiceStatus}">
+                        <option value="">--all--</option>
+                        <option th:each="currStatus : ${statusListForFilter}"
+                                th:value="${currStatus.name()}"
+                                th:text="${currStatus.toString()}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_sumFrom">sum from</label>
+                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumFrom" type="number"
+                           th:field="*{sumFrom}"
+                           placeholder="sum from" required/>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_sumTo">sum to</label>
+                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumTo" type="number"
+                           th:field="*{sumTo}"
+                           placeholder="sum to" required/>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_date_from">date from</label>
+                    <input type="date" id="adv_filter_date_from" class="form-control input-sm"
+                           th:field="*{dateFrom}"/>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_date_to">date to</label>
+                    <input type="date" id="adv_filter_date_to" class="form-control input-sm"
+                           th:field="*{dateTo}"/>
+                </div>
+
+                <div class="col-md-2 mb-3">
+                    <button type="submit" class="btn btn-info btn-sm">apply
+                        <span class="glyphicon glyphicon-filter"></span>
+                    </button>
+                    <a th:href="@{/customer/invoices}"
+                       class="btn btn-default btn-sm">clear</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="panel panel-primary filterable">
+    <div class="panel-heading">
+        <h3 class="panel-title">Invoices</h3>
+        <div class="pull-right">
+            <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter
+            </button>
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+        <div class="bulk_btn_wrapper" style="display: none;">
+            <span>Total Sum: <span id="bulk_pay_sum"
+                                   style="font-weight: bold;border: 1px solid #ddd; padding: 5px; border-radius: 3px;"></span> MDL</span>
+            <a id="bulk_pay_btn" class="btn btn-danger bulk_invoices_btn" style="width: 100px;">PAY</a>
+        </div>
+        <tr class="filters">
+            <th>
+                <div class="checkbox_users_wrapper">
+                    <input type="checkbox" id="check_all_invoices"/>
+                </div>
+            </th>
+            <th><input type="text" class="form-control" placeholder="Issue Date" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Expire Date" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
+            <th>
+                <select class="sel_status_invoice" disabled>
+                    <option selected value="Status_INV">Status</option>
+                    <option>PAID</option>
+                    <option>SENT</option>
+                    <option>OVERDUE</option>
+                </select>
+            </th>
+            <th><input type="text" class="form-control" placeholder="Company" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Service" disabled></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody class="filter_body">
+        <tr th:each="invoice: ${invoices}" th:id="'row' + ${invoice.getId()}">
+            <td><input type="checkbox" th:value="${invoice.id}" th:if="${invoice.status}!=${invoice.status.PAID}"
+                       class="checkbox_invoice_element"/></td>
+            <td id="invoice_date" th:text="${#temporals.format(invoice.issueDate, 'dd-MM-yyyy')} ">Issue Date</td>
+            <td th:text="${#temporals.format(invoice.dueDate, 'dd-MM-yyyy')}">Expire Date</td>
+            <td><span id="sum_to_pay" th:text="${invoice.sum}"></span><span> MDL</span></td>
+            <td class="filter_status_invoice" th:text="${invoice.getStatus()}">Status</td>
+            <td th:text="${invoice.getContract().getCompany().getName()}">Company</td>
+            <td th:text="${invoice.getContract().getProduct().getName()}">Service</td>
+            <td>
+                <button th:if="${invoice.getStatus()}!=${invoice.status.PAID}" th:id="${invoice.getId()}"
+                        class="btn btn-danger" onclick="payInvoice(this)">PAY
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="alert_success" class="alert alert-success alert-dismissible fade in">
+    <div id="approval_info">
+        <strong id="confirm_alert_message"></strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+</div>
+<div id="alert_error" class="alert alert-danger alert-dismissible fade in">
+    <div id="alert_error_info">
+        <strong id="error_alert_message"></strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+</div>
+<script src="/js/loadbalance.js"></script>
+<script src="/js/user-websock.js"></script>
+<script src="/js/customer-sock-distribute.js"></script>
+<script src="/js/invoice-payment.js"></script>
+</body>
+</html>

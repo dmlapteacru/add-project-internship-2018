@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Invoices</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/header.css"/>
+    <link rel="stylesheet" href="/css/table-filter.css">
+    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
+    <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js" integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe" crossorigin="anonymous"></script>
+    <script src="/js/table-filter.js"></script>
+    <script th:src="@{/js/moment.js}"></script>
+
+    <style>
+        .row_issued_color{
+            background: #c8f8ff;
+        }
+        .row_sent_color{
+            background: #fff0a8;
+        }
+        .row_paid_color{
+            background: #a4ffb0;
+        }
+        .row_overdue_color{
+            background: #ffacb3;
+        }
+
+        .text_issued_color{
+            font-weight: 800;
+            color: #283dff;
+
+        }
+        .text_sent_color{
+            font-weight: 800;
+            color: #ffa325;
+        }
+        .text_paid_color{
+            font-weight: 800;
+            color: #0d9d17;
+        }
+        .text_overdue_color{
+            font-weight: 800;
+            color: #fa100a;
+        }
+    </style>
+
+    <script>
+
+        $(document).ready(function () {
+            console.log("document ready")
+            $("table.table tbody input[type=checkbox]").change(function () {
+                calculateTotalSum();
+            });
+            $("#btn_delete_invoice").on("click",function () {
+                console.log("delete button");
+                console.log($('#delete_inv_hidd_id').val());
+                console.log('delete_invoice_id:  '+ $('#delete_inv_hidd_id').val());
+                var id =$('#delete_inv_hidd_id').val();
+                console.log(JSON.stringify(id));
+                console.log(JSON.stringify({"id": parseFloat(id)}))
+                $.ajax(
+                    {
+                        url: "/restinvoice/deleteInvoice",
+                        type: "POST",
+                        data: {"invoiceId": id},
+                        success: function () {
+                            console.log("deleted successfully");
+                            $("#row"+id).remove();
+                            $("#modalDeleteConfirm").modal("hide");
+                        },
+                        error: function (errMsg, a, b) {
+                            alert("Please call admins")
+                            console.log("fail")
+                            console.log(errMsg)
+                            console.log(a)
+                            console.log(b)
+                        }
+                    }
+                )
+            });
+        })
+
+        function selectAllCheckBoxes() {
+            var selectedRows = $('table.table tbody input[type=checkbox]');
+            console.log($("#check_all"));
+            if ($("#check_all").prop("checked")) {
+
+                for (var i = 0; i < selectedRows.length; i++) {
+                    selectedRows[i].checked = true;
+                }
+                calculateTotalSum();
+            } else {
+                for (var i = 0; i < selectedRows.length; i++) {
+                    selectedRows[i].checked = false;
+                }
+                calculateTotalSum();
+            }
+        }
+
+
+
+        function calculateTotalSum() {
+            var selectedRows = $('table.table tbody input[type=checkbox]:checked');
+            var ids = [];
+            for (var i = 0; i < selectedRows.length; i++) {
+                ids.push(selectedRows[i].id);
+            }
+            var totalSum = 0;
+            ids.forEach(function (id) {
+                totalSum += parseFloat($("#sum" + id).text());
+            });
+            $('#total_sum').text(totalSum.toFixed(2));
+
+        }
+
+        function editInvoice(elementFromView) {
+            console.log(elementFromView);
+            var id = elementFromView.id;
+            var issueDate = $("#issueDate" + id).text();
+            var dueDate = $("#dueDate" + id).text();
+            console.log(dueDate);
+            var sum = $("#sum" + id).text();
+            console.log(sum);
+            var fullName = $("#fullName" + id).text();
+            console.log(fullName);
+
+            console.log(moment(issueDate, 'DD-MM-YYYY').format('YYYY-MM-DD'));
+            console.log(moment(dueDate, 'DD-MM-YYYY').format('YYYY-MM-DD'));
+            $("#input_invoice_id").text(id);
+            $("#input_issue_date").val(moment(issueDate, 'DD-MM-YYYY').format('YYYY-MM-DD'));
+            $("#input_due_date").val(moment(dueDate, 'DD-MM-YYYY').format('YYYY-MM-DD'));
+            $("#input_sum").val(sum);
+            $("#input_full_name").text(fullName);
+
+            $("#editInvoiceDialog").modal();
+        }
+
+        function editAjax(data) {
+            $.ajax({
+                type: "POST",
+                url: "/restinvoice/createInvoice",
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                success: function (response) {
+                    $("#dueDate" + data.id).text(moment(data.dueDate, 'YYYY-MM-DD').format('DD-MM-YYYY'));
+                    $("#sum" + data.id).text(data.sum);
+                    $("#editInvoiceDialog").modal('hide')
+                },
+                error: function (errMsg, a, b) {
+                    alert("Please call admins")
+                    console.log("fail")
+                    console.log(errMsg)
+                    console.log(a)
+                    console.log(b)
+                }
+            });
+        }
+
+        function editInvoiceButton() {
+            var id = $("#input_invoice_id").text();
+            var dueDate = $("#input_due_date").val();
+            var sum = $("#input_sum").val();
+            var data = {
+                sum: sum, dueDate: dueDate, id: id
+            };
+            editAjax(data);
+        }
+
+            function deleteInvoice(btn) {
+            $('#modalDeleteConfirm').modal('show');
+            console.log('Invoice_id to be deleted   '+btn.id);
+            $('#delete_inv_hidd_id').val(btn.id);
+        }
+
+        function sendBulkInvoices() {
+            var selectedRows = $('table.table tbody input[type=checkbox]:checked');
+            if(selectedRows.length == 0){$("#modalBulkNoInvoiceSelected").modal();}
+
+            console.log('selectedRows:', selectedRows);
+            var ids = [];
+            for(var i = 0; i < selectedRows.length; i++){
+                ids.push(selectedRows[i].id);
+            }
+            var invIDS={invoiceIDS : ids}
+            $.ajax(
+                {
+                    url: "/restinvoice/sendBulkToCustomer",
+                    type: "POST",
+                    data: JSON.stringify(invIDS),
+                    contentType: "application/json; charset=utf-8",
+                    success: function () {
+                        console.log("Success !!!")
+                        for (var i=0; i<ids.length; i++){
+                            // $("#row"+ids[i]).remove();
+                            $('#row' + ids[i] +" .btn-danger").remove();
+                            $('#row' + ids[i]).find(".btn.btn-success").remove();
+                            $('#row' + ids[i]).find("input[type='checkbox']").remove();
+                            $('#status'+ids[i]).removeClass('text_issued_color');
+                            $('#status'+ids[i]).addClass('text_sent_color');
+                        }
+                        calculateTotalSum();
+                    },
+                    error: function (errMsg, a, b) {
+                        alert("Please call admins")
+                        console.log("fail")
+                        console.log(errMsg)
+                        console.log(a)
+                        console.log(b)
+                    }
+                }
+            )
+        }
+
+        function sendInvoiceToCustomer(invoice) {
+            var id = invoice.id;
+            $.ajax(
+                {
+                    url: "/restinvoice/sendToCustomer",
+                    type: "POST",
+                    data: {"invoiceId": id},
+                    success: function () {
+                        console.log("Success !!!")
+                        $('#status'+id).text("SENT");
+                        $('#row'+id +" .btn-danger").remove();
+                        $('#row'+id).find(".btn.btn-success").remove();
+                        $('#row'+id).find("input[type='checkbox']").remove();
+                        $('#status'+id).removeClass('text_issued_color');
+                        $('#status'+id).addClass('text_sent_color');
+                        calculateTotalSum();
+                    },
+                    error: function (errMsg, a, b) {
+                        alert("Please call admins")
+                        console.log("fail")
+                        console.log(errMsg)
+                        console.log(a)
+                        console.log(b)
+                    }
+                }
+            )
+        }
+
+    </script>
+
+</head>
+
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<div class="panel panel-default panel-no-border">
+    <div class="panel-body">
+        <form class="pull-right"
+              th:object="${filter}"
+              th:action="@{/company/invoices/filtered}"
+              method="post">
+            <div class="form-row">
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_status">status</label>
+                    <select id="adv_filter_status" class="form-control input-sm" th:field="*{invoiceStatus}">
+                        <option value="">--all--</option>
+                        <option th:each="currStatus : ${statusListForFilter}"
+                                th:value="${currStatus.name()}"
+                                th:text="${currStatus.toString()}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_sumFrom">sum from</label>
+                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumFrom" type="number"
+                           th:field="*{sumFrom}"
+                           placeholder="sum from" required/>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_sumTo">sum to</label>
+                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumTo" type="number"
+                           th:field="*{sumTo}"
+                           placeholder="sum to" required/>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_date_from">date from</label>
+                    <input type="date" id="adv_filter_date_from" class="form-control input-sm"
+                           th:field="*{dateFrom}"/>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_date_to">date to</label>
+                    <input type="date" id="adv_filter_date_to" class="form-control input-sm"
+                           th:field="*{dateTo}"/>
+                </div>
+
+                <div class="col-md-2 mb-3">
+                    <button type="submit" class="btn btn-info btn-sm">apply
+                        <span class="glyphicon glyphicon-filter"></span>
+                    </button>
+                    <a th:href="@{/company/invoices}"
+                       class="btn btn-default btn-sm">clear</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="editInvoiceDialog" role="dialog">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Edit current Invoice</h4>
+            </div>
+            <form>
+                <div class="modal-body">
+
+                    <label>Invoice ID</label>
+                    <p id="input_invoice_id" class="form-control"></p>
+                    <label>Issue Date</label>
+                    <input id="input_issue_date" class="form-control" type="date">
+                    <label>Expire Date</label>
+                    <input id="input_due_date" class="form-control" type="date">
+                    <label>Sum</label>
+                    <input id="input_sum" class="form-control" type="number">
+                    <label>Full Name</label>
+                    <p id="input_full_name" class="form-control"></p>
+
+                </div>
+                <div class="modal-footer modal_btn">
+                    <button id="save_btn" onclick="editInvoiceButton()" type="button" class="btn btn-success">Save
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade" id="modalDeleteConfirm" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Are you sure you want delete?</h4>
+                <input id="delete_inv_hidd_id" type="text" hidden="hidden"/>
+            </div>
+            <div class="modal-footer modal_btn">
+                <button type="button" style="display: none;" class="btn"></button>
+                <button id="btn_delete_invoice" type="button" class="btn btn-danger">Delete</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalBulkNoInvoiceSelected" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">No one INVOICE is selected</h4>
+            </div>
+            <div class="modal-footer modal_btn">
+                <button type="button" style="display: none;" class="btn"></button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--<div class="container">-->
+
+<div class="panel panel-primary filterable">
+    <div class="panel-heading">
+        <h3 class="panel-title">Invoices</h3>
+        <div class="pull-right">
+            <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter
+            </button>
+        </div>
+    </div>
+    <table class="table table-striped">
+        <thead >
+        <div>
+           <p class="form-control pt-3">Total Sum: <span id="total_sum"  >0.0</span> </p>
+        </div>
+
+        <tr class="filters">
+            <th hidden="hidden"><input type="text" class="form-control" placeholder="Invoice_id" disabled ></th>
+            <th><input type="checkbox" onclick="selectAllCheckBoxes()" th:id="check_all" name="sel"/></th>
+            <th><input type="text" class="form-control" placeholder="Issue Date" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Expire Date" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
+            <!--<th><input type="text" class="form-control" placeholder="Status" disabled></th>-->
+            <th>
+                <select class="sel_status_invoice" disabled>
+                    <option selected value="Status_INV">Status</option>
+                    <option>PAID</option>
+                    <option>SENT</option>
+                    <option>OVERDUE</option>
+                    <option>ISSUED</option>
+                </select>
+            </th>
+            <th><input type="text" class="form-control" placeholder="Customer Name" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Service Name" disabled></th>
+            <th><input type="text" class="form-control" placeholder="" disabled></th>
+            <th><input type="text" class="form-control" placeholder="" disabled></th>
+
+            </tr>
+            </thead>
+
+            <tbody class="filter_body">
+            <!--<tr th:classappend="${(invoice.getStatus().name() == 'ISSUED')? 'bg-primary': (invoice.getStatus().name() == 'SENT') ? 'bg-warning': (invoice.getStatus().name() == 'PAID')?'bg-success':'bg-danger'}"  th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">-->
+            <tr th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">
+                <!--th:classappend="|${(invoice.getStatus().name() == 'ISSUED') ? 'row_issued_color':''}-->
+                <!--${(invoice.getStatus().name() == 'SENT') ? 'row_sent_color':''}-->
+                <!--${(invoice.getStatus().name() == 'PAID')?'row_paid_color':''}-->
+                <!--${(invoice.getStatus().name() == 'OVERDUE')?'row_overdue_color':''} |"-->
+
+                <td th:id="invoice_id_hidd" th:text="${invoice.getId()}" style="display: none;"></td>
+                <td>
+                    <input th:if="${invoice.getStatus().name() == 'ISSUED'}" type="checkbox" th:id="${invoice.getId()}" name="sel"/></td>
+                <td th:id="${'issueDate'+invoice.getId()}"
+                    th:text="${#temporals.format(invoice.getIssueDate(), 'dd-MM-yyyy')} "> Issue Date
+                </td>
+                <td class="table-primary" th:id="${'dueDate'+invoice.getId()}" th:text="${#temporals.format(invoice.getDueDate(), 'dd-MM-yyyy')} ">Expire Date</td>
+                <td th:id="${'sum'+invoice.getId()}" th:text="${#numbers.formatDecimal(invoice.getSum(),1,2)+' MDL'}">Sum</td>
+                <td class="filter_status_invoice" th:id="${'status'+invoice.getId()}" th:text="${invoice.getStatus()}"
+                    th:classappend="|${(invoice.getStatus().name() == 'ISSUED') ? 'text_issued_color':''}
+                ${(invoice.getStatus().name() == 'SENT') ? 'text_sent_color':''}
+                ${(invoice.getStatus().name() == 'PAID')?'text_paid_color':''}
+                ${(invoice.getStatus().name() == 'OVERDUE')?'text_overdue_color':''} |">
+                    <!--th:class="${invoice.getStatus() == 'ACTIVE'} ? 'success' : (${invoice.getStatus() == 'ISSUED'} ? 'warning' : 'red')"-->
+                </td>
+                <td th:id="${'contract_id'+invoice.getId()}" th:text="${invoice.getContract().getCustomer().getFullName()}">Customer Name</td>
+                <td th:id="${'fullName'+invoice.getId()}" th:text="${invoice.getContract().getProduct().getName()}">
+                    Service Name
+                </td>
+                <td>
+                    <a th:if="${invoice.getStatus().name() == 'ISSUED'}" th:id="${invoice.id}" onclick="deleteInvoice(this)" class="btn btn-sm btn-danger">DELETE</a>
+                </td>
+                <td>
+                    <button th:id="${invoice.getId()}" th:if="${invoice.getStatus().name() == 'ISSUED'}" onclick="sendInvoiceToCustomer(this)" class="btn btn-sm btn-success" >SEND</button>
+                </td>
+            </tr>
+            <!--invoice.getSum()+' MDL'-->
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                    <button class="btn btn-warning" onclick="sendBulkInvoices()">BULK SEND</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    <!--</div>-->
+
+
+</div>
+
+<script src="/js/loadbalance.js"></script>
+<script src="/js/user-websock.js"></script>
+<script src="/js/customer-sock-distribute.js"></script>
+<script type="text/javascript">
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,401 @@
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    padding: 3px;
+}
+.main_wrapper{
+    display: flex;
+    flex-direction: column;
+    padding: 15px 15px 0 15px;
+    height: 100vh;
+}
+.logout_form {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 25px;
+}
+.logout_form>img {
+    width: 140px;
+    height: 45px;
+}
+.logout_btn_wrap {
+    display: flex;
+    flex-direction: row-reverse;
+}
+.time-date {
+    margin-right: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.btn{
+    margin-bottom:5px;
+}
+.body_wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+}
+
+.menu_wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 15%;
+    border-top: #319e5c 1px solid;
+}
+
+.info_wrapper {
+    display: flex;
+    width: 85%;
+    height: 100%;
+    border-top: #319e5c 1px solid;
+    border-left: #319e5c 1px solid;
+}
+
+/* Style tab links */
+.tablink {
+    background-color: #fff;
+    color: #319e5c;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 10px 10px;
+    font-size: 14px;
+}
+.sub_tablink {
+    font-size: 12px;
+    background-color: rgba(49, 158, 92, 0.2);
+    display: none;
+}
+.sub_tablink_active{
+    background-color: rgba(49, 158, 92, 0.5);
+}
+
+.sub_tablink_active:before{
+    content: '> ';
+    margin-right: 2px;
+}
+
+.tablink_active {
+    color: #fff;
+    background-color: #319e5c;
+}
+.tablink:hover {
+    background-color: #e8e8e8;
+}
+
+.tablink_active:hover {
+    color: #fff;
+    background-color: #319e5c;
+}
+.tabcontent {
+    display: none;
+    height: 100%;
+    width: 100%;
+}
+.tabcontent_active {
+    display: block;
+}
+#users {
+    display: block;
+}
+
+.modal_body_category {
+    display: flex;
+    flex-direction: column;
+}
+.modal-body > input{
+    border: 1px solid #cccccc;
+    border-radius: 3px;
+    padding: 5px;
+}
+.modal-body > select{
+    border: 1px solid #cccccc;
+    border-radius: 3px;
+    padding: 5px;
+}
+.delete_category_pencil {
+    cursor: pointer;
+}
+
+.edit_category_pencil {
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+a{
+    cursor: pointer;
+}
+#table-messages td:nth-child(2){
+    width: 5%;
+}
+#table-messages td:nth-child(3){
+    width: 25%;
+}
+#table-messages td:nth-child(4){
+    width: 50%;
+}
+.circle{
+    position: relative;
+    cursor: pointer;
+    display: none;
+    width: 11px;
+    height: 11px;
+    border: 1px solid green;
+    border-radius: 50%;
+}
+.circle_active {
+    cursor: pointer;
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border: 1px solid green;
+    border-radius: 50%;
+    background-color: green;
+}
+.circle > span {
+    font-weight: normal;
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 140%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.8s;
+}
+
+.circle>span::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border: 5px solid;
+    border-color: #555 transparent transparent transparent;
+}
+.circle:hover > span{
+    visibility: visible;
+    opacity: 1;
+}
+#table-messages > tbody > tr:hover .circle{
+    display: inline-block;
+}
+#table-messages > tbody > tr:hover{
+    cursor: pointer;
+    background-color: #e8e8e8;
+}
+.unread_message_bold {
+    font-weight: bold;
+}
+
+.alert {
+    position: absolute;
+    display: none;
+    top: 35px;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+}
+#load {
+    position: absolute;
+    display: block;
+    top: 50%;
+    left: 50%;
+    width: 75px;
+    height: 75px;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+.change_status_all_btn_wrapper{
+    display: flex;
+
+}
+.checkbox_users_wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.change_status_all_btn_mess, .change_status_all_btn {
+    position: relative;
+    display: none;
+}
+.change_status_all_btn_mess > span, .change_status_all_btn > span {
+    font-weight: normal;
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 140%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.8s;
+}
+
+.change_status_all_btn_mess>span::after, .change_status_all_btn > span::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border: 5px solid;
+    border-color: #555 transparent transparent transparent;
+}
+.change_status_all_btn_mess:hover > span, .change_status_all_btn:hover > span{
+    visibility: visible;
+    opacity: 1;
+}
+.btn-status-change {
+    margin: 5px 0 0 5px;
+}
+.notification_link {
+    position: relative;
+}
+.notification_body {
+    display: none;
+    font-weight: normal;
+    font-size: 12px;
+    visibility: visible;
+    width: 400px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px;
+    position: absolute;
+    z-index: 1;
+    top: 125%;
+    left: -200%;
+    /*margin-left: -60px;*/
+    opacity: 1;
+    transition: opacity 0.8s;
+}
+#notification_ {
+    display: flex;
+    flex-direction:column-reverse;
+}
+.visible {
+    visibility: visible;
+    opacity: 1;
+}
+.notification_body::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 57%;
+    margin-left: -5px;
+    border: 5px solid;
+    border-color:  transparent  transparent #555 transparent;
+}
+.notification_wrapper{
+    display: flex;
+    flex-direction:column;
+    justify-content:center;
+}
+.notification_icon {
+    position: relative;
+    padding: 2px 2px;
+    border: 1px solid #f4a742;
+    border-radius: 4px;
+    background-color: #f4a742;
+    display: flex;
+    justify-content: center;
+    font-size: 12px;
+    color: #fff;
+    margin: 2px;
+    visibility: hidden;
+}
+.notification_icon::after {
+    content: "";
+    position: absolute;
+    width: 15px;
+    height: 22px;
+    border: 0px solid #f4a742;
+    border-radius: 6px;
+    top: -2px;
+
+}
+@keyframes example {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.5);
+    }
+}
+@keyframes example {
+    from {
+        transform: scale(1.5);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+.cue {
+    animation-name: example;
+    animation-duration: 1s;
+}
+.notification {
+    display: flex;
+
+}
+.notification_link {
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+}
+
+.notification_item {
+    display: flex;
+    justify-content:space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #ccc;
+}
+.notification_item > a{
+    font-size: 15px;
+    color: #fff;
+}
+.notification_item > a:hover{
+    text-decoration: none;
+    transform: scale(1.5);
+}
+.notification_item>span{
+    margin-right: 5px;
+}
+.notification_view_all > button{
+    background-color: transparent;
+    border: none;
+
+}
+.notification_view_all > button:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.act{
+    background-color: #aaa;
+}
+
+.not_case:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
