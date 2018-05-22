@@ -15,7 +15,9 @@
     <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js" integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe" crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"
+            integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe"
+            crossorigin="anonymous"></script>
     <script src="/js/table-filter.js"></script>
 </head>
 
@@ -27,25 +29,48 @@
 <div class="panel panel-default panel-no-border">
     <div class="panel-body">
         <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalService"
-           class="btn btn-info btn-sm" role="button" onclick="getCategories()">Create new service</a>
-        <a sec:authorize="hasAuthority('CUSTOMER')" th:href="@{/servicesRest/pdfExport}"
-           class="btn btn-info btn-sm" role="button">Download as PDF</a>
-        <form class="form-inline pull-right"
-              th:object="${filter}"
-              th:action="${ownerType=='customer'} ? @{/customer/services/filtered} : @{/company/services/filtered}"
-              method="post">
-            <div class="form-group">
-                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumFrom}"
-                       placeholder="sum from" required/>
-                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumTo}"
-                       placeholder="sum to" required/>
+           class="btn btn-info btn-sm pull-left" role="button" onclick="getCategories()">Create new service</a>
+        <div sec:authorize="hasAuthority('CUSTOMER')" class="dropdown pull-left">
+            <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="priceListMenu" data-toggle="dropdown">
+                Download price-list
+                <span class="caret"></span></button>
+            <ul class="dropdown-menu dropdown-menu-left" role="menu" aria-labelledby="priceListMenu">
+                <li role="presentation">
+                    <a role="menuitem" tabindex="-1"
+                       th:href="@{/productRest/pdfExport(products=null)}">all available services</a>
+                </li>
+                <li role="presentation">
+                    <a role="menuitem" tabindex="-1"
+                       onclick="getPriceListAsPDF()">selected services</a>
+                </li>
+            </ul>
+        </div>
+
+        <form class="pull-right" th:object="${filter}" method="post"
+              th:action="${ownerType=='customer'} ? @{/customer/services/filtered} : @{/company/services/filtered}">
+            <div class="form-row">
+                <div class="col-md-3 mb-3">
+                    <label for="adv_filter_sumFrom">sum from</label>
+                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumFrom" type="number"
+                           th:field="*{sumFrom}"
+                           placeholder="sum from" required/>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="adv_filter_sumTo">sum to</label>
+                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumTo" type="number"
+                           th:field="*{sumTo}"
+                           placeholder="sum to" required/>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <button type="submit" class="btn btn-info btn-sm">apply
+                        <span class="glyphicon glyphicon-filter"></span>
+                    </button>
+                    <a th:href="${ownerType=='customer'} ? @{/customer/services} : @{/company/services}"
+                       class="btn btn-default btn-sm">clear</a>
+                </div>
             </div>
-            <button type="submit" class="btn btn-info btn-sm">apply
-                <span class="glyphicon glyphicon-filter"></span>
-            </button>
-            <a th:href="${ownerType=='customer'} ? @{/customer/services} : @{/company/services}"
-               class="btn btn-default btn-sm">clear</a>
         </form>
+
     </div>
 </div>
 
@@ -62,6 +87,7 @@
     <table class="table table-condensed table-hover">
         <thead>
         <tr class="filters">
+            <th></th>
             <th>
                 <select class="form-control sel_category" id="selectFilter" disabled>
                     <option selected value="Category">Category</option>
@@ -81,6 +107,12 @@
         </thead>
         <tbody class="filter_body">
         <tr th:each="product : ${products}" th:id="'row'+${product.getId()}">
+
+            <td>
+                <label>
+                    <input type="checkbox" id="selected_for_priceList" th:value="${product.getId()}">
+                </label>
+            </td>
 
             <td class="filter_category" th:id="categoryId" th:value="${product.getCategory().getId()}"
                 th:text="${product.getCategory().getName()}">category
@@ -116,46 +148,63 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Create new Service</h4>
+                <h4 class="modal-title">Service details:</h4>
             </div>
-            <form>
-                <div class="modal-body modal_body_category">
+            <div class="modal-body modal_body_category">
+
+                <form class="form-horizontal">
+
                     <p id="company_id" sec:authorize="hasAuthority('COMPANY')"
                        th:text="${companyId}" style="display: none"></p>
                     <!--<input id="new_category_id" type="text" hidden="hidden"/>-->
 
                     <div class="form-group">
-                        <label>Category name</label>
-                        <select id="select_category" class="form-control">
-                            <option id="0">--select--</option>
-                        </select>
-                        <p id="select_categoryError" style="color: red; display: none"> validation error</p>
+                        <label class="col-sm-3 control-label">Category</label>
+                        <div class="col-sm-7">
+                            <select id="select_category" class="form-control">
+                                <option id="0">--select--</option>
+                            </select>
+                            <p id="select_categoryError" style="color: red; display: none"> validation error</p>
+                        </div>
                     </div>
+
                     <div class="form-group">
-                        <label>Name</label>
-                        <input id="new_service_name" class="form-control" type="text" required="required"/>
-                        <p id="new_service_nameError" style="color: red; display: none"> validation error</p>
+                        <label class="col-sm-3 control-label">Name</label>
+                        <div class="col-sm-7">
+                            <input id="new_service_name" class="form-control" type="text" required="required"/>
+                            <p id="new_service_nameError" style="color: red; display: none"> validation error</p>
+                        </div>
                     </div>
+
                     <div class="form-group">
-                        <label>Price</label>
-                        <input id="new_service_price" class="form-control" type="number" min="0" step="0.01" value="0.00"
-                               required="required"/>
-                        <p id="new_service_priceError" style="color: red;display: none"> validation error</p>
+                        <label class="col-sm-3 control-label">Price</label>
+                        <div class="col-sm-7">
+                            <input id="new_service_price" class="form-control" type="number" min="0" step="0.01"
+                                   value="0.00"
+                                   required="required"/>
+                            <p id="new_service_priceError" style="color: red;display: none"> validation error</p>
+                        </div>
                     </div>
+
                     <div class="form-group">
-                        <label>Description</label>
-                        <input id="new_service_desc" class="form-control" type="text" required="required"/>
-                        <p id="new_service_descError" style="color: red; display: none"> validation error</p>
+                        <label class="col-sm-3 control-label">Description</label>
+                        <div class="col-sm-7">
+                            <textarea id="new_service_desc" class="form-control" required="required"></textarea>
+                            <p id="new_service_descError" style="color: red; display: none"> validation error</p>
+                        </div>
                     </div>
 
                     <p id="error_service" style="color: red"></p>
-                </div>
-                <div class="modal-footer modal_btn">
-                    <button type="button" style="display: none;" class="btn"></button>
-                    <button id="save_btn_service" type="submit" class="btn btn-success">Save</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </form>
+                    <div class="form-group">
+                        <div class="col-sm-7 col-xs-offset-3">
+                            <button type="button" style="display: none;" class="btn"></button>
+                            <button id="save_btn_service" type="submit" class="btn btn-success">Save</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -428,6 +477,26 @@
             $('#select_category').parent().removeClass('has-error');
             $('#select_categoryError').hide();
         });
+        $('#new_issueDate').parent().removeClass('has-error');
+        $('#new_issueDateError').hide();
+        $('#new_expireDate').parent().removeClass('has-error');
+        $('#new_expireDateError').hide();
+        $('#new_service_name').parent().removeClass('has-error');
+        $('#new_service_nameError').hide();
+        $('#new_service_price').parent().removeClass('has-error');
+        $('#new_service_priceError').hide();
+        $('#new_service_desc').parent().removeClass('has-error');
+        $('#new_service_descError').hide();
+        $('#select_category').parent().removeClass('has-error');
+        $('#select_categoryError').hide();
+    }
+
+    function getPriceListAsPDF() {
+        var productIds = [];
+        $(".table input:checkbox:checked").each(function () {
+            productIds.push($(this).val());
+        });
+        window.location = '/productRest/pdfExport?products=' + productIds;
     }
 
 </script>

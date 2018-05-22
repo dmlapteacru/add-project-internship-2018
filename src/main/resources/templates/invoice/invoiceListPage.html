@@ -27,37 +27,52 @@
 
 <div class="panel panel-default panel-no-border">
     <div class="panel-body">
-        <form class="form-inline pull-right"
+        <form class="pull-right"
               th:object="${filter}"
               th:action="@{/customer/invoices/filtered}"
               method="post">
-            <div class="form-group">
-                <select id="adv_filter_status" class="form-control input-sm" th:field="*{invoiceStatus}">
-                    <option value="">--all--</option>
-                    <option th:each="currStatus : ${statusListForFilter}"
-                            th:value="${currStatus.name()}"
-                            th:text="${currStatus.toString()}">
-                    </option>
-                </select>
-            </div>
-            <div class="form-group">
-                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumFrom}"
-                       placeholder="sum from" required/>
-                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumTo}"
-                       placeholder="sum to" required/>
-            </div>
-            <div class="form-group">
-                <input type="date" id="adv_filter_date_from" class="form-control input-sm col-sm-2"
-                       th:field="*{dateFrom}"/>
-                <input type="date" id="adv_filter_date_to" class="form-control input-sm col-sm-2"
-                       th:field="*{dateTo}"/>
-            </div>
+            <div class="form-row">
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_status">status</label>
+                    <select id="adv_filter_status" class="form-control input-sm" th:field="*{invoiceStatus}">
+                        <option value="">--all--</option>
+                        <option th:each="currStatus : ${statusListForFilter}"
+                                th:value="${currStatus.name()}"
+                                th:text="${currStatus.toString()}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_sumFrom">sum from</label>
+                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumFrom" type="number"
+                           th:field="*{sumFrom}"
+                           placeholder="sum from" required/>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_sumTo">sum to</label>
+                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumTo" type="number"
+                           th:field="*{sumTo}"
+                           placeholder="sum to" required/>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_date_from">date from</label>
+                    <input type="date" id="adv_filter_date_from" class="form-control input-sm"
+                           th:field="*{dateFrom}"/>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_date_to">date to</label>
+                    <input type="date" id="adv_filter_date_to" class="form-control input-sm"
+                           th:field="*{dateTo}"/>
+                </div>
 
-            <button type="submit" class="btn btn-info btn-sm">apply
-                <span class="glyphicon glyphicon-filter"></span>
-            </button>
-            <a th:href="@{/customer/invoices}"
-               class="btn btn-default btn-sm">clear</a>
+                <div class="col-md-2 mb-3">
+                    <button type="submit" class="btn btn-info btn-sm">apply
+                        <span class="glyphicon glyphicon-filter"></span>
+                    </button>
+                    <a th:href="@{/customer/invoices}"
+                       class="btn btn-default btn-sm">clear</a>
+                </div>
+            </div>
         </form>
     </div>
 </div>
@@ -73,7 +88,8 @@
     <table class="table">
         <thead>
         <div class="bulk_btn_wrapper" style="display: none;">
-            <span>Total Sum: <span id="bulk_pay_sum" style="font-weight: bold;border: 1px solid #ddd; padding: 5px; border-radius: 3px;"></span> MDL</span>
+            <span>Total Sum: <span id="bulk_pay_sum"
+                                   style="font-weight: bold;border: 1px solid #ddd; padding: 5px; border-radius: 3px;"></span> MDL</span>
             <a id="bulk_pay_btn" class="btn btn-danger bulk_invoices_btn" style="width: 100px;">PAY</a>
         </div>
         <tr class="filters">
@@ -100,7 +116,8 @@
         </thead>
         <tbody class="filter_body">
         <tr th:each="invoice: ${invoices}" th:id="'row' + ${invoice.getId()}">
-            <td><input type="checkbox" th:value="${invoice.id}" th:if="${invoice.status}!=${invoice.status.PAID}" class="checkbox_invoice_element"/></td>
+            <td><input type="checkbox" th:value="${invoice.id}" th:if="${invoice.status}!=${invoice.status.PAID}"
+                       class="checkbox_invoice_element"/></td>
             <td id="invoice_date" th:text="${#temporals.format(invoice.issueDate, 'dd-MM-yyyy')} ">Issue Date</td>
             <td th:text="${#temporals.format(invoice.dueDate, 'dd-MM-yyyy')}">Expire Date</td>
             <td><span id="sum_to_pay" th:text="${invoice.sum}"></span><span> MDL</span></td>
@@ -108,7 +125,9 @@
             <td th:text="${invoice.getContract().getCompany().getName()}">Company</td>
             <td th:text="${invoice.getContract().getProduct().getName()}">Service</td>
             <td>
-                <button th:if="${invoice.getStatus()}!=${invoice.status.PAID}" th:id="${invoice.getId()}" class="btn btn-danger" onclick="payInvoice(this)">PAY</button>
+                <button th:if="${invoice.getStatus()}!=${invoice.status.PAID}" th:id="${invoice.getId()}"
+                        class="btn btn-danger" onclick="payInvoice(this)">PAY
+                </button>
             </td>
         </tr>
         </tbody>

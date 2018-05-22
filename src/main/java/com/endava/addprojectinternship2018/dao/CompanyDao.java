@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface CompanyDao extends JpaRepository<Company, Integer> {
 
-    List<Company> findAll();
+    List<Company> findAllByOrderByName();
 
     Optional<Company> findById(int id);
 
