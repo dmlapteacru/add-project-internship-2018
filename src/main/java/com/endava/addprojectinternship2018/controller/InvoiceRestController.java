@@ -42,7 +42,7 @@ public class InvoiceRestController {
     public ResponseEntity editNewInvoiceFrom(@RequestBody @Valid InvoiceEditDto dto, BindingResult result) {
         //TODO check if this invoice is of that company
         //TODO get invoice by id ,change data that comes from modal dialog
-        //TODO persist this entity
+
 
 
         if (result.hasErrors()) {
@@ -81,18 +81,11 @@ public class InvoiceRestController {
             success = false;
         }
 
-//        if (!list.isEmpty()){
-//            success = false;
-//        }
-
         if (success) {
             invoice.setIssueDate(dto.getIssueDate());
             invoice.setDueDate(dto.getDueDate());
             invoice.setStatus(dto.getStatus());
             invoice.setContract(contractService.getById(dto.getContractId()));
-
-//            System.out.println(contractService.getById(dto.getContractId()));
-
             invoice.setSum(dto.getSum());
 
 //            invoiceService.save(invoice);
@@ -114,7 +107,7 @@ public class InvoiceRestController {
 
         if (!list.isEmpty()) {
             response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("customer_inv_name", "Contract for active period already exists !"));
+            errorMessageList.add(new ErrorMessage("issue_inv_date", "Contract for active period already exists !"));
         }
 
         if (dto.getDueDate() == null) {

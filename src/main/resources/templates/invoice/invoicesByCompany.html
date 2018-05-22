@@ -31,6 +31,24 @@
         .row_overdue_color{
             background: #ffacb3;
         }
+
+        .text_issued_color{
+            font-weight: 800;
+            color: #283dff;
+
+        }
+        .text_sent_color{
+            font-weight: 800;
+            color: #ffa325;
+        }
+        .text_paid_color{
+            font-weight: 800;
+            color: #0d9d17;
+        }
+        .text_overdue_color{
+            font-weight: 800;
+            color: #fa100a;
+        }
     </style>
 
     <script>
@@ -184,8 +202,8 @@
                             $('#row' + ids[i] +" .btn-danger").remove();
                             $('#row' + ids[i]).find(".btn.btn-success").remove();
                             $('#row' + ids[i]).find("input[type='checkbox']").remove();
-                            $('#row'+ids[i]).removeClass('row_issued_color');
-                            $('#row'+ids[i]).addClass('bg-warning');
+                            $('#status'+ids[i]).removeClass('text_issued_color');
+                            $('#status'+ids[i]).addClass('text_sent_color');
                         }
                         calculateTotalSum();
                     },
@@ -213,8 +231,8 @@
                         $('#row'+id +" .btn-danger").remove();
                         $('#row'+id).find(".btn.btn-success").remove();
                         $('#row'+id).find("input[type='checkbox']").remove();
-                        $('#row'+id).removeClass('row_issued_color');
-                        $('#row'+id).addClass('row_sent_color');
+                        $('#status'+id).removeClass('text_issued_color');
+                        $('#status'+id).addClass('text_sent_color');
                         calculateTotalSum();
                     },
                     error: function (errMsg, a, b) {
@@ -347,7 +365,7 @@
             </button>
         </div>
     </div>
-    <table class="table">
+    <table class="table table-striped">
         <thead >
         <div>
            <p class="form-control pt-3">Total Sum: <span id="total_sum"  >0.0</span> </p>
@@ -379,7 +397,12 @@
 
             <tbody class="filter_body">
             <!--<tr th:classappend="${(invoice.getStatus().name() == 'ISSUED')? 'bg-primary': (invoice.getStatus().name() == 'SENT') ? 'bg-warning': (invoice.getStatus().name() == 'PAID')?'bg-success':'bg-danger'}"  th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">-->
-            <tr th:classappend="|${(invoice.getStatus().name() == 'ISSUED') ? 'row_issued_color':''} ${(invoice.getStatus().name() == 'SENT') ? 'row_sent_color':''} ${(invoice.getStatus().name() == 'PAID')?'row_paid_color':''} ${(invoice.getStatus().name() == 'OVERDUE')?'row_overdue_color':''} |"  th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">
+            <tr th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">
+                <!--th:classappend="|${(invoice.getStatus().name() == 'ISSUED') ? 'row_issued_color':''}-->
+                <!--${(invoice.getStatus().name() == 'SENT') ? 'row_sent_color':''}-->
+                <!--${(invoice.getStatus().name() == 'PAID')?'row_paid_color':''}-->
+                <!--${(invoice.getStatus().name() == 'OVERDUE')?'row_overdue_color':''} |"-->
+
                 <td th:id="invoice_id_hidd" th:text="${invoice.getId()}" style="display: none;"></td>
                 <td>
                     <input th:if="${invoice.getStatus().name() == 'ISSUED'}" type="checkbox" th:id="${invoice.getId()}" name="sel"/></td>
@@ -387,9 +410,14 @@
                     th:text="${#temporals.format(invoice.getIssueDate(), 'dd-MM-yyyy')} "> Issue Date
                 </td>
                 <td class="table-primary" th:id="${'dueDate'+invoice.getId()}" th:text="${#temporals.format(invoice.getDueDate(), 'dd-MM-yyyy')} ">Expire Date</td>
-                <td th:id="${'sum'+invoice.getId()}" th:text="${invoice.getSum()}">Sum</td>
+                <td th:id="${'sum'+invoice.getId()}" th:text="${#numbers.formatDecimal(invoice.getSum(),1,2)+' MDL'}">Sum</td>
                 <td class="filter_status_invoice" th:id="${'status'+invoice.getId()}" th:text="${invoice.getStatus()}"
-                    th:class="${invoice.getStatus() == 'ACTIVE'} ? 'success' : (${invoice.getStatus() == 'ISSUED'} ? 'warning' : 'red')"></td>
+                    th:classappend="|${(invoice.getStatus().name() == 'ISSUED') ? 'text_issued_color':''}
+                ${(invoice.getStatus().name() == 'SENT') ? 'text_sent_color':''}
+                ${(invoice.getStatus().name() == 'PAID')?'text_paid_color':''}
+                ${(invoice.getStatus().name() == 'OVERDUE')?'text_overdue_color':''} |">
+                    <!--th:class="${invoice.getStatus() == 'ACTIVE'} ? 'success' : (${invoice.getStatus() == 'ISSUED'} ? 'warning' : 'red')"-->
+                </td>
                 <td th:id="${'contract_id'+invoice.getId()}" th:text="${invoice.getContract().getCustomer().getFullName()}">Customer Name</td>
                 <td th:id="${'fullName'+invoice.getId()}" th:text="${invoice.getContract().getProduct().getName()}">
                     Service Name
@@ -401,6 +429,7 @@
                     <button th:id="${invoice.getId()}" th:if="${invoice.getStatus().name() == 'ISSUED'}" onclick="sendInvoiceToCustomer(this)" class="btn btn-sm btn-success" >SEND</button>
                 </td>
             </tr>
+            <!--invoice.getSum()+' MDL'-->
             <tr>
                 <td></td>
                 <td></td>

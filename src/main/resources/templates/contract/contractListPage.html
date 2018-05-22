@@ -191,6 +191,7 @@
                             <input type="date" class="form-control" id="issue_inv_date" required="required"/>
                             <p class="error-message" id="issue_inv_dateError" style="display: none"> validation
                                 error</p>
+
                         </div>
                     </div>
 
@@ -726,9 +727,9 @@
 
     function clearErrorsSecond() {
 
-            $('#customer_inv_name').focus(function () {
-                $('#customer_inv_name').parent().removeClass('has-error');
-                $('#customer_inv_nameError').hide();
+            $('#issue_inv_date').focus(function () {
+                $('#issue_inv_date').parent().removeClass('has-error');
+                $('#issue_inv_dateError').hide();
             })
 
             $('#expire_inv_date').focus(function () {
@@ -736,9 +737,9 @@
                 $('#expire_inv_dateError').hide();
             })
 
-            $('#customer_inv_nameError').hide();
+            $('#issue_inv_dateError').hide();
             $('#expire_inv_dateError').hide();
-            $('#customer_inv_name').parent().removeClass('has-error');
+            $('#issue_inv_date').parent().removeClass('has-error');
             $('#expire_inv_date').parent().removeClass('has-error');
 
     }
