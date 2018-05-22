@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Customer contracts list</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/table-filter.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/header.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/admin.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
+    <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"
+            integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe"
+            crossorigin="anonymous"></script>
+    <script src="/js/table-filter.js"></script>
+</head>
+
+<body>
+<div th:replace="fragments/header :: header">
+
+</div>
+
+<div class="panel panel-default panel-no-border">
+    <div class="panel-body">
+        <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalService"
+           class="btn btn-info btn-sm pull-left" role="button" onclick="getCategories()">Create new service</a>
+        <div sec:authorize="hasAuthority('CUSTOMER')" class="dropdown pull-left">
+            <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="priceListMenu" data-toggle="dropdown">
+                Download price-list
+                <span class="caret"></span></button>
+            <ul class="dropdown-menu dropdown-menu-left" role="menu" aria-labelledby="priceListMenu">
+                <li role="presentation">
+                    <a role="menuitem" tabindex="-1"
+                       th:href="@{/productRest/pdfExport(products=null)}">all available services</a>
+                </li>
+                <li role="presentation">
+                    <a role="menuitem" tabindex="-1"
+                       onclick="getPriceListAsPDF()">selected services</a>
+                </li>
+            </ul>
+        </div>
+
+        <form class="pull-right" th:object="${filter}" method="post"
+              th:action="${ownerType=='customer'} ? @{/customer/services/filtered} : @{/company/services/filtered}">
+            <div class="form-row">
+                <div class="col-md-3 mb-3">
+                    <label for="adv_filter_sumFrom">sum from</label>
+                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumFrom" type="number"
+                           th:field="*{sumFrom}"
+                           placeholder="sum from" required/>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="adv_filter_sumTo">sum to</label>
+                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumTo" type="number"
+                           th:field="*{sumTo}"
+                           placeholder="sum to" required/>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <button type="submit" class="btn btn-info btn-sm">apply
+                        <span class="glyphicon glyphicon-filter"></span>
+                    </button>
+                    <a th:href="${ownerType=='customer'} ? @{/customer/services} : @{/company/services}"
+                       class="btn btn-default btn-sm">clear</a>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<div class="panel panel-primary filterable">
+    <div class="panel-heading">
+        <h3 class="panel-title">Services</h3>
+        <div class="pull-right">
+            <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter
+            </button>
+        </div>
+    </div>
+    <input type="hidden" id="customerId" th:value="${customerId}">
+    <input type="hidden" id="customerName" th:value="${customerName}">
+    <table class="table table-condensed table-hover">
+        <thead>
+        <tr class="filters">
+            <th></th>
+            <th>
+                <select class="form-control sel_category" id="selectFilter" disabled>
+                    <option selected value="Category">Category</option>
+                    <option th:each="category : ${categoryList}"
+                            th:text="${category.getName()}">
+                    </option>
+                </select>
+            </th>
+            <th><input type="text" class="form-control" placeholder="Name" disabled></th>
+            <th sec:authorize="hasAuthority('CUSTOMER')">
+                <input type="text" class="form-control" placeholder="Company" disabled>
+            </th>
+            <th><input type="text" class="form-control" placeholder="Price" disabled></th>
+            <th><input type="text" class="form-control" placeholder="Description" disabled></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody class="filter_body">
+        <tr th:each="product : ${products}" th:id="'row'+${product.getId()}">
+
+            <td>
+                <label>
+                    <input type="checkbox" id="selected_for_priceList" th:value="${product.getId()}">
+                </label>
+            </td>
+
+            <td class="filter_category" th:id="categoryId" th:value="${product.getCategory().getId()}"
+                th:text="${product.getCategory().getName()}">category
+            </td>
+            <td th:id="productId" th:value="${product.getId()}"
+                th:text="${product.getName()}">name
+            </td>
+            <td sec:authorize="hasAuthority('CUSTOMER')" th:id="companyId"
+                th:value="${product.getCompany().getId()}"
+                th:text="${product.getCompany().getName()}">company
+            </td>
+            <td class="currency money" th:id="sum" th:value="${product.getPrice()}"
+                th:text="${#numbers.formatDecimal(product.getPrice(),1,2)}+' MDL'">price
+            </td>
+            <td th:id="description" th:value="${product.getDescription()}"
+                th:text="${product.getDescription()}">description
+            </td>
+
+            <td>
+                <a sec:authorize="hasAuthority('CUSTOMER')" data-toggle="modal" data-target="#modalContract"
+                   class="btn btn-info btn-sm" role="button" th:id="${product.getId()}"
+                   onclick="createNewContract(this)">create new contract</a>
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="modalService" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Service details:</h4>
+            </div>
+            <div class="modal-body modal_body_category">
+
+                <form class="form-horizontal">
+
+                    <p id="company_id" sec:authorize="hasAuthority('COMPANY')"
+                       th:text="${companyId}" style="display: none"></p>
+                    <!--<input id="new_category_id" type="text" hidden="hidden"/>-->
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Category</label>
+                        <div class="col-sm-7">
+                            <select id="select_category" class="form-control">
+                                <option id="0">--select--</option>
+                            </select>
+                            <p id="select_categoryError" style="color: red; display: none"> validation error</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Name</label>
+                        <div class="col-sm-7">
+                            <input id="new_service_name" class="form-control" type="text" required="required"/>
+                            <p id="new_service_nameError" style="color: red; display: none"> validation error</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Price</label>
+                        <div class="col-sm-7">
+                            <input id="new_service_price" class="form-control" type="number" min="0" step="0.01"
+                                   value="0.00"
+                                   required="required"/>
+                            <p id="new_service_priceError" style="color: red;display: none"> validation error</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Description</label>
+                        <div class="col-sm-7">
+                            <textarea id="new_service_desc" class="form-control" required="required"></textarea>
+                            <p id="new_service_descError" style="color: red; display: none"> validation error</p>
+                        </div>
+                    </div>
+
+                    <p id="error_service" style="color: red"></p>
+                    <div class="form-group">
+                        <div class="col-sm-7 col-xs-offset-3">
+                            <button type="button" style="display: none;" class="btn"></button>
+                            <button id="save_btn_service" type="submit" class="btn btn-success">Save</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalContract" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Contract details</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Issue date</label>
+                        <div class="col-sm-6">
+                            <input type="date" class="form-control" id="new_issueDate" required="required"/>
+                            <p class="error-message" id="new_issueDateError" style="display: none"> validation error</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Expire date</label>
+                        <div class="col-sm-6">
+                            <input type="date" class="form-control" id="new_expireDate" required="required"/>
+                            <p class="error-message" id="new_expireDateError" style="display: none">validation error</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Customer</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="new_customer" value="" readonly/>
+                            <input type="hidden" class="form-control" id="new_customerId"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Company</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="new_company" readonly/>
+                            <input type="hidden" class="form-control" id="new_companyId"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Service</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="new_product" value="" readonly/>
+                            <input type="hidden" class="form-control" id="new_productId"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Sum</label>
+                        <div class="col-sm-6">
+                            <input type="number" class="form-control" id="new_sum" readonly/>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Signature</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="new_status">
+                                <option selected>Signed</option>
+                                <option>Unsigned</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="alert-warning">
+                        <span id="new_contractError" style="display: none">validation error</span>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-6 col-xs-offset-3">
+                            <button type="submit" id="btn_save_contract" class="btn btn-info">Save</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalAlert" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 id="alertMessage"></h4>
+            </div>
+            <div class="modal-footer modal_btn">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+
+<script src="/js/loadbalance.js"></script>
+<script src="/js/user-websock.js"></script>
+<script src="/js/customer-sock-distribute.js"></script>
+<script>
+
+    function getCategories() {
+        clearErrors();
+        $("#new_service_name").val("");
+        $("#new_service_desc").val("");
+        $("#new_service_price").val("0.0");
+        $('#select_category').find('option').each(function () {
+            if ($(this).text() !== '--select--') {
+                $(this).remove();
+            }
+        });
+        $.ajax(
+            {
+                url: "/categories",
+                success: function (result) {
+                    loadCategories(result);
+                }
+            }
+        )
+    }
+
+    function loadCategories(data) {
+        $.each(data, function (id, object) {
+            var categoryID = object.id;
+            $.each(object, function (key, value) {
+                if (key == "name") {
+                    $("#select_category").append("<option id='" + categoryID + "'>" + value + "</option>")
+                }
+            });
+        });
+    }
+
+    $("#save_btn_service").click(function (event) {
+
+        event.preventDefault();
+
+        var newServiceData = {
+            "name": $("#new_service_name").val(),
+            "price": $("#new_service_price").val(),
+            "companyId": $("#company_id").text(),
+            "categoryId": $("#select_category").children(":selected").attr("id"),
+            "description": $("#new_service_desc").val()
+        }
+
+        $.ajax(
+            {
+                url: "/companyRest/newService",
+                type: "post",
+                contentType: "application/json",
+                data: JSON.stringify(newServiceData),
+                success: function (response) {
+                    if (response.status === 'FAIL') {
+                        var allErrors = response.errorMessageList;
+                        for (i = 0; i < allErrors.length; i++) {
+                            var currFieldName = allErrors[i].fieldName;
+                            $('#' + currFieldName).parent().addClass('has-error');
+                            $('#' + currFieldName + 'Error').text(allErrors[i].message);
+                            $('#' + currFieldName + 'Error').show();
+                        }
+                    } else {
+                        $('#modalService').modal('hide');
+                        location.reload();
+                    }
+                },
+                error: function (exception) {
+                    alert('Error: ' + exception);
+                }
+            }
+        )
+    })
+
+    function createNewContract(btn) {
+        clearErrors();
+        var row = $("#row" + btn.id);
+        var now = new Date();
+        var day = ("0" + now.getDate()).slice(-2);
+        var month = ("0" + (now.getMonth() + 1)).slice(-2);
+        var today = now.getFullYear() + "-" + (month) + "-" + (day);
+        $('#new_issueDate').val(today);
+        $('#new_expireDate').val(null);
+        $('#new_customer').val($('#customerName').val());
+        $('#new_customerId').val($("#customerId").val());
+        $('#new_company').val(row.find("#companyId").text());
+        $('#new_companyId').val(row.find("#companyId").attr('value'));
+        $('#new_product').val(row.find("#productId").text());
+        $('#new_productId').val(row.find("#productId").attr('value'));
+        $('#new_sum').val(row.find("#sum").attr('value'));
+    };
+
+    $("#btn_save_contract").click(function (event) {
+
+        event.preventDefault();
+        $('#alertMessage').text('');
+
+        var newContractData = {
+            "issueDate": $("#new_issueDate").val(),
+            "expireDate": $("#new_expireDate").val(),
+            "sum": $("#new_sum").val(),
+            "status": ($("#new_status").val() === 'Signed' ? "SIGNED_BY_CUSTOMER" : "UNSIGNED"),
+            "companyId": $("#new_companyId").val(),
+            "customerId": $("#new_customerId").val(),
+            "productId": $("#new_productId").val()
+        }
+
+        $.ajax(
+            {
+                url: "/contractRest/newContract",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(newContractData),
+                success: function (response) {
+
+                    if (response.status === 'FAIL') {
+                        var allErrors = response.errorMessageList;
+                        for (i = 0; i < allErrors.length; i++) {
+                            var currFieldName = allErrors[i].fieldName;
+                            var currErrorMessage = allErrors[i].message;
+                            $('#' + currFieldName).parent().addClass('has-error');
+                            $('#' + currFieldName + 'Error').text(currErrorMessage);
+                            $('#' + currFieldName + 'Error').show();
+                        }
+                    } else {
+                        $('#modalContract').modal('hide');
+                        $('#alertMessage').text('New contract was added successful');
+                        $('#modalAlert').modal('show');
+                    }
+                },
+
+                error: function (exception) {
+                    alert('Error: ' + exception);
+
+                }
+            }
+        )
+    });
+
+    function clearErrors() {
+        $('#new_issueDate').focus(function () {
+            $('#new_issueDate').parent().removeClass('has-error');
+            $('#new_issueDateError').hide();
+        });
+        $('#new_expireDate').focus(function () {
+            $('#new_expireDate').parent().removeClass('has-error');
+            $('#new_expireDateError').hide();
+        });
+        $('#new_service_name').focus(function () {
+            $('#new_service_name').parent().removeClass('has-error');
+            $('#new_service_nameError').hide();
+        });
+        $('#new_service_price').focus(function () {
+            $('#new_service_price').parent().removeClass('has-error');
+            $('#new_service_priceError').hide();
+        });
+        $('#new_service_desc').focus(function () {
+            $('#new_service_desc').parent().removeClass('has-error');
+            $('#new_service_descError').hide();
+        });
+        $('#select_category').focus(function () {
+            $('#select_category').parent().removeClass('has-error');
+            $('#select_categoryError').hide();
+        });
+        $('#new_issueDate').parent().removeClass('has-error');
+        $('#new_issueDateError').hide();
+        $('#new_expireDate').parent().removeClass('has-error');
+        $('#new_expireDateError').hide();
+        $('#new_service_name').parent().removeClass('has-error');
+        $('#new_service_nameError').hide();
+        $('#new_service_price').parent().removeClass('has-error');
+        $('#new_service_priceError').hide();
+        $('#new_service_desc').parent().removeClass('has-error');
+        $('#new_service_descError').hide();
+        $('#select_category').parent().removeClass('has-error');
+        $('#select_categoryError').hide();
+    }
+
+    function getPriceListAsPDF() {
+        var productIds = [];
+        $(".table input:checkbox:checked").each(function () {
+            productIds.push($(this).val());
+        });
+        window.location = '/productRest/pdfExport?products=' + productIds;
+    }
+
+</script>
+
+</html>
