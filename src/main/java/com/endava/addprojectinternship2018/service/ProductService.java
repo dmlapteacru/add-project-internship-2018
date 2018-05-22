@@ -39,11 +39,11 @@ public class ProductService {
     private static final Logger LOGGER = Logger.getLogger(ProductService.class);
 
     public List<Product> getAllByCompanyId(int id) {
-        return productDao.findAllByCompanyId(id);
+        return productDao.findAllByCompanyIdOrderByName(id);
     }
 
     public List<Product> getAllProducts() {
-        return productDao.findAllByOrderByName();
+        return productDao.findAllByOrderByCompanyName();
     }
 
     public long countAll() {
@@ -137,14 +137,14 @@ public class ProductService {
         return productDao.findAllByPriceBetween(priceFrom, priceTo);
     }
 
-    public ByteArrayInputStream getPriceList(boolean areAll, List<Integer> companyIds) {
+    public ByteArrayInputStream getPriceList(int[] productIds) {
 
         List<Product> products = new LinkedList<>();
-        if (areAll) {
+        if (productIds.length == 0) {
             products.addAll(getAllProducts());
         } else {
-            for (int companyId : companyIds) {
-                products.addAll(getAllByCompanyId(companyId));
+            for (int productId : productIds) {
+                products.add(getById(productId));
             }
         }
 
@@ -154,7 +154,7 @@ public class ProductService {
         try {
 
             PdfPTable table = new PdfPTable(4);
-            table.setWidthPercentage(80);
+            table.setWidthPercentage(100);
             table.setWidths(new int[]{4, 4, 3, 10});
 
             Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
@@ -164,7 +164,7 @@ public class ProductService {
             hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
             table.addCell(hcell);
 
-            hcell = new PdfPCell(new Phrase("Product name", headFont));
+            hcell = new PdfPCell(new Phrase("Service name", headFont));
             hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
             table.addCell(hcell);
 

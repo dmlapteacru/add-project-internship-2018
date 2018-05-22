@@ -62,9 +62,12 @@ public class InvoiceRestController {
         //TODO get invoice by id ,change data that comes from modal dialog
         //TODO persist this entity
 
-        Contract contract = contractService.getById(dto.getContractId());
+        boolean success = true;
 
-        System.out.println("Statutul contractului: " + contract.getStatus());
+        Contract contract = contractService.getById(dto.getContractId());
+        if (contract == null) {
+            success = false;
+        }
 
         List<Invoice> list = invoiceService.getInvoiceInPeriodService(dto.getContractId(), dto.getIssueDate());
 
@@ -73,8 +76,6 @@ public class InvoiceRestController {
             System.out.println(inv);
         }
 
-
-        boolean success = true;
         Invoice invoice = new Invoice();
 
         if (result.hasErrors()) {
@@ -85,10 +86,9 @@ public class InvoiceRestController {
             invoice.setIssueDate(dto.getIssueDate());
             invoice.setDueDate(dto.getDueDate());
             invoice.setStatus(dto.getStatus());
-            invoice.setContract(contractService.getById(dto.getContractId()));
+            invoice.setContract(contract);
             invoice.setSum(dto.getSum());
 
-//            invoiceService.save(invoice);
             return new ResponseEntity(HttpStatus.OK);
         }
 
@@ -105,6 +105,12 @@ public class InvoiceRestController {
         List<Invoice> list = invoiceService.getInvoiceInPeriodService(dto.getContractId(), dto.getIssueDate());
         Invoice invoice = new Invoice();
 
+        Contract currentContract = contractService.getById(dto.getContractId());
+        if (currentContract == null) {
+            response.setStatus("FAIL");
+            errorMessageList.add(new ErrorMessage("issue_inv_date", "Contract with id " + dto.getContractId() + " not found"));
+        }
+
         if (!list.isEmpty()) {
             response.setStatus("FAIL");
             errorMessageList.add(new ErrorMessage("issue_inv_date", "Contract for active period already exists !"));
@@ -120,7 +126,7 @@ public class InvoiceRestController {
             invoice.setDueDate(dto.getDueDate());
             invoice.setStatus(dto.getStatus());
             invoice.setSum(dto.getSum());
-            invoice.setContract(contractService.getById(dto.getContractId()));
+            invoice.setContract(currentContract);
             invoiceService.save(invoice);
         }
 
@@ -130,30 +136,30 @@ public class InvoiceRestController {
     }
 
     @PostMapping(value = "/sendToCustomer")
-    public String sendInvoiceToCustomer(@RequestParam int invoiceId){
-        System.out.println("invoice_d:   "+invoiceId);
+    public String sendInvoiceToCustomer(@RequestParam int invoiceId) {
+        System.out.println("invoice_d:   " + invoiceId);
         System.out.println("In sentToCustomer kkk");
         invoiceService.changeInvoiceStatusToSent(invoiceId);
         return "Ok";
     }
 
     @PostMapping(value = "/sendBulkToCustomer")
-    public String sendBulkInvoiceToCustomer(@RequestBody Map<String, Object> data){
+    public String sendBulkInvoiceToCustomer(@RequestBody Map<String, Object> data) {
 
         List<String> list = (List<String>) data.get("invoiceIDS");
-        list.forEach(s-> System.out.println(s));
+        list.forEach(s -> System.out.println(s));
         List<Integer> invoiceBulkIds = list.stream().map(Integer::parseInt).collect(Collectors.toList());
-        System.out.println("Size of the list:  "+invoiceBulkIds.size());
+        System.out.println("Size of the list:  " + invoiceBulkIds.size());
         invoiceBulkIds.forEach(integer -> System.out.println(integer));
-        for (int id: invoiceBulkIds
-             ) {
+        for (int id : invoiceBulkIds
+                ) {
             invoiceService.changeInvoiceStatusToSent(id);
         }
         return "Ok";
     }
 
     @PostMapping(value = "/deleteInvoice")
-    public String deleteInvoice(@RequestParam int invoiceId){
+    public String deleteInvoice(@RequestParam int invoiceId) {
         System.out.println("Invoice_ID to be deleted  " + invoiceId);
         invoiceService.deleteInvoice(invoiceId);
         return "Ok";

@@ -36,6 +36,9 @@ public class InvoiceController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    InvoiceTransactionDao dao=new InvoiceTransactionDao();
+
     @GetMapping(value = "createNew")
     public String showNewInvoice(Model model){
         InvoiceDto invoiceDto = new InvoiceDto(LocalDate.now(), InvoiceStatus.ISSUED);
@@ -119,11 +122,10 @@ public class InvoiceController {
         return "invoice/invoicesByCompany";
     }
 
-    @GetMapping("/test")
-    public List getTest(){
+//    @GetMapping("/test")
+//    public List getTest(){
+//
+//        return dao.getInvoiceDtoExt(1,1,InvoiceStatus.ACTIVE);
+//    }
 
-        return dao.getInvoiceDtoExt(1,1,InvoiceStatus.ACTIVE);
-    }
-    @Autowired
-    InvoiceTransactionDao dao=new InvoiceTransactionDao();
 }

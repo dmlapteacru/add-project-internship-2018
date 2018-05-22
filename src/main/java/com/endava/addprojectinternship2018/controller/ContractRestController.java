@@ -29,13 +29,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping(value = "contractRest")
 public class ContractRestController {
 
+    @Autowired
+    private UserUtil userUtil;
+
     private final ContractService contractService;
     private final CustomerService customerService;
     private final CompanyService companyService;
     private final ProductService productService;
-
-    @Autowired
-    private UserUtil userUtil;
 
     private static final Logger LOGGER = Logger.getLogger(ContractRestController.class);
 

@@ -30,9 +30,9 @@ public class ProductRestController {
 
     @RequestMapping(value = "/pdfExport", method = RequestMethod.GET,
             produces = MediaType.APPLICATION_PDF_VALUE)
-    public ResponseEntity<InputStreamResource> getPriceList(@RequestParam(name = "companyId") int companyId) {
+    public ResponseEntity<InputStreamResource> getPriceList(@RequestParam(name = "products") int[] products) {
 
-        ByteArrayInputStream bis = productService.getPriceList(true, new ArrayList<>());
+        ByteArrayInputStream bis = productService.getPriceList(products);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "inline; filename=ServicePriceList.pdf");
