@@ -4,6 +4,8 @@ import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.service.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -37,4 +39,8 @@ public class RestController {
         return categoryService.getAllCategory();
     }
 
+    @RequestMapping(value = "/status/dev", method = GET)
+    public ResponseEntity<?> devOpsCheckStatus(){
+        return new ResponseEntity<>("STATUS CHECKED ;) I AM A TEAPOT",HttpStatus.I_AM_A_TEAPOT);
+    }
 }
