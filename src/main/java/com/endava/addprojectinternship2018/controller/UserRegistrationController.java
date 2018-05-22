@@ -1,12 +1,23 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.model.dto.CompanyRegistrationDto;
-import com.endava.addprojectinternship2018.model.dto.CustomerRegistrationDto;
-import com.endava.addprojectinternship2018.model.dto.UserRegistrationDto;
+import com.endava.addprojectinternship2018.model.Notification;
+import com.endava.addprojectinternship2018.model.enums.NotificationCase;
+import com.endava.addprojectinternship2018.model.enums.Role;
+import com.endava.addprojectinternship2018.model.dto.CompanyDto;
+import com.endava.addprojectinternship2018.model.dto.CustomerDto;
+import com.endava.addprojectinternship2018.model.dto.UserDto;
+import com.endava.addprojectinternship2018.model.enums.UserStatus;
+import com.endava.addprojectinternship2018.security.config.LoginAuthenticationSuccessHandler;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.CustomerService;
-import com.endava.addprojectinternship2018.service.user.UserService;
+import com.endava.addprojectinternship2018.service.NotificationService;
+import com.endava.addprojectinternship2018.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -30,65 +41,111 @@ public class UserRegistrationController {
     @Autowired
     private CompanyService companyService;
 
+    @Autowired
+    private LoginAuthenticationSuccessHandler loginAuthenticationSuccessHandler;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private NotificationService notificationService;
     @GetMapping(value = "")
     public String showRegistrationForm() {
-        return "registration/commonForm";
+        return "redirect:/login";
     }
 
+    @PostMapping(value = "")
+    public String choiceRegistrationForm(@ModelAttribute(name = "choice") String choice){
+        if (choice.equals("CUSTOMER")){
+            return "redirect:/registration/customer";
+        }
+        if (choice.equals("COMPANY")){
+            return "redirect:/registration/company";
+        }
+        return "redirect:/login";
+    }
     @GetMapping(value = "customer")
     public String showCustomerRegistrationForm(Model model) {
-        model.addAttribute("user", new CustomerRegistrationDto());
+        UserDto userDto = new UserDto();
+        userDto.setRole(Role.CUSTOMER);
+        userDto.setStatus(UserStatus.ACTIVE);
+        CustomerDto customerDto = new CustomerDto();
+        customerDto.setUserDto(userDto);
+        model.addAttribute("customerDto", customerDto);
+        model.addAttribute("update", false);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)){
+            return "redirect:" + loginAuthenticationSuccessHandler.authenticatedRedirectDefaultPage(authentication);
+        }
         return "registration/customer";
     }
 
     @GetMapping(value = "company")
     public String showCompanyRegistrationForm(Model model) {
-        model.addAttribute("user", new CompanyRegistrationDto());
+        UserDto userDto = new UserDto();
+        userDto.setRole(Role.COMPANY);
+        userDto.setStatus(UserStatus.INACTIVE);
+        CompanyDto companyDto = new CompanyDto();
+        companyDto.setUserDto(userDto);
+        model.addAttribute("companyDto", companyDto);
+        model.addAttribute("update", false);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)){
+            return "redirect:" + loginAuthenticationSuccessHandler.authenticatedRedirectDefaultPage(authentication);
+        }
         return "registration/company";
     }
 
+
     @PostMapping(value = "company")
-    public String registerCompany(@ModelAttribute("user") @Valid CompanyRegistrationDto user,
+    public String registerCompany(@ModelAttribute("companyDto") @Valid CompanyDto companyDto,
                                   BindingResult result, Model model) {
 
         if (result.hasErrors()) {
             return "registration/company";
         }
 
-        if (userService.getUserByUsername(user.getUsername()).isPresent()) {
+        if (userService.getUserByUsername(companyDto.getUserDto().getUsername()).isPresent()) {
             result.rejectValue("username", "username.error", "Username is not unique");
             return "registration/company";
         }
 
-        if (companyService.getCompanyByEmail(user.getEmail()).isPresent()) {
+        if (companyService.getCompanyByEmail(companyDto.getEmail()).isPresent()) {
             result.rejectValue("email", "email.error", "Email is not unique");
             return "registration/company";
         }
 
-        userService.saveUser(user);
-        return "redirect:/registration/company?success";
+        notificationService.save(new Notification(NotificationCase.NEW_USER, "New company - "+companyDto.getName()+" registered.", "admin"));
+        messagingTemplate.convertAndSendToUser("admin","/queue/messages", "NOTIFICATION");
+        companyService.saveCompany(companyDto);
+        return "redirect:/login?error=reg_approval";
 
     }
 
     @PostMapping(value = "customer")
-    public String registerCustomer(@ModelAttribute("user") @Valid CustomerRegistrationDto user,
+    public String registerCustomer(@ModelAttribute("customerDto") @Valid CustomerDto customerDto,
                                   BindingResult result, Model model) {
+
         if (result.hasErrors()) {
             return "registration/customer";
         }
 
-        if (userService.getUserByUsername(user.getUsername()).isPresent()) {
-            result.rejectValue("username", "username.error", "Username is not unique");
-            return "registration/customer";
-        }
-
-        if (customerService.getCustomerByEmail(user.getEmail()).isPresent()) {
+        if (customerService.getCustomerByEmail(customerDto.getEmail()).isPresent()) {
             result.rejectValue("email", "email.error", "Email is not unique");
             return "registration/customer";
         }
 
-        userService.saveUser(user);
-        return "redirect:/registration/customer?success";
+        if (userService.getUserByUsername(customerDto.getUserDto().getUsername()).isPresent()) {
+            result.rejectValue("userDto.username", "username.error", "Username is not unique");
+            return "registration/customer";
+        }
+
+        notificationService.save(new Notification(NotificationCase.NEW_USER, "New company - "+customerDto.getFirstName()
+                                    +" "+
+                                    customerDto.getLastName()+" registered.", "admin"));
+        messagingTemplate.convertAndSendToUser("admin","/queue/messages", "NOTIFICATION");
+        customerService.saveCustomer(customerDto);
+        return "redirect:/login";
     }
 
 }

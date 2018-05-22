@@ -1,5 +1,7 @@
 package com.endava.addprojectinternship2018.model;
 
+import com.endava.addprojectinternship2018.model.enums.Role;
+import com.endava.addprojectinternship2018.model.enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,6 +37,11 @@ public class User {
     @Column
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 
     public User(String username, String password, UserStatus userStatus) {
         this.username = username;

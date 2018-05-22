@@ -3,14 +3,105 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Customer main page</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/default.css"/>
+    <title>Customer bank operations</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/header.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/bank.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
+    <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js" integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe" crossorigin="anonymous"></script>
 </head>
 
 <body>
-<div class="main_wrapper">
-
+<div class="container">
+    <div th:replace="fragments/header :: header">
+    </div>
+    <div class="body_wrapper">
+        <div class="body_content">
+            <div class="account_info">
+                <div class="account_info_user">
+                    <span>EVERYDAY CHECKING</span>
+                    <div class="account_holder_wr">
+                        <span class="additional_info">Name: </span>
+                        <span class="main_info" th:text="${customer.getFullName()}"></span>
+                    </div>
+                    <div class="account_number_wr">
+                        <div class="account_number_wr_info">
+                            <span class="additional_info">Account number: </span>
+                            <span class="main_info" th:if="${customer.countNumber != null}" th:text="${customer.countNumber}"></span>
+                            <span class="main_info" th:if="${customer.countNumber == null}">NO ACCOUNT</span>
+                        </div>
+                        <button id="create_account" th:if="${customer.countNumber == null}" class="btn btn-warning" type="submit">CREATE ACCOUNT</button>
+                    </div>
+                </div>
+                <div class="account_info_balance">
+                    <div>
+                        <span class="balance_info"></span>
+                        <span class="currency">MDL</span>
+                    </div>
+                    <span class="additional_info">Available balance</span>
+                    <form th:if="${customer.countNumber != null}" class="add_money">
+                        <div>
+                            <input id="money_sum" pattern="[0-9].{1,}" title="Must be numbers" type="number" value="0.0"/>
+                            <br/>
+                            <button id="btn_add_money_req" class="btn btn-success" type="submit">ADD MONEY</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="statement_wrapper">
+        <div class="statement_link_updown">
+            <div class="statement_date_picker">
+                <div class="statement_date_picker_wrapper">
+                    <input id="date_from" type="date" name=""/>
+                    <input id="date_to" type="date" name=""/>
+                    <input id="btn_statement_req" type="button" name="" value="Account Activity"/>
+                </div>
+            </div>
+        </div>
+        <div class="statement_body">
+            <div class="table_wrapper">
+                <table class="table table-striped table_statement">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th id="bal-change">+/-</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="alert_success" class="alert alert-success alert-dismissible fade in">
+        <div id="approval_info">
+            <strong id="confirm_alert_message"></strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+    <div id="alert_error" class="alert alert-danger alert-dismissible fade in">
+        <div id="alert_error_info">
+            <strong id="error_alert_message"></strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
 </div>
+<script src="/js/loadbalance.js"></script>
+<script src="/js/bank.js"></script>
+<script src="/js/user-websock.js"></script>
+<script src="/js/customer-sock-distribute.js"></script>
 </body>
 </html>

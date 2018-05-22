@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Product page</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/header.css"/>
+</head>
+
+<body>
+<div th:replace="fragments/header :: header">
+
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+
+            <div th:if="${param.success}">
+                <div class="alert alert-info">
+                    <span th:if="not ${update}">New service was saved successfully</span>
+                    <span th:if="${update}">Service was updated successfully</span>
+                </div>
+            </div>
+
+            <div th:if="${update}">
+                <h1>Edit service</h1>
+            </div>
+
+            <div th:if="not ${update}">
+                <h2>Create new service</h2>
+            </div>
+
+            <form th:action="@{/service/save}" th:object="${productDto}" method="post">
+
+                <p class="error-message"
+                   th:if="${#fields.hasGlobalErrors()}"
+                   th:each="error : ${#fields.errors('global')}"
+                   th:text="${error}"> Validation error
+                </p>
+
+                <div class="form-group" th:classappend="${#fields.hasErrors('category')}? 'has-error':''">
+                    <label for="category" class="control-label">Category</label>
+                    <select class="form-control" id="category" th:field="*{category}">
+                        <option value="" selected>-select-</option>
+                        <option th:each="category : ${categoryList}"
+                                th:value="${category.getId()}"
+                                th:text="${category.getName()}">
+                        </option>
+                    </select>
+                    <p class="error-message"
+                       th:each="error: ${#fields.errors('category')}"
+                       th:text="${error}">Validation error</p>
+                </div>
+
+                <div class="form-group" th:classappend="${#fields.hasErrors('name')}? 'has-error':''">
+                    <label for="name" class="control-label">Name</label>
+                    <input type="text" id="name"
+                           class="form-control"
+                           th:field="*{name}"/>
+                    <p class="error-message"
+                       th:each="error: ${#fields.errors('name')}"
+                       th:text="${error}">Validation error</p>
+                </div>
+
+                <div class="form-group" th:classappend="${#fields.hasErrors('price')}? 'has-error':''">
+                    <label for="price" class="control-label">Price</label>
+                    <input type="number" min="0" step="0.01" id="price"
+                           class="form-control"
+                           th:field="*{price}"/>
+                    <p class="error-message"
+                       th:each="error: ${#fields.errors('price')}"
+                       th:text="${error}">Validation error</p>
+                </div>
+
+                <div class="form-group" th:classappend="${#fields.hasErrors('description')}? 'has-error':''">
+                    <label for="description" class="control-label">Description</label>
+                    <textarea rows="3" id="description"
+                           class="form-control"
+                           th:field="*{description}"/>
+                    <p class="error-message"
+                       th:each="error: ${#fields.errors('description')}"
+                       th:text="${error}">Validation error</p>
+                </div>
+
+                <input type="hidden" class="form-control" th:field="*{company}"/>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <!--<a th:href="@{/customer/contracts}"-->
+                       <!--class="btn btn-default" role="button">Cancel</a>-->
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</html>

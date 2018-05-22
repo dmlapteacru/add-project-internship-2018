@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>ADD login page</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/header.css"  />
+    <link rel="stylesheet" type="text/css" href="/css/default.css"  />
+    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
+    <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js" integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe" crossorigin="anonymous"></script>
+</head>
+
+<body>
+<div th:replace="fragments/header :: header">
+</div>
+
+<div class="main_wrapper">
+    <div style="display: flex; flex-direction: column;" class="wrapper">
+        <div class="reset_password_body">
+            <form>
+                <div class="modal_body_custom">
+                    <label>Email</label>
+                    <input id="new_message_email" type="text"
+                           pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Email is invalid" th:value="${user}" disabled required/>
+                    <label>Subject</label>
+                    <input id="new_message_subject" type="text" placeholder="Subject.." required/>
+                    <label>Message</label>
+                    <textarea maxlength="250" placeholder="Your message.." id="new_message" required></textarea>
+                </div>
+                <div class="modal-footer modal_btn">
+                    <!--<button type="button" style="display: none;" class="btn"></button>-->
+                    <button id="save_btn_message" type="submit" class="btn btn-success">Send</button>
+                    <a id="home_btn" th:href="@{/login}"
+                       class="btn btn-default" role="button">Back Home</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="/js/loadbalance.js"></script>
+<script src="/js/customer-sock-distribute.js"></script>
+<script>
+    $("#save_btn_message").click(function () {
+        if ($("#new_message").val() != "" && $("#new_message_subject").val() != ""){
+            var message = {
+                "message" : $("#new_message").val(),
+                "userEmail" : $("#new_message_email").val(),
+                "subject" : $("#new_message_subject").val()
+            };
+            $.ajax(
+                {
+                    url: "/message/send",
+                    type: "post",
+                    contentType: "application/json",
+                    data: JSON.stringify(message),
+                    success: function () {
+                        sendMessageNotification();
+                        window.open($("#home_btn").attr("href"), "_blank");
+                    }
+                }
+            )
+        }
+    });
+//    $(document).ready(function () {
+//        connect();
+//    });
+//    function connect() {
+//        var socket = new SockJS('/admin-sock');
+//        stompClient = Stomp.over(socket);
+//        stompClient.connect({}, function () {
+//        });
+//    }
+//    function sendMessageNotification() {
+//        var json = {
+//            "notificationCase" : "NEW_MESSAGE",
+//            "content" : "New message from: " + $("#new_message_email").val(),
+//            "userTo" : "admin"
+//        };
+//        stompClient.send("/app/admin", {}, JSON.stringify(json));
+//    }
+</script>
+</body>
+</html>

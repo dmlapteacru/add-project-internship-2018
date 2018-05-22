@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 
 
 @Configuration
@@ -27,6 +29,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private LoginAuthenticationSuccessHandler loginAuthenticationSuccessHandler;
+    @Autowired
+    private LoginAuthenticationFailureHandler loginAuthenticationFailureHandler;
 
     @Autowired
     public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
@@ -35,6 +39,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
+
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -51,18 +56,41 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.authorizeRequests()
-                .antMatchers("/login", "/registration", "/").permitAll()
+                .antMatchers("/login","/test", "/registration/**", "/", "/resetPassword","/reset/password", "/newUserPassword", "/email", "/message/send").permitAll()
                 .antMatchers("/admin/**").access("hasAuthority('ADMIN')")
                 .antMatchers("/customer/**").access("hasAuthority('CUSTOMER')")
                 .antMatchers("/company/**").access("hasAuthority('COMPANY')")
-                .antMatchers("/invoices/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
+                .antMatchers("/invoices/**", "/notifications/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
                 .antMatchers("/service/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
-                .antMatchers("/bank/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
+                .antMatchers("/bankAccount/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
                 .anyRequest().authenticated()
                 .and().formLogin().loginPage("/login")
                 .successHandler(loginAuthenticationSuccessHandler)
-                .failureUrl("/login?error=true")
+                .failureHandler(loginAuthenticationFailureHandler)
                 .usernameParameter("username").passwordParameter("password")
                 .and().csrf().disable();
+    }
+
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler(
+                "/webjars/**",
+                "/img/**",
+                "/css/**",
+                "/js/**")
+                .addResourceLocations(
+                        "/webjars/",
+                        "classpath:/static/img/",
+                        "classpath:/static/css/",
+                        "classpath:/static/js/");
+        registry
+                .addResourceHandler("/webjars/**")
+                .addResourceLocations("/webjars/");
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web
+                .ignoring()
+                .antMatchers("/resources/**", "/static/**", "/js/**", "/css/**", "/images/**", "/webjars/**", "/fonts/**", "/admin-sock/**", "/user-sock/**");
     }
 }

@@ -1,11 +1,11 @@
 package com.endava.addprojectinternship2018.model;
 
+import com.endava.addprojectinternship2018.model.dto.UserBankAccountDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "COMPANY")
@@ -25,16 +25,13 @@ public class Company {
     private String email;
 
     @Column
-    private String accountNumber;
+    private Long countNumber = null;
 
-    @OneToOne
+    @Column
+    private Long accessKey = null;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
-
-    @OneToMany(mappedBy = "company")
-    private List<Product> products;
-
-    @OneToMany(mappedBy = "company")
-    private List<Contract> contracts;
 
 }

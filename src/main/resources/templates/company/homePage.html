@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<html lang="en">
 
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
@@ -7,21 +6,108 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/header.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
+    <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js" integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe" crossorigin="anonymous"></script>
+    <script src="/js/loadbalance.js"></script>
 </head>
+
+
+<div th:replace="fragments/header :: header">
+</div>
+
 <body>
 
-<h3>Company Page</h3>
-<p th:text="#{home.welcome}"></p>
-    <div>
-        <a href="/company/contracts">Contracts</a>
+<div class="container">
+
+    <h2 th:text="'Welcome '+${companyName}+','"></h2>
+    <h3>here is your current statistics:</h3>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Provided services</div>
+        <div class="panel-body">
+            <a th:href="@{/company/services}" class="btn btn-primary"> Total
+                <span class="badge" th:text="${totalServices}"></span>
+            </a>
+        </div>
     </div>
-<p>
-    <a href="/company/prices">Prices</a>
-</p>
 
-<p>
-    <a href="/company/invoices">Invoices</a>
-</p>
+    <div class="panel panel-default">
+        <div class="panel-heading">Contracts</div>
+        <div class="panel-body">
+            <form th:action="@{/company/contracts/filtered}"
+                  th:object="${filterActiveContracts}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{contractStatus}">
+                <button type="submit" class="btn btn-primary"> Active
+                    <span class="badge" th:text="${activeContracts}"></span>
+                </button>
+            </form>
+            <form th:action="@{/company/contracts/filtered}"
+                  th:object="${filterSignedContracts}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{contractStatus}">
+                <button type="submit" class="btn btn-info"> Signed only by you
+                    <span class="badge" th:text="${onePartSignedContracts}"></span>
+                </button>
+            </form>
+            <form th:action="@{/company/contracts/filtered}"
+                  th:object="${filterSignedContracts}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{contractStatus}">
+                <button type="submit" class="btn btn-info"> Signed only your partner
+                    <span class="badge" th:text="${anotherPartSignedContracts}"></span>
+                </button>
+            </form>
+            <form th:action="@{/company/contracts/filtered}"
+                  th:object="${filterUnsignedContracts}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{contractStatus}">
+                <button type="submit" class="btn"> Unsigned
+                    <span class="badge" th:text="${unsignedContracts}"></span>
+                </button>
+            </form>
+        </div>
+    </div>
 
+    <div class="panel panel-default">
+        <div class="panel-heading">Invoices</div>
+        <div class="panel-body">
+            <form th:action="@{/company/invoices/filtered}"
+                  th:object="${filterIssuedInvoices}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{invoiceStatus}">
+                <button type="submit" class="btn btn-info"> Issued
+                    <span class="badge" th:text="${issuedInvoices}"></span>
+                </button>
+            </form>
+            <form th:action="@{/company/invoices/filtered}"
+                  th:object="${filterSentInvoices}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{invoiceStatus}">
+                <button type="submit" class="btn btn-primary"> Sent
+                    <span class="badge" th:text="${sentInvoices}"></span>
+                </button>
+            </form>
+            <form th:action="@{/company/invoices/filtered}"
+                  th:object="${filterPaidInvoices}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{invoiceStatus}">
+                <button type="submit" class="btn btn-info"> Paid
+                    <span class="badge" th:text="${paidInvoices}"></span>
+                </button>
+            </form>
+            <form th:action="@{/company/invoices/filtered}"
+                  th:object="${filterOverdueInvoices}" method="post" class="input-group pull-left">
+                <input type="hidden" th:field="*{invoiceStatus}">
+                <button type="submit" class="btn"> Overdue
+                    <span class="badge" th:text="${overdueInvoices}"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
+<script src="/js/user-websock.js"></script>
+<script src="/js/customer-sock-distribute.js"></script>
 </body>
+
 </html>
