@@ -44,7 +44,7 @@ public class AdminPanelRestController {
     @Autowired
     private AdminMessageService adminMessageService;
 
-    private static final Logger LOGGER = Logger.getLogger(RestController.class);
+    private static final Logger LOGGER = Logger.getLogger(AdminPanelRestController.class);
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public String adminMain(Model model){

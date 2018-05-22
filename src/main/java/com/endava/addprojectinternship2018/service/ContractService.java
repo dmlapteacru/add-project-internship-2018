@@ -26,24 +26,31 @@ import static com.endava.addprojectinternship2018.model.enums.ContractStatus.ACT
 public class ContractService {
 
     @Autowired
-    private ContractDao contractDao;
-
-    @Autowired
     private UserUtil userUtil;
 
-    @Autowired
-    private CustomerDao customerDao;
+    private final ContractDao contractDao;
 
-    @Autowired
-    private CompanyDao companyDao;
+    private final CustomerDao customerDao;
 
-    @Autowired
-    private ProductDao productDao;
+    private final CompanyDao companyDao;
 
-    @Autowired
-    private WebSocketDistributeService webSocketDistributeService;
+    private final ProductDao productDao;
+
+    private final InvoiceDao invoiceDao;
+
+    private final WebSocketDistributeService webSocketDistributeService;
 
     private static final Logger LOGGER = Logger.getLogger(ContractService.class);
+
+    @Autowired
+    public ContractService(ContractDao contractDao, CustomerDao customerDao, CompanyDao companyDao, ProductDao productDao, InvoiceDao invoiceDao, WebSocketDistributeService webSocketDistributeService) {
+        this.contractDao = contractDao;
+        this.customerDao = customerDao;
+        this.companyDao = companyDao;
+        this.productDao = productDao;
+        this.invoiceDao = invoiceDao;
+        this.webSocketDistributeService = webSocketDistributeService;
+    }
 
     public List<Contract> getAllByCompanyName(String companyName) {
         return contractDao.findAllByCompanyName(companyName);
@@ -66,6 +73,11 @@ public class ContractService {
     }
 
     public Contract getById(int contractId) {
+        Optional<Contract> optionalContract = contractDao.findById(contractId);
+        if (!optionalContract.isPresent()) {
+            LOGGER.error("Contract with id " + contractId + " not found");
+            return null;
+        }
         return contractDao.findById(contractId).get();
     }
 
@@ -84,7 +96,7 @@ public class ContractService {
     @Transactional
     public void saveContract(ContractDto contractDto) {
         contractDao.save(convertContractDtoToContract(contractDto));
-        if (userUtil.getCurrentUser().getRole()==Role.CUSTOMER){
+        if (userUtil.getCurrentUser().getRole() == Role.CUSTOMER) {
             webSocketDistributeService.sendNewContractNotification(contractDto.getSelectedCompany().getUser().getUsername());
         } else {
             webSocketDistributeService.sendNewContractNotification(contractDto.getSelectedCustomer().getUser().getUsername());
@@ -94,7 +106,7 @@ public class ContractService {
                 userUtil.getCurrentUser().getUsername(),
                 contractDto.getSelectedCompany().getName(),
                 contractDto.getSelectedCustomer().getFullName()
-                ));
+        ));
     }
 
     @Transactional
@@ -184,7 +196,7 @@ public class ContractService {
             });
         }
         if (productList.isEmpty()) {
-            productList.addAll(productDao.findAllByCompanyId(companyId));
+            productList.addAll(productDao.findAllByCompanyIdOrderByName(companyId));
         }
         if (productList.isEmpty()) {
             productList.addAll(productDao.findAll());
@@ -242,8 +254,8 @@ public class ContractService {
     public List<Contract> getAllByCompanyIdFiltered(int currentCompanyId, AdvancedFilter filter) {
         double sumFrom = (filter.getSumFrom() == 0 ? Double.MIN_VALUE : filter.getSumFrom());
         double sumTo = (filter.getSumTo() == 0 ? Double.MAX_VALUE : filter.getSumTo());
-        LocalDate dateFrom = (filter.getDateFrom() == null ? LocalDate.of(1,1,1) : filter.getDateFrom());
-        LocalDate dateTo = (filter.getDateTo() == null ? LocalDate.of(4999,12,31) : filter.getDateTo());
+        LocalDate dateFrom = (filter.getDateFrom() == null ? LocalDate.of(1, 1, 1) : filter.getDateFrom());
+        LocalDate dateTo = (filter.getDateTo() == null ? LocalDate.of(4999, 12, 31) : filter.getDateTo());
 
         if (filter.getContractStatus() != null) {
             return contractDao.findAllByCompanyIdAndStatusAndSumBetweenAndIssueDateBetweenOrderByIssueDate
@@ -257,8 +269,8 @@ public class ContractService {
     public List<Contract> getAllByCustomerIdFiltered(int currentCustomerId, AdvancedFilter filter) {
         double sumFrom = (filter.getSumFrom() == 0 ? Double.MIN_VALUE : filter.getSumFrom());
         double sumTo = (filter.getSumTo() == 0 ? Double.MAX_VALUE : filter.getSumTo());
-        LocalDate dateFrom = (filter.getDateFrom() == null ? LocalDate.of(1,1,1) : filter.getDateFrom());
-        LocalDate dateTo = (filter.getDateTo() == null ? LocalDate.of(4999,12,31) : filter.getDateTo());
+        LocalDate dateFrom = (filter.getDateFrom() == null ? LocalDate.of(1, 1, 1) : filter.getDateFrom());
+        LocalDate dateTo = (filter.getDateTo() == null ? LocalDate.of(4999, 12, 31) : filter.getDateTo());
 
         if (filter.getContractStatus() != null) {
             return contractDao.findAllByCustomerIdAndStatusAndSumBetweenAndIssueDateBetweenOrderByIssueDate
@@ -269,7 +281,16 @@ public class ContractService {
         }
     }
 
-    public Contract getLastContract(){
+    public Contract getLastContract() {
         return contractDao.findFirstByOrderByIdDesc().get(0);
+    }
+
+    public boolean isNotOverdue(int contractId) {
+        Contract currentContract = getById(contractId);
+        return currentContract != null && currentContract.getExpireDate().isAfter(LocalDate.now());
+    }
+
+    public boolean haveInvoices(int contractId) {
+        return invoiceDao.countAllByContractId(contractId) > 0;
     }
 }

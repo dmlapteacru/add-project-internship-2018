@@ -18,6 +18,39 @@
     <script src="/js/table-filter.js"></script>
     <script th:src="@{/js/moment.js}"></script>
 
+    <style>
+        .row_issued_color{
+            background: #c8f8ff;
+        }
+        .row_sent_color{
+            background: #fff0a8;
+        }
+        .row_paid_color{
+            background: #a4ffb0;
+        }
+        .row_overdue_color{
+            background: #ffacb3;
+        }
+
+        .text_issued_color{
+            font-weight: 800;
+            color: #283dff;
+
+        }
+        .text_sent_color{
+            font-weight: 800;
+            color: #ffa325;
+        }
+        .text_paid_color{
+            font-weight: 800;
+            color: #0d9d17;
+        }
+        .text_overdue_color{
+            font-weight: 800;
+            color: #fa100a;
+        }
+    </style>
+
     <script>
 
         $(document).ready(function () {
@@ -148,6 +181,8 @@
 
         function sendBulkInvoices() {
             var selectedRows = $('table.table tbody input[type=checkbox]:checked');
+            if(selectedRows.length == 0){$("#modalBulkNoInvoiceSelected").modal();}
+
             console.log('selectedRows:', selectedRows);
             var ids = [];
             for(var i = 0; i < selectedRows.length; i++){
@@ -167,6 +202,8 @@
                             $('#row' + ids[i] +" .btn-danger").remove();
                             $('#row' + ids[i]).find(".btn.btn-success").remove();
                             $('#row' + ids[i]).find("input[type='checkbox']").remove();
+                            $('#status'+ids[i]).removeClass('text_issued_color');
+                            $('#status'+ids[i]).addClass('text_sent_color');
                         }
                         calculateTotalSum();
                     },
@@ -194,6 +231,8 @@
                         $('#row'+id +" .btn-danger").remove();
                         $('#row'+id).find(".btn.btn-success").remove();
                         $('#row'+id).find("input[type='checkbox']").remove();
+                        $('#status'+id).removeClass('text_issued_color');
+                        $('#status'+id).addClass('text_sent_color');
                         calculateTotalSum();
                     },
                     error: function (errMsg, a, b) {
@@ -216,37 +255,52 @@
 
 <div class="panel panel-default panel-no-border">
     <div class="panel-body">
-        <form class="form-inline pull-right"
+        <form class="pull-right"
               th:object="${filter}"
               th:action="@{/company/invoices/filtered}"
               method="post">
-            <div class="form-group">
-                <select id="adv_filter_status" class="form-control input-sm" th:field="*{invoiceStatus}">
-                    <option value="">--all--</option>
-                    <option th:each="currStatus : ${statusListForFilter}"
-                            th:value="${currStatus.name()}"
-                            th:text="${currStatus.toString()}">
-                    </option>
-                </select>
-            </div>
-            <div class="form-group">
-                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumFrom}"
-                       placeholder="sum from" required/>
-                <input class="form-control input-sm col-sm-2" type="number" th:field="*{sumTo}"
-                       placeholder="sum to" required/>
-            </div>
-            <div class="form-group">
-                <input type="date" id="adv_filter_date_from" class="form-control input-sm col-sm-2"
-                       th:field="*{dateFrom}"/>
-                <input type="date" id="adv_filter_date_to" class="form-control input-sm col-sm-2"
-                       th:field="*{dateTo}" />
-            </div>
+            <div class="form-row">
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_status">status</label>
+                    <select id="adv_filter_status" class="form-control input-sm" th:field="*{invoiceStatus}">
+                        <option value="">--all--</option>
+                        <option th:each="currStatus : ${statusListForFilter}"
+                                th:value="${currStatus.name()}"
+                                th:text="${currStatus.toString()}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_sumFrom">sum from</label>
+                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumFrom" type="number"
+                           th:field="*{sumFrom}"
+                           placeholder="sum from" required/>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_sumTo">sum to</label>
+                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumTo" type="number"
+                           th:field="*{sumTo}"
+                           placeholder="sum to" required/>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_date_from">date from</label>
+                    <input type="date" id="adv_filter_date_from" class="form-control input-sm"
+                           th:field="*{dateFrom}"/>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="adv_filter_date_to">date to</label>
+                    <input type="date" id="adv_filter_date_to" class="form-control input-sm"
+                           th:field="*{dateTo}"/>
+                </div>
 
-            <button type="submit" class="btn btn-info btn-sm">apply
-                <span class="glyphicon glyphicon-filter"></span>
-            </button>
-            <a th:href="@{/company/invoices}"
-               class="btn btn-default btn-sm">clear</a>
+                <div class="col-md-2 mb-3">
+                    <button type="submit" class="btn btn-info btn-sm">apply
+                        <span class="glyphicon glyphicon-filter"></span>
+                    </button>
+                    <a th:href="@{/company/invoices}"
+                       class="btn btn-default btn-sm">clear</a>
+                </div>
+            </div>
         </form>
     </div>
 </div>
@@ -301,6 +355,21 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modalBulkNoInvoiceSelected" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">No one INVOICE is selected</h4>
+            </div>
+            <div class="modal-footer modal_btn">
+                <button type="button" style="display: none;" class="btn"></button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!--<div class="container">-->
 
 <div class="panel panel-primary filterable">
@@ -311,7 +380,7 @@
             </button>
         </div>
     </div>
-    <table class="table">
+    <table class="table table-striped">
         <thead >
         <div>
            <p class="form-control pt-3">Total Sum: <span id="total_sum"  >0.0</span> </p>
@@ -338,48 +407,61 @@
             <th><input type="text" class="form-control" placeholder="" disabled></th>
             <th><input type="text" class="form-control" placeholder="" disabled></th>
 
-        </tr>
-        </thead>
+            </tr>
+            </thead>
 
-        <tbody class="filter_body">
-        <tr th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">
-            <td th:id="invoice_id_hidd" th:text="${invoice.getId()}" style="display: none;"></td>
-            <td>
-                <input th:if="${invoice.getStatus().name() == 'ISSUED'}" type="checkbox" th:id="${invoice.getId()}" name="sel"/></td>
-            <td th:id="${'issueDate'+invoice.getId()}"
-                th:text="${#temporals.format(invoice.getIssueDate(), 'dd-MM-yyyy')} "> Issue Date
-            </td>
-            <td th:id="${'dueDate'+invoice.getId()}" th:text="${#temporals.format(invoice.getDueDate(), 'dd-MM-yyyy')}">Expire Date</td>
-            <td th:id="${'sum'+invoice.getId()}" th:text="${invoice.getSum()}">Sum</td>
-            <td class="filter_status_invoice" th:id="${'status'+invoice.getId()}" th:text="${invoice.getStatus()}"
-                th:class="${invoice.getStatus() == 'ACTIVE'} ? 'success' : (${invoice.getStatus() == 'ISSUED'} ? 'warning' : 'red')"></td>
-            <td th:id="${'contract_id'+invoice.getId()}" th:text="${invoice.getContract().getCustomer().getFullName()}">Contract_id</td>
-            <td th:id="${'fullName'+invoice.getId()}" th:text="${invoice.getContract().getProduct().getName()}">
-                Full Name
-            </td>
-            <td>
-                <a th:if="${invoice.getStatus().name() == 'ISSUED'}" th:id="${invoice.id}" onclick="deleteInvoice(this)" class="btn btn-danger">DELETE</a>
-            </td>
-            <td>
-                <button th:id="${invoice.getId()}" th:if="${invoice.getStatus().name() == 'ISSUED'}" onclick="sendInvoiceToCustomer(this)" class="btn  btn-success" >SEND</button>
-            </td>
-        </tr>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-                <button class="btn btn-warning" onclick="sendBulkInvoices()">BULK SEND</button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+            <tbody class="filter_body">
+            <!--<tr th:classappend="${(invoice.getStatus().name() == 'ISSUED')? 'bg-primary': (invoice.getStatus().name() == 'SENT') ? 'bg-warning': (invoice.getStatus().name() == 'PAID')?'bg-success':'bg-danger'}"  th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">-->
+            <tr th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">
+                <!--th:classappend="|${(invoice.getStatus().name() == 'ISSUED') ? 'row_issued_color':''}-->
+                <!--${(invoice.getStatus().name() == 'SENT') ? 'row_sent_color':''}-->
+                <!--${(invoice.getStatus().name() == 'PAID')?'row_paid_color':''}-->
+                <!--${(invoice.getStatus().name() == 'OVERDUE')?'row_overdue_color':''} |"-->
+
+                <td th:id="invoice_id_hidd" th:text="${invoice.getId()}" style="display: none;"></td>
+                <td>
+                    <input th:if="${invoice.getStatus().name() == 'ISSUED'}" type="checkbox" th:id="${invoice.getId()}" name="sel"/></td>
+                <td th:id="${'issueDate'+invoice.getId()}"
+                    th:text="${#temporals.format(invoice.getIssueDate(), 'dd-MM-yyyy')} "> Issue Date
+                </td>
+                <td class="table-primary" th:id="${'dueDate'+invoice.getId()}" th:text="${#temporals.format(invoice.getDueDate(), 'dd-MM-yyyy')} ">Expire Date</td>
+                <td th:id="${'sum'+invoice.getId()}" th:text="${#numbers.formatDecimal(invoice.getSum(),1,2)+' MDL'}">Sum</td>
+                <td class="filter_status_invoice" th:id="${'status'+invoice.getId()}" th:text="${invoice.getStatus()}"
+                    th:classappend="|${(invoice.getStatus().name() == 'ISSUED') ? 'text_issued_color':''}
+                ${(invoice.getStatus().name() == 'SENT') ? 'text_sent_color':''}
+                ${(invoice.getStatus().name() == 'PAID')?'text_paid_color':''}
+                ${(invoice.getStatus().name() == 'OVERDUE')?'text_overdue_color':''} |">
+                    <!--th:class="${invoice.getStatus() == 'ACTIVE'} ? 'success' : (${invoice.getStatus() == 'ISSUED'} ? 'warning' : 'red')"-->
+                </td>
+                <td th:id="${'contract_id'+invoice.getId()}" th:text="${invoice.getContract().getCustomer().getFullName()}">Customer Name</td>
+                <td th:id="${'fullName'+invoice.getId()}" th:text="${invoice.getContract().getProduct().getName()}">
+                    Service Name
+                </td>
+                <td>
+                    <a th:if="${invoice.getStatus().name() == 'ISSUED'}" th:id="${invoice.id}" onclick="deleteInvoice(this)" class="btn btn-sm btn-danger">DELETE</a>
+                </td>
+                <td>
+                    <button th:id="${invoice.getId()}" th:if="${invoice.getStatus().name() == 'ISSUED'}" onclick="sendInvoiceToCustomer(this)" class="btn btn-sm btn-success" >SEND</button>
+                </td>
+            </tr>
+            <!--invoice.getSum()+' MDL'-->
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                    <button class="btn btn-warning" onclick="sendBulkInvoices()">BULK SEND</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    <!--</div>-->
+
 
 </div>
 

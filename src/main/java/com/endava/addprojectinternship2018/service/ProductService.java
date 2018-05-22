@@ -1,6 +1,7 @@
 package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.ProductDao;
+import com.endava.addprojectinternship2018.model.Company;
 import com.endava.addprojectinternship2018.model.Product;
 import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
 import com.endava.addprojectinternship2018.model.dto.ProductDto;
@@ -18,6 +19,8 @@ import javax.validation.constraints.NotNull;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,11 +39,11 @@ public class ProductService {
     private static final Logger LOGGER = Logger.getLogger(ProductService.class);
 
     public List<Product> getAllByCompanyId(int id) {
-        return productDao.findAllByCompanyId(id);
+        return productDao.findAllByCompanyIdOrderByName(id);
     }
 
     public List<Product> getAllProducts() {
-        return productDao.findAll();
+        return productDao.findAllByOrderByCompanyName();
     }
 
     public long countAll() {
@@ -134,9 +137,16 @@ public class ProductService {
         return productDao.findAllByPriceBetween(priceFrom, priceTo);
     }
 
-    public ByteArrayInputStream getPriceList() {
+    public ByteArrayInputStream getPriceList(int[] productIds) {
 
-        List<Product> products = getAllProducts();
+        List<Product> products = new LinkedList<>();
+        if (productIds.length == 0) {
+            products.addAll(getAllProducts());
+        } else {
+            for (int productId : productIds) {
+                products.add(getById(productId));
+            }
+        }
 
         Document document = new Document();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -144,7 +154,7 @@ public class ProductService {
         try {
 
             PdfPTable table = new PdfPTable(4);
-            table.setWidthPercentage(60);
+            table.setWidthPercentage(100);
             table.setWidths(new int[]{4, 4, 3, 10});
 
             Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
@@ -154,7 +164,7 @@ public class ProductService {
             hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
             table.addCell(hcell);
 
-            hcell = new PdfPCell(new Phrase("Product name", headFont));
+            hcell = new PdfPCell(new Phrase("Service name", headFont));
             hcell.setHorizontalAlignment(Element.ALIGN_CENTER);
             table.addCell(hcell);
 

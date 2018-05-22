@@ -197,14 +197,6 @@
         stompClient.connect({}, function () {
         });
     }
-    function sendMessageNotification() {
-        var json = {
-            "notificationCase" : "NEW_MESSAGE",
-            "content" : "New message from: " + $("#new_message_email").val(),
-            "userTo" : "admin"
-        };
-        stompClient.send("/app/admin", {}, JSON.stringify(json));
-    };
 
 </script>
 </body>

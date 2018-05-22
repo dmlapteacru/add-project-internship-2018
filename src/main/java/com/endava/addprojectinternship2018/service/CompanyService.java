@@ -21,7 +21,7 @@ public class CompanyService {
     private UserService userService;
 
     public List<Company> getAllCompanies() {
-        return companyDao.findAll();
+        return companyDao.findAllByOrderByName();
     }
 
     public Optional<Company> getCompanyById(int id) {

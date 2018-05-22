@@ -74,8 +74,6 @@ public class CustomerController {
         model.addAttribute("paidInvoices", invoiceService.countByCustomerIdAndStatus(currentCustomerId, InvoiceStatus.PAID));
         model.addAttribute("overdueInvoices", invoiceService.countByCustomerIdAndStatus(currentCustomerId, InvoiceStatus.OVERDUE));
 
-        LOGGER.info(String.format("Customer %s:%s accessed home page", currentCustomer.getId(), currentCustomer.getFullName()));
-
         return "customer/homePage";
     }
 
