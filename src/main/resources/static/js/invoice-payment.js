@@ -1,16 +1,16 @@
 //
 
 $(document).ready(function () {
-    $.each($(".filter_status_invoice"),function () {
-        if ($(this).text() === "PAID"){
-            $(this).parent().addClass("success");
-        } else if ($(this).text() === "SENT"){
-            $(this).parent().addClass("warning");
-        }else if ($(this).text() === "OVERDUE"){
-            $(this).parent().addClass("danger");
-        }
-    })
-})
+    // $.each($(".filter_status_invoice"),function () {
+    //     if ($(this).text() === "PAID"){
+    //         $(this).addClass("success");
+    //     } else if ($(this).text() === "SENT"){
+    //         $(this).parent().addClass("warning");
+    //     }else if ($(this).text() === "OVERDUE"){
+    //         $(this).parent().addClass("danger");
+    //     }
+    // })
+});
 //INVOICE PAYMENT
 
 function payInvoice(btn) {

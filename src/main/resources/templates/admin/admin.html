@@ -69,7 +69,7 @@
                             </th>
                             <th>
                                 <select class="sel_roles" disabled>
-                                    <option selected value="Roles">Roles</option>
+                                    <option selected value="Roles">User type</option>
                                     <option>COMPANY</option>
                                     <option>CUSTOMER</option>
                                     <option>ADMIN</option>
@@ -96,7 +96,7 @@
 
                         </thead>
                         <tbody class="filter_body">
-                        <tr th:each="user : ${users}">
+                        <tr th:each="user : ${users}" th:if="${user.username}!='admin'">
                             <td><input type="checkbox" th:value="${user.username}" class="checkbox_users_element"/></td>
                             <td class="filter_role" th:text="${user.role}" valign="center"></td>
                             <td th:text="${user.name}" valign="center"></td>

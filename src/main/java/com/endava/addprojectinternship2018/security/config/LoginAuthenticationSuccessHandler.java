@@ -1,6 +1,9 @@
 package com.endava.addprojectinternship2018.security.config;
 
 
+import com.endava.addprojectinternship2018.service.UserService;
+import com.endava.addprojectinternship2018.service.WebSocketDistributeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -17,11 +20,15 @@ public class LoginAuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
     private static final String DEFAULT_URL_COMPANY = "/company/home";
     private static final String DEFAULT_URL_CUSTOMER = "/customer/home";
 
+    @Autowired
+    private UserService userService;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException {
         Set<String> setOfAuthorities = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
+        userService.setSocketToken();
         if (setOfAuthorities.contains("ADMIN")) {
             getRedirectStrategy().sendRedirect(request, response, DEFAULT_URL_ADMIN);
         } else if (setOfAuthorities.contains("COMPANY")) {
