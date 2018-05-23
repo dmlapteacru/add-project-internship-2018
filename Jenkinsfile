@@ -47,7 +47,7 @@ pipeline {
 
         stage('Upload artifact') {
            steps {
-               nexusArtifactUploader artifacts: [[artifactId: 'add-project-internship-2018', classifier: '', file: 'target/ServiceSystem-' + version.trim() + '.war', type: 'war']], 
+               nexusArtifactUploader artifacts: [[artifactId: 'add-project-internship-2018', classifier: '', file: 'target/add-project-internship-2018-' + version.trim() + '.war', type: 'war']], 
                credentialsId: '9d977555-9613-4485-8c0c-a25b72a316e3', 
                groupId: 'com.endava', 
                nexusUrl: 'nexus.endava.net', 
