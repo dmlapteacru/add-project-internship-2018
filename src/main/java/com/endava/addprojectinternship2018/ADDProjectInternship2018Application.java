@@ -4,16 +4,27 @@ import com.endava.addprojectinternship2018.security.config.LoginAuthenticationFa
 import com.endava.addprojectinternship2018.security.config.LoginAuthenticationSuccessHandler;
 import com.endava.addprojectinternship2018.service.EmailServiceImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
-public class ADDProjectInternship2018Application {
+public class ADDProjectInternship2018Application extends SpringBootServletInitializer{
+    @Value("${bank.connection.endpoint}")
+    private String bankEndpoint;
 
     public static void main(String[] args) {
         SpringApplication.run(ADDProjectInternship2018Application.class, args);
+    }
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+        return builder.sources(ADDProjectInternship2018Application.class);
     }
 
     @Bean
@@ -39,7 +50,7 @@ public class ADDProjectInternship2018Application {
     @Bean
     @Qualifier("bank_ip")
     public String bankIP() {
-        return "http://localhost:64509/api";
+        return bankEndpoint;
     }
 
 }
