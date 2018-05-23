@@ -30,6 +30,12 @@ public class Invoice {
     @Convert(converter = LocalDateConverter.class)
     private LocalDate dueDate;
 
+    @Convert(converter = LocalDateConverter.class)
+    private LocalDate serviceStartDate;
+
+    @Convert(converter = LocalDateConverter.class)
+    private LocalDate serviceEndDate;
+
     @Column
     @Enumerated(EnumType.STRING)
     private InvoiceStatus status;
