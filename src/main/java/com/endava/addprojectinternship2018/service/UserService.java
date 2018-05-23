@@ -6,6 +6,7 @@ import com.endava.addprojectinternship2018.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,13 +18,13 @@ import static com.endava.addprojectinternship2018.model.enums.UserStatus.INACTIV
 public class UserService {
 
     @Autowired
+    private PasswordTokenService passwordTokenService;
+
+    @Autowired
     private UserDao userDao;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    private PasswordTokenService passwordTokenService;
 
     public Optional<User> getUserByUsername(String username) {
         return userDao.findUserByUsername(username);
@@ -37,6 +38,7 @@ public class UserService {
         return userDao.findAll();
     }
 
+    @Transactional
     public User saveUser(UserDto userDto) {
         return userDao.save(convertUserDtoToUser(userDto));
     }
@@ -60,6 +62,7 @@ public class UserService {
         return userDto;
     }
 
+    @Transactional
     public void changeUserStatus(String username) {
         User user = userDao.findUserByUsername(username).get();
         if (user.getUserStatus() == ACTIVE) {
@@ -68,6 +71,7 @@ public class UserService {
         userDao.save(user);
     }
 
+    @Transactional
     public void changeUserStatusOnActive(List<ChangeUserStatusDto> changeUserStatusDtoList) {
         User user;
         for (ChangeUserStatusDto u:changeUserStatusDtoList
@@ -77,6 +81,8 @@ public class UserService {
             userDao.save(user);
         }
     }
+
+    @Transactional
     public void changeUserStatusOnInactive(List<ChangeUserStatusDto> changeUserStatusDtoList) {
         User user;
         for (ChangeUserStatusDto u:changeUserStatusDtoList
@@ -91,6 +97,7 @@ public class UserService {
         return userDao.findAllUsersWithProfile();
     }
 
+    @Transactional
     public void changeUserPassword(UserDto user){
         User oldUser = getUserByUsername(user.getUsername()).get();
         oldUser.setPassword(passwordEncoder.encode(user.getPassword()));

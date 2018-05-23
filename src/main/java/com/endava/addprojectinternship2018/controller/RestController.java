@@ -13,13 +13,16 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @org.springframework.web.bind.annotation.RestController
 public class RestController {
 
-    @Autowired
-    private CompanyService companyService;
-
-    @Autowired
-    private CategoryService categoryService;
+    private final CompanyService companyService;
+    private final CategoryService categoryService;
 
     private static final Logger LOGGER = Logger.getLogger(RestController.class);
+
+    @Autowired
+    public RestController(CompanyService companyService, CategoryService categoryService) {
+        this.companyService = companyService;
+        this.categoryService = categoryService;
+    }
 
     //  -----   REST Company
     @GetMapping("/rest/getCompanyByEmail/{name}")

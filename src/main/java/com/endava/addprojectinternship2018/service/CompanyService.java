@@ -11,14 +11,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
 public class CompanyService {
 
-    @Autowired
-    private CompanyDao companyDao;
+    private final CompanyDao companyDao;
+    private final UserService userService;
 
     @Autowired
-    private UserService userService;
+    public CompanyService(CompanyDao companyDao, UserService userService) {
+        this.companyDao = companyDao;
+        this.userService = userService;
+    }
 
     public List<Company> getAllCompanies() {
         return companyDao.findAllByOrderByName();
@@ -40,10 +42,12 @@ public class CompanyService {
         return companyDao.findByUserId(id);
     }
 
+    @Transactional
     public Company saveCompany(CompanyDto companyDto) {
         return companyDao.save(convertCompanyDtoToCompany(companyDto));
     }
 
+    @Transactional
     public void save(Company company){
         companyDao.save(company);
     }

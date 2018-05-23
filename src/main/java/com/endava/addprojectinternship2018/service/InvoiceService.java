@@ -1,30 +1,20 @@
 package com.endava.addprojectinternship2018.service;
 
-import com.endava.addprojectinternship2018.controller.CustomerController;
-import com.endava.addprojectinternship2018.dao.CompanyDao;
-import com.endava.addprojectinternship2018.dao.ContractDao;
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
 import com.endava.addprojectinternship2018.dao.InvoiceTransactionDao;
-import com.endava.addprojectinternship2018.model.Contract;
-import com.endava.addprojectinternship2018.model.Product;
-import com.endava.addprojectinternship2018.model.dto.InvoiceCustomerViewDto;
 import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
 import com.endava.addprojectinternship2018.model.dto.InvoiceDescriptionPaymentDto;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
-import com.endava.addprojectinternship2018.model.User;
 import com.endava.addprojectinternship2018.model.dto.InvoiceDto;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.*;
@@ -32,16 +22,18 @@ import static com.endava.addprojectinternship2018.model.enums.InvoiceStatus.*;
 @Service
 public class InvoiceService {
 
-    @Autowired
-    private InvoiceDao invoiceDao;
-
-    @Autowired
-    private InvoiceTransactionDao invoiceTransactionDao;
-
-    @Autowired
-    private WebSocketDistributeService webSocketDistributeService;
+    private final InvoiceDao invoiceDao;
+    private final InvoiceTransactionDao invoiceTransactionDao;
+    private final WebSocketDistributeService webSocketDistributeService;
 
     private static final Logger LOGGER = Logger.getLogger(InvoiceService.class);
+
+    @Autowired
+    public InvoiceService(InvoiceDao invoiceDao, InvoiceTransactionDao invoiceTransactionDao, WebSocketDistributeService webSocketDistributeService) {
+        this.invoiceDao = invoiceDao;
+        this.invoiceTransactionDao = invoiceTransactionDao;
+        this.webSocketDistributeService = webSocketDistributeService;
+    }
 
     public List<Invoice> getAllInvoices(){
         return invoiceDao.findAll();
@@ -123,13 +115,18 @@ public class InvoiceService {
         return invoiceDto;
     }
 
+    @Transactional
     public void changeInvoiceStatus(int invoiceId) {
         Invoice invoice = invoiceDao.findById(invoiceId).get();
         if (invoice.getStatus() == InvoiceStatus.ACTIVE) {
             invoice.setStatus(IN_PROGRESS);
-        } else invoice.setStatus(ACTIVE);
+        } else {
+            invoice.setStatus(ACTIVE);
+        }
+        invoiceDao.save(invoice);
     }
 
+    @Transactional
     public void changeInvoiceStatusToSent(int invoiceId) {
         Invoice invoice = invoiceDao.findById(invoiceId).get();
         System.out.println(invoice);

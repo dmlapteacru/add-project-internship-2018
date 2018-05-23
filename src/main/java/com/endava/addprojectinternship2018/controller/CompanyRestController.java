@@ -2,9 +2,8 @@ package com.endava.addprojectinternship2018.controller;
 
 import com.endava.addprojectinternship2018.model.Company;
 import com.endava.addprojectinternship2018.model.Product;
-import com.endava.addprojectinternship2018.model.dto.CompanyDto;
 import com.endava.addprojectinternship2018.model.dto.CompanyDtoLight;
-import com.endava.addprojectinternship2018.model.dto.ProductDtoTest;
+import com.endava.addprojectinternship2018.model.dto.ProductDto;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.ProductService;
 import com.endava.addprojectinternship2018.validation.ErrorMessage;
@@ -44,43 +43,42 @@ public class CompanyRestController {
 
     @RequestMapping(value = "/newService", method = POST)
     public @ResponseBody
-    ValidationResponse saveNewService(@RequestBody @Valid ProductDtoTest productDtoTest,
+    ValidationResponse saveNewService(@RequestBody @Valid ProductDto productDto,
                                       BindingResult bindingResult) {
 
         ValidationResponse response = new ValidationResponse();
         response.setStatus("SUCCESS");
         final List<ErrorMessage> errorMessageList = new ArrayList<>();
 
-        if (productDtoTest.getCategoryId() == 0) {
+        if (productDto.getCategoryId() == 0) {
             response.setStatus("FAIL");
             errorMessageList.add(new ErrorMessage("select_category", "must not be empty"));
         }
 
-        if (productDtoTest.getName() == null || productDtoTest.getName().isEmpty()) {
+        if (productDto.getName() == null || productDto.getName().isEmpty()) {
             response.setStatus("FAIL");
             errorMessageList.add(new ErrorMessage("new_service_name", "must not be empty"));
         }
 
-        if (productDtoTest.getName().matches("(<\\s*script\\s*>)|(alert\\s*\\(\\s*\\))")) {
+        if (productDto.getName().matches("(<\\s*script\\s*>)|(alert\\s*\\(\\s*\\))")) {
             response.setStatus("FAIL");
             errorMessageList.add(new ErrorMessage("new_service_name", "contains illegal characters"));
         }
 
-        if (productDtoTest.getDescription().matches("(<\\s*script\\s*>)|(alert\\s*\\(\\s*\\))")) {
+        if (productDto.getDescription().matches("(<\\s*script\\s*>)|(alert\\s*\\(\\s*\\))")) {
             response.setStatus("FAIL");
             errorMessageList.add(new ErrorMessage("new_service_desc", "contains illegal characters"));
         }
 
-
-        if (productDtoTest.getPrice() <= 0) {
+        if (productDto.getPrice() <= 0) {
             response.setStatus("FAIL");
             errorMessageList.add(new ErrorMessage("new_service_price", "must be more than 0"));
         }
 
         Optional<Product> optionalProduct = productService.getByNameAndCategoryIdAndCompanyId(
-                productDtoTest.getName(),
-                productDtoTest.getCategoryId(),
-                productDtoTest.getCompanyId());
+                productDto.getName(),
+                productDto.getCategoryId(),
+                productDto.getCompanyId());
         if (optionalProduct.isPresent()) {
             response.setStatus("FAIL");
             errorMessageList.add(new ErrorMessage("new_service_name", "service name exists"));
@@ -96,7 +94,7 @@ public class CompanyRestController {
         response.setErrorMessageList(errorMessageList);
 
         if (response.getStatus().equals("SUCCESS")) {
-            productService.save(productDtoTest);
+            productService.save(productDto);
         }
 
         return response;

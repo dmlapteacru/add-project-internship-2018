@@ -1,13 +1,9 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.dao.InvoiceTransactionDao;
 import com.endava.addprojectinternship2018.model.Contract;
 import com.endava.addprojectinternship2018.model.Invoice;
-import com.endava.addprojectinternship2018.model.dto.ContractDto;
-import com.endava.addprojectinternship2018.model.dto.ContractDtoTest;
 import com.endava.addprojectinternship2018.model.dto.InvoiceEditDto;
 import com.endava.addprojectinternship2018.model.dto.InvoiceSaveNewDto;
-import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.service.ContractService;
 import com.endava.addprojectinternship2018.service.InvoiceService;
 import com.endava.addprojectinternship2018.validation.ErrorMessage;
@@ -15,17 +11,14 @@ import com.endava.addprojectinternship2018.validation.ValidationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController

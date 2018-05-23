@@ -2,7 +2,6 @@ package com.endava.addprojectinternship2018.controller;
 
 import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
-import com.endava.addprojectinternship2018.model.dto.ContractDto;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -25,27 +23,29 @@ import java.util.Optional;
 public class CustomerController {
 
     @Autowired
-    private InvoiceService invoiceService;
-
-    @Autowired
     private UserUtil userUtil;
 
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private CustomerService customerService;
-
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private CategoryService categoryService;
-
-    @Autowired
-    private ContractService contractService;
+    private final CustomerService customerService;
+    private final ProductService productService;
+    private final CategoryService categoryService;
+    private final ContractService contractService;
+    private final InvoiceService invoiceService;
 
     private static final Logger LOGGER = Logger.getLogger(CustomerController.class);
+
+    @Autowired
+    public CustomerController(CustomerService customerService, ProductService productService,
+                              CategoryService categoryService, ContractService contractService,
+                              InvoiceService invoiceService) {
+        this.customerService = customerService;
+        this.productService = productService;
+        this.categoryService = categoryService;
+        this.contractService = contractService;
+        this.invoiceService = invoiceService;
+    }
 
     @GetMapping(value = "home")
     public String getHomePage(Model model) {
@@ -164,24 +164,6 @@ public class CustomerController {
         model.addAttribute("ownerType", "customer");
         model.addAttribute("filter", filter);
 
-        return "product/productListPage";
-    }
-
-    @Deprecated
-    @GetMapping(value = "services/newcontract")
-    public String getProductsPageSignContract(@RequestParam(name = "customerId") int customerId,
-                                              @RequestParam(name = "companyId") int companyId,
-                                              @RequestParam(name = "productId") int productId,
-                                              Model model) {
-        ContractDto contractDto = contractService.createNewContractDto(customerId, companyId, productId);
-        int currentCustomerId = userUtil.getCurrentCustomer().getId();
-        List<Product> productList = productService.getAllProducts();
-        List<Category> categoryList = categoryService.getAllCategory();
-        model.addAttribute("contractDto", contractDto);
-        model.addAttribute("categoryList", categoryList);
-        model.addAttribute("products", productList);
-        model.addAttribute("customerId", currentCustomerId);
-        model.addAttribute("update", false);
         return "product/productListPage";
     }
 

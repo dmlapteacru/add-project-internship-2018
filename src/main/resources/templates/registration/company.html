@@ -4,7 +4,7 @@
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="stylesheet" type="text/css" href="/css/default.css"  />
+    <link rel="stylesheet" type="text/css" href="/css/default.css"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -23,13 +23,14 @@
 
             </div>
 
-            <div th:if="${param.success}">
-                <div class="alert alert-info">
-                    You have successfully registered in our system!
+            <div th:if="not ${update}">
+                <h2>New company registration</h2> <br>
+                <div th:if="${param.success}">
+                    <div class="alert alert-info">
+                        You have successfully registered in our system!
+                    </div>
                 </div>
             </div>
-
-            <h1>Registration</h1>
 
             <form th:action="${update} ? @{/company/updateProfile} : @{/registration/company}"
                   th:object="${companyDto}" method="post">
@@ -47,8 +48,7 @@
                 <div class="form-group"
                      th:classappend="${#fields.hasErrors('name')}? 'has-error':''">
                     <label for="name" class="control-label">Company name</label>
-                    <input id="name"
-                           class="form-control"
+                    <input id="name" class="form-control"
                            th:field="*{name}"/>
                     <p class="error-message"
                        th:each="error: ${#fields.errors('name')}"

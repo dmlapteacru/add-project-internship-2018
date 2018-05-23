@@ -13,11 +13,14 @@ import java.util.Optional;
 @Service
 public class CustomerService {
 
-    @Autowired
-    private CustomerDao customerDao;
+    private final CustomerDao customerDao;
+    private final UserService userService;
 
     @Autowired
-    private UserService userService;
+    public CustomerService(CustomerDao customerDao, UserService userService) {
+        this.customerDao = customerDao;
+        this.userService = userService;
+    }
 
     public List<Customer> getAllCustomers() {
         return customerDao.findAll();
@@ -44,6 +47,7 @@ public class CustomerService {
         customerDao.save(convertCustomerDtoToCustomer(customerDto));
     }
 
+    @Transactional
     public void save(Customer customer){
         customerDao.save(customer);
     }
