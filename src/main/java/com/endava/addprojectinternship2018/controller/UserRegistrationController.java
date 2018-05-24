@@ -42,6 +42,7 @@ public class UserRegistrationController {
     private final NotificationService notificationService;
 
     private static final Logger LOGGER = Logger.getLogger(UserRegistrationController.class);
+    private static final String PATTERN = "(.*<\\s*script\\s*>.*)|(.*alert\\s*\\(\\s*\\).*)";
 
     @Autowired
     public UserRegistrationController(CustomerService customerService, CompanyService companyService, LoginAuthenticationSuccessHandler loginAuthenticationSuccessHandler, SimpMessagingTemplate messagingTemplate, NotificationService notificationService) {
@@ -111,7 +112,7 @@ public class UserRegistrationController {
             return "registration/company";
         }
 
-        if (companyDto.getName().matches("(<\\s*script\\s*>)|(alert\\s*\\(\\s*\\))")) {
+        if (companyDto.getName().matches(PATTERN)) {
             result.rejectValue("name", "name.error", "Name contains illegal characters");
             return "registration/company";
         }
@@ -142,12 +143,12 @@ public class UserRegistrationController {
             return "registration/customer";
         }
 
-        if (customerDto.getFirstName().matches("(<\\s*script\\s*>)|(alert\\s*\\(\\s*\\))")) {
+        if (customerDto.getFirstName().matches(PATTERN)) {
             result.rejectValue("firstName", "firstName.error", "First name contains illegal characters");
             return "registration/customer";
         }
 
-        if (customerDto.getLastName().matches("(<\\s*script\\s*>)|(alert\\s*\\(\\s*\\))")) {
+        if (customerDto.getLastName().matches(PATTERN)) {
             result.rejectValue("lastName", "lastName.error", "Last name contains illegal characters");
             return "registration/customer";
         }

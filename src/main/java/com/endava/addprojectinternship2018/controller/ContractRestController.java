@@ -133,14 +133,14 @@ public class ContractRestController {
         LOGGER.info(String.format("%s: attempt to delete contract: %s", userUtil.getCurrentUser().getUsername(), contractId));
         Set<String> deleteResult = contractService.deleteContract(contractId);
         if (deleteResult.contains("OK")) {
-            LOGGER.info("Contract deleted");
+            LOGGER.info("Contract was deleted");
             return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
         } else {
             StringBuilder sb = new StringBuilder();
             for (String s : deleteResult) {
                 sb.append(s + "\n");
             }
-            LOGGER.info("Can not delete: " + sb.toString());
+            LOGGER.info("contract can not be deleted: " + sb.toString());
             return new ResponseEntity<>(sb.toString(), HttpStatus.BAD_REQUEST);
         }
 

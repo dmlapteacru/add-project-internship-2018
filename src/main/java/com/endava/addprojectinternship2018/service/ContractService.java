@@ -132,10 +132,10 @@ public class ContractService {
             }
         }
         if (haveInvoices(contractId)) {
-            result.add("Contract have active invoices");
+            result.add("Contract has active invoices");
             result.remove("OK");
         }
-        if (!isNotOverdue(contractId)) {
+        if (isOverdue(contractId)) {
             result.add("OK");
         }
         if (result.contains("OK")) {
@@ -191,6 +191,7 @@ public class ContractService {
         if (newStatus != currentStatus) {
             currentContract.setStatus(newStatus);
             contractDao.save(currentContract);
+            LOGGER.info(String.format("%s changed contract %s to new status %s", userUtil.getCurrentUser().getUsername(), contractId, newStatus));
         }
 
         return newStatus.toString();
@@ -231,9 +232,8 @@ public class ContractService {
         return contractDao.findFirstByOrderByIdDesc().get(0);
     }
 
-    public boolean isNotOverdue(int contractId) {
-        Contract currentContract = getById(contractId);
-        return currentContract != null && currentContract.getExpireDate().isAfter(LocalDate.now());
+    public boolean isOverdue(int contractId) {
+        return getById(contractId).getExpireDate().isBefore(LocalDate.now());
     }
 
     public boolean haveInvoices(int contractId) {

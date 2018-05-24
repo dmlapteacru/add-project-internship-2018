@@ -120,8 +120,6 @@ public class CustomerController {
         model.addAttribute("statusListForFilter", Arrays.asList(ContractStatus.values()));
         model.addAttribute("filter", new AdvancedFilter());
 
-        LOGGER.info(String.format("customer %s:%s accessed contracts page", currentCustomerId, userUtil.getCurrentCustomer().getFullName()));
-
         return "contract/contractListPage";
 
     }

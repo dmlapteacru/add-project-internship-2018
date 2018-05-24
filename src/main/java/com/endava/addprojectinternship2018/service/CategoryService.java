@@ -36,7 +36,7 @@ public class CategoryService {
     }
 
     public Category getCategoryById(int id){
-        return categoryDao.getOne(id);
+        return categoryDao.findById(id).get();
     }
 
     public Optional<Category> getCategoryByName(String name) {

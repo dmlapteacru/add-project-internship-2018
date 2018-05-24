@@ -12,6 +12,8 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class ProductDto {
 
+    private int productId;
+
     @NotNull
     private String name;
 

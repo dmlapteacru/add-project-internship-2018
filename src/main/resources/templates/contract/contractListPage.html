@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/table-filter.css">
     <link rel="stylesheet" type="text/css" href="/css/header.css"/>
-    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>-->
     <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
     <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
     <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
@@ -27,9 +26,13 @@
 
 </div>
 
+<div class="modal fade" id="load_icon_wrapper" data-backdrop="static" data-keyboard="false">
+    <img id="load" src="/img/load_icon.gif"/>
+</div>
+
 <div class="panel panel-default panel-no-border">
     <div class="panel-body">
-        <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalContract"
+        <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalContract" data-backdrop="static"
            class="btn btn-info btn-sm" role="button" th:id="${companyId}"
            onclick="createNewContract(this)">Create new contract</a>
         <form class="pull-right"
@@ -259,7 +262,7 @@
                 <input id="deleteContractId" type="text" hidden="hidden"/>
             </div>
             <div class="modal-footer modal_btn">
-                <button id="btn_delete_contract" type="button" class="btn btn-danger">Delete</button>
+                <button id="btn_delete_contract" type="button" class="btn btn-warning">Delete</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -415,7 +418,6 @@
 
     $(document).ready(function () {
         $('#createInvoiceDialog').on('hidden.bs.modal', function () {
-            console.log('modal is closing');
             clearErrorsSecond();
         })
     });
@@ -438,8 +440,10 @@
         modalBody.append('<p>Service: ' + row.find('#productName').text() + '</p>');
         modalBody.append('<p>Sum: ' + row.find('#sum').text() + '</p>');
         modalBody.append('<p>Status: ' + row.find('#status').text() + '</p>');
+        modalConfirm.modal({backdrop: "static"});
         modalConfirm.modal('show');
         $('#deleteContractId').val(contractId);
+        $("#btn_delete_contract").attr("disabled", false);
     }
 
     function showAlert(title, message) {
@@ -451,10 +455,12 @@
         for (i = 0; i < strings.length; i++) {
             alertBody.append('<p>' + strings[i] + '</p>');
         }
+        alertWindow.modal({backdrop: "static"});
         alertWindow.modal('show');
     }
 
     $('#btn_delete_contract').click(function () {
+        $("#btn_delete_contract").attr("disabled", true);
         $.ajax(
             {
                 url: "/contractRest/deleteContract",
@@ -478,8 +484,6 @@
         var row = $("#row" + rowId);
         var issueDate = new Date();
 
-        // console.log(row.find("#contractId").text());
-
         $('#issue_inv_date').val(moment(issueDate).format('YYYY-MM-DD'));
         $('#company_inv_out').val($('#company_inv_in').val());
         $('#status_inv_out').val($('#status_inv_in').val());
@@ -496,7 +500,8 @@
         console.log($('#issue_inv_date').val());
         console.log($('#expire_inv_date').val());
 
-        $("#createInvoiceDialog").modal();
+        $('#createInvoiceDialog').modal({backdrop: "static"});
+        $("#createInvoiceDialog").modal('show');
 
     }
 
@@ -639,14 +644,13 @@
         loadCompanyName(companyId);
         loadAllCustomers();
         loadProducts(companyId);
+        $("#btn_save_contract").attr("disabled", false);
     }
 
     $("#btn_save_contract").click(function (event) {
-
         event.preventDefault();
-
+        $("#btn_save_contract").attr("disabled", true);
         $('#alertMessage').text('');
-
         var newContractData = {
             "issueDate": $("#new_issueDate").val(),
             "expireDate": $("#new_expireDate").val(),
@@ -693,24 +697,29 @@
         $('#new_issueDate').focus(function () {
             $('#new_issueDate').parent().removeClass('has-error');
             $('#new_issueDateError').hide();
+            $("#btn_save_contract").attr("disabled", false);
         });
         $('#new_expireDate').focus(function () {
             $('#new_expireDateError').hide();
             $('#new_expireDate').parent().removeClass('has-error');
+            $("#btn_save_contract").attr("disabled", false);
         });
         $('#new_customerSelect').focus(function () {
             $('#new_customerSelectError').hide();
             $('#new_customerSelect').parent().removeClass('has-error');
             $('#new_contractError').hide();
+            $("#btn_save_contract").attr("disabled", false);
         });
         $('#new_productSelect').focus(function () {
             $('#new_productSelectError').hide();
             $('#new_productSelect').parent().removeClass('has-error');
             $('#new_contractError').hide();
+            $("#btn_save_contract").attr("disabled", false);
         });
         $('#new_sum').focus(function () {
             $('#new_sumError').hide();
             $('#new_sum').parent().removeClass('has-error');
+            $("#btn_save_contract").attr("disabled", false);
         });
         $('#new_expireDateError').hide();
         $('#new_expireDate').parent().removeClass('has-error');
@@ -759,10 +768,15 @@
             $('#btn_sign_contract').hide();
         }
         $('#modalSignConfirm').find('.modal-title').text(title);
+        $('#modalSignConfirm').modal({backdrop: "static"});
         $('#modalSignConfirm').modal('show');
+        $("#btn_sign_contract").attr("disabled", false);
+        $("#btn_unsign_contract").attr("disabled", false);
     }
 
     function signContract() {
+        $("#btn_sign_contract").attr("disabled", true);
+        $("#btn_unsign_contract").attr("disabled", true);
         $.ajax(
             {
                 url: "/contractRest/signContract",
@@ -777,7 +791,9 @@
             })
     }
 
-    $('#btn_sign_contract').click(signContract());
+    $('#btn_sign_contract').click(function(){
+        signContract();
+    })
 
 </script>
 

@@ -27,77 +27,16 @@ public class CompanyRestController {
     private static final Logger LOGGER = Logger.getLogger(CompanyRestController.class);
 
     private final CompanyService companyService;
-    private final ProductService productService;
 
     @Autowired
-    public CompanyRestController(CompanyService companyService, ProductService productService) {
+    public CompanyRestController(CompanyService companyService) {
         this.companyService = companyService;
-        this.productService = productService;
     }
 
     @GetMapping(value = "/getNameById")
     public String getCompanyNameById(@RequestParam(name = "companyId") int companyId) {
         return companyService.getCompanyById(companyId)
                 .map(Company::getName).orElse("");
-    }
-
-    @RequestMapping(value = "/newService", method = POST)
-    public @ResponseBody
-    ValidationResponse saveNewService(@RequestBody @Valid ProductDto productDto,
-                                      BindingResult bindingResult) {
-
-        ValidationResponse response = new ValidationResponse();
-        response.setStatus("SUCCESS");
-        final List<ErrorMessage> errorMessageList = new ArrayList<>();
-
-        if (productDto.getCategoryId() == 0) {
-            response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("select_category", "must not be empty"));
-        }
-
-        if (productDto.getName() == null || productDto.getName().isEmpty()) {
-            response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("new_service_name", "must not be empty"));
-        }
-
-        if (productDto.getName().matches("(<\\s*script\\s*>)|(alert\\s*\\(\\s*\\))")) {
-            response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("new_service_name", "contains illegal characters"));
-        }
-
-        if (productDto.getDescription().matches("(<\\s*script\\s*>)|(alert\\s*\\(\\s*\\))")) {
-            response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("new_service_desc", "contains illegal characters"));
-        }
-
-        if (productDto.getPrice() <= 0) {
-            response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("new_service_price", "must be more than 0"));
-        }
-
-        Optional<Product> optionalProduct = productService.getByNameAndCategoryIdAndCompanyId(
-                productDto.getName(),
-                productDto.getCategoryId(),
-                productDto.getCompanyId());
-        if (optionalProduct.isPresent()) {
-            response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("new_service_name", "service name exists"));
-        }
-
-        if (bindingResult.hasErrors()) {
-            response.setStatus("FAIL");
-            bindingResult.getFieldErrors().stream()
-                    .map(fieldError -> new ErrorMessage(fieldError.getField(), fieldError.getDefaultMessage()))
-                    .forEach(errorMessageList::add);
-        }
-
-        response.setErrorMessageList(errorMessageList);
-
-        if (response.getStatus().equals("SUCCESS")) {
-            productService.save(productDto);
-        }
-
-        return response;
     }
 
     @GetMapping(value = "getAllIdAndName")
