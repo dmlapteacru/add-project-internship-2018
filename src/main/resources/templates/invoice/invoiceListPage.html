@@ -121,7 +121,7 @@
             <td id="invoice_date" th:text="${#temporals.format(invoice.issueDate, 'dd-MM-yyyy')} ">Issue Date</td>
             <td th:text="${#temporals.format(invoice.dueDate, 'dd-MM-yyyy')}">Expire Date</td>
             <td><span id="sum_to_pay" th:text="${invoice.sum}"></span><span> MDL</span></td>
-            <td class="filter_status_invoice" th:text="${invoice.getStatus()}">Status</td>
+            <td><span class="filter_status_invoice" th:text="${invoice.getStatus()}"></span></td>
             <td th:text="${invoice.getContract().getCompany().getName()}">Company</td>
             <td th:text="${invoice.getContract().getProduct().getName()}">Service</td>
             <td>

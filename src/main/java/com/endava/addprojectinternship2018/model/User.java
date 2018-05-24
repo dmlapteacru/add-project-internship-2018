@@ -38,6 +38,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
+    @Column
+    private String socketToken;
+
     public User(String username, String password) {
         this.username = username;
         this.password = password;

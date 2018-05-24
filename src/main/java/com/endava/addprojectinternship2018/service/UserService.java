@@ -3,6 +3,7 @@ package com.endava.addprojectinternship2018.service;
 import com.endava.addprojectinternship2018.dao.UserDao;
 import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.model.dto.*;
+import com.endava.addprojectinternship2018.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,6 +26,12 @@ public class UserService {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserUtil userUtil;
+
+    @Autowired
+    private WebSocketDistributeService webSocketDistributeService;
 
     public Optional<User> getUserByUsername(String username) {
         return userDao.findUserByUsername(username);
@@ -112,4 +119,11 @@ public class UserService {
     public UserBankAccountDto getUserBankAccountByUsername(String username){
        return userDao.findUserBankAccountByUsername(username);
     }
+
+    public void setSocketToken() {
+        User currentUser = userUtil.getCurrentUser();
+        currentUser.setSocketToken(passwordEncoder.encode(webSocketDistributeService.generateSocketToken()));
+        userDao.save(currentUser);
+    }
+
 }

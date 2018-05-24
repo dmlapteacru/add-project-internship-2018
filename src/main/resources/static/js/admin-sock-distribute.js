@@ -5,9 +5,9 @@ $(document).ready(function () {
     loadNotifications();
     $.each($(".filter_status"),function () {
         if ($(this).children().text() === "ACTIVE"){
-            $(this).parent().addClass("success");
+            $(this).children().addClass("user-status-active");
         } else {
-            $(this).parent().addClass("danger");
+            $(this).children().addClass("user-status-inactive");
         }
     })
 });

@@ -399,3 +399,21 @@ a{
     cursor: pointer;
     text-decoration: underline;
 }
+
+.user-status-active {
+    font-size: 9pt;
+    padding: 2px 5px;
+    background-color: #3ecc88;
+    border: 1px solid #3ecc88;
+    border-radius: 14px;
+    color: #fff;
+}
+
+.user-status-inactive {
+    color: #fff;
+    font-size: 9pt;
+    padding: 2px 5px;
+    background-color: #ee4c48;
+    border: 1px solid #ee4c48;
+    border-radius: 14px;
+}
