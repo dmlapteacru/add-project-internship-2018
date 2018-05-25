@@ -16,5 +16,13 @@ function selectAllCheckBoxes() {
     }
 }
 
+function uncheckAllCheckBoxes() {
+    var selectedRows = $('table.table tbody input[type=checkbox]');
+    for (var i = 0; i<selectedRows.length; i++){
+        selectedRows[i].checked = false;
+    }
+    $('#checked_all').prop('checked', false);
+}
+
 
 
