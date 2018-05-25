@@ -1,7 +1,10 @@
 package com.endava.addprojectinternship2018.controller;
 
+import com.endava.addprojectinternship2018.model.Customer;
 import com.endava.addprojectinternship2018.model.User;
+import com.endava.addprojectinternship2018.model.enums.Role;
 import com.endava.addprojectinternship2018.service.UserService;
+import com.endava.addprojectinternship2018.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,8 +18,19 @@ public class UserRestController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserUtil userUtil;
+
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public List<User> all(){
         return userService.getAllUsers();
+    }
+
+    @RequestMapping(value = "/get/username", method = RequestMethod.GET)
+    public String getUserName(){
+        Customer customer = userUtil.getCurrentCustomer();
+        if (customer!=null){
+            return customer.getFullName();
+        } else return userUtil.getCurrentCompany().getName();
     }
 }

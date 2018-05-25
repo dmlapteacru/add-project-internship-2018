@@ -19,30 +19,40 @@ $("#create_account").click(function () {
     )
 });
 $(".add_money").submit(function (e) {
+    $("html body").css("cursor", "progress");
     e.preventDefault();
-    $.ajax(
-        {
-            url : "/bankAccount/addmoney?sum=" + $("#money_sum").val(),
-            type : "POST",
-            success: function () {
-                $("#confirm_alert_message").text("Money added.");
-                $("#alert_success").slideToggle("slow");
-                setTimeout(function () {
+    if ($(".balance_info").text()===" -no connection- "){
+        $("#error_alert_message").text("No connection with bank.");
+        $("#alert_error").slideToggle("slow");
+        setTimeout(function () {
+            $("#alert_error").slideToggle("slow");
+        },3000);
+    } else {
+        $.ajax(
+            {
+                url : "/bankAccount/addmoney?sum=" + $("#money_sum").val(),
+                type : "POST",
+                success: function () {
+                    $("#confirm_alert_message").text("Money added.");
                     $("#alert_success").slideToggle("slow");
-                },3000);
-                $(".btn_add_money_toggle").click();
-                $("#money_sum").val("0.0");
-                loadBalance();
-            },
-            error: function (response) {
-                $("#error_alert_message").text(response.responseText);
-                $("#alert_error").slideToggle("slow");
-                setTimeout(function () {
+                    setTimeout(function () {
+                        $("#alert_success").slideToggle("slow");
+                    },3000);
+                    $(".btn_add_money_toggle").click();
+                    $("#money_sum").val("0.0");
+                    loadBalance();
+                },
+                error: function (response) {
+                    $("#error_alert_message").text(response.responseText);
                     $("#alert_error").slideToggle("slow");
-                },3000);
+                    setTimeout(function () {
+                        $("#alert_error").slideToggle("slow");
+                    },3000);
+                }
             }
-        }
-    )
+        )
+    }
+
 });
 $("#btn_statement_req").click(function () {
     if (($("#date_from").val() === "") || ($("#date_to").val() === "")){

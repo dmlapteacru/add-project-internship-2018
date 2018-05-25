@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/table-filter.css">
     <link rel="stylesheet" type="text/css" href="/css/header.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/contracts.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/custom_radio_buttons.css"/>
     <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
     <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
@@ -22,171 +23,191 @@
 </head>
 
 <body>
-<div th:replace="fragments/header :: header">
-
-</div>
 
 <div class="modal fade" id="load_icon_wrapper" data-backdrop="static" data-keyboard="false">
     <img id="load" src="/img/load_icon.gif"/>
 </div>
 
-<div class="panel panel-default panel-no-border">
-    <div class="panel-body">
-        <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalContract" data-backdrop="static"
-           class="btn btn-info btn-sm" role="button" th:id="${companyId}"
-           onclick="createNewContract(this)">Create new contract</a>
-        <form class="pull-right"
-              th:object="${filter}"
-              th:action="${companyId==0} ? @{/customer/contracts/filtered} : @{/company/contracts/filtered}"
-              method="post">
-            <div class="form-row">
-                <div class="col-md-2 mb-3">
-                    <label for="adv_filter_status">status</label>
-                    <select id="adv_filter_status" class="form-control input-sm" th:field="*{contractStatus}">
-                        <option value="">--all--</option>
-                        <option th:each="currStatus : ${statusListForFilter}"
-                                th:value="${currStatus.name()}"
-                                th:text="${currStatus.toString()}">
-                        </option>
-                    </select>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label for="adv_filter_sumFrom">sum from</label>
-                    <input class="form-control input-sm" id="adv_filter_sumFrom" type="number" th:field="*{sumFrom}"
-                           placeholder="sum from" required/>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label for="adv_filter_sumTo">sum from</label>
-                    <input class="form-control input-sm" id="adv_filter_sumTo" type="number" th:field="*{sumTo}"
-                           placeholder="sum to" required/>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label for="adv_filter_date_from">date from</label>
-                    <input type="date" id="adv_filter_date_from" class="form-control input-sm col-sm-2"
-                           th:field="*{dateFrom}"/>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label for="adv_filter_date_to">date to</label>
-                    <input type="date" id="adv_filter_date_to" class="form-control input-sm col-sm-2"
-                           th:field="*{dateTo}"/>
-                </div>
-
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-info btn-sm">apply
-                        <span class="glyphicon glyphicon-filter"></span>
+<div class="wrapper">
+    <div th:replace="fragments/header :: header"></div>
+    <div class="content_wrapper">
+        <div class="filter_wrapper">
+            <div class="filter_title">
+                <span>FILTERS</span>
+                <a th:href="${companyId==0} ? @{/customer/contracts} : @{/company/contracts}"
+                   class="default_btn"><span class="btn_icon_left"><i class="fas fa-eraser"></i></span><span>Clear all filters</span></a>
+            </div>
+            <div class="filter_content">
+                <form class="filter_form"
+                      th:object="${filter}"
+                      th:action="${companyId==0} ? @{/customer/contracts/filtered} : @{/company/contracts/filtered}"
+                      method="post">
+                    <div class="filter_form_status filter_item">
+                        <label for="adv_filter_status">Status</label>
+                        <select id="adv_filter_status" class="form-control input-sm" th:field="*{contractStatus}">
+                            <option value="">--all--</option>
+                            <option th:each="currStatus : ${statusListForFilter}"
+                                    th:value="${currStatus.name()}"
+                                    th:text="${currStatus.toString()}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="filter_form_range_sum filter_item">
+                        <div class="sum_input">
+                            <label for="adv_filter_sumFrom">Sum from</label>
+                            <input class="form-control input-sm input-br-head" id="adv_filter_sumFrom" type="number"
+                                   th:field="*{sumFrom}"
+                                   placeholder="sum from" required/>
+                        </div>
+                        <div class="sum_input">
+                            <label for="adv_filter_sumTo">Sum to</label>
+                            <input class="form-control input-sm input-br-head" id="adv_filter_sumTo" type="number"
+                                   th:field="*{sumTo}"
+                                   placeholder="sum to" required/>
+                        </div>
+                    </div>
+                    <div class="filter_form_range_date filter_item">
+                        <div class="date_input">
+                            <label for="adv_filter_date_from">Date from</label>
+                            <input type="date" id="adv_filter_date_from" class="form-control input-sm input-br-head"
+                                   th:field="*{dateFrom}"/>
+                        </div>
+                        <div class="date_input">
+                            <label for="adv_filter_date_to">Date to</label>
+                            <input type="date" id="adv_filter_date_to" class="form-control input-sm input-br-head"
+                                   th:field="*{dateTo}"/>
+                        </div>
+                    </div>
+                    <div class="filter_item">
+                        <button type="submit" class="btn_apply"><span>Apply</span>
+                            <span class="btn_icon_right"><i class="fas fa-check"></i></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="filterable">
+            <div class="panel-heading">
+                <!--<h3 class="panel-title">Contracts</h3>-->
+                <div class="contracts_btn_wrapper">
+                    <button sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalContract" data-backdrop="static"
+                            class="btn_create_service" role="button" th:id="${companyId}"
+                            onclick="createNewContract(this)">
+                        <div>
+                            <span class="btn_icon_left"><i class="fas fa-plus-circle"></i></span>
+                            <span>NEW CONTRACT</span>
+                        </div>
                     </button>
-                    <a th:href="${companyId==0} ? @{/customer/contracts} : @{/company/contracts}"
-                       class="btn btn-default btn-sm">clear</a>
+                    <button id="bulk_create_invoices" sec:authorize="hasAuthority('COMPANY')" type="button" class="btn_create_service"
+                            onclick="createBulkInvoices()">
+                        <div>
+                            <span class="btn_icon_left"><i class="fas fa-plus-circle"></i></span>
+                            <span>CREATE INVOICES</span>
+                        </div>
+                    </button>
+                </div>
+                <div class="pull-right">
+                    <button class="btn btn-default btn-xs btn-filter">
+                        <span class="glyphicon glyphicon-filter"></span>Search
+                    </button>
                 </div>
             </div>
-        </form>
-    </div>
-</div>
-
-<div class="panel panel-primary filterable">
-    <div class="panel-heading">
-        <h3 class="panel-title">Contracts</h3>
-        <div class="pull-right">
-            <button class="btn btn-default btn-xs btn-filter">
-                <span class="glyphicon glyphicon-filter"></span> quick filter
-            </button>
-        </div>
-    </div>
-    <table class="table table-condensed table-stripped">
-        <thead>
-        <tr class="filters">
-            <th sec:authorize="hasAuthority('COMPANY')"><input type="checkbox" onclick="selectActiveContractkBoxes()"
-                                                               th:id="check_all" name="sel"/></th>
-            <th sec:authorize="hasAuthority('CUSTOMER')"><input type="text" class="form-control"
-                                                                placeholder="Company name" disabled></th>
-            <th sec:authorize="hasAuthority('COMPANY')"><input type="text" class="form-control"
-                                                               placeholder="Customer name" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Issue date" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Expire date" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Service name" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
-            <th>
-                <select class="sel_status_contract" disabled>
-                    <option selected value="Status">Status</option>
-                    <option th:each="status : ${statusListForFilter}"
-                            th:text="${status.toString()}">
-                    </option>
-                </select>
-            </th>
-        </tr>
+            <table class="table">
+                <thead>
+                <tr class="filters">
+                    <th sec:authorize="hasAuthority('COMPANY')" width="3%">
+                        <label class="control control--radio">
+                            <input type="checkbox" onclick="selectActiveContractkBoxes()" th:id="check_all" name="sel"/>
+                            <div class="control__indicator"></div>
+                        </label>
+                    </th>
+                    <th sec:authorize="hasAuthority('CUSTOMER')"><input type="text" class="form-control"
+                                                                        placeholder="Company name" disabled></th>
+                    <th sec:authorize="hasAuthority('COMPANY')"><input type="text" class="form-control"
+                                                                       placeholder="Customer name" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Issue date" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Expire date" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Service name" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
+                    <th>
+                        <select class="sel_status_contract" disabled>
+                            <option selected value="Status">Status</option>
+                            <option th:each="status : ${statusListForFilter}"
+                                    th:text="${status.toString()}">
+                            </option>
+                        </select>
+                    </th>
+                    <th></th>
+                </tr>
 
         </thead>
         <tbody class="filter_body">
         <tr th:each="contract : ${contractList}" th:id="${'row'+contract.getId()}">
-            <td sec:authorize="hasAuthority('COMPANY')">
-                <input th:if="${contract.getStatus().name() == 'ACTIVE'}" type="checkbox" th:id="${contract.getId()}"
-                       name="sel"/></td>
+                    <td sec:authorize="hasAuthority('COMPANY')" width="3%">
+                        <label class="control control--radio" th:if="${contract.getStatus().name() == 'ACTIVE'}">
+                            <input class="contracts_active_check" type="checkbox" th:id="${contract.getId()}" name="sel"/>
+                            <div class="control__indicator"></div>
+                        </label>
+                    </td>
+                    <td sec:authorize="hasAuthority('CUSTOMER')" th:id="company_name"
+                        th:text="${contract.getCompany().getName()}">company name
+                    </td>
+                    <td sec:authorize="hasAuthority('COMPANY')" th:id="customer"
+                        th:text="${contract.getCustomer().getFullName()}">customer
+                        name
+                    </td>
+                    <td th:id="issueDate" th:text="${#temporals.format(contract.getIssueDate(),'dd.MM.yyyy')}">issue date</td>
+                    <td th:id="expireDate" th:text="${#temporals.format(contract.getExpireDate(),'dd.MM.yyyy')}">expire date
+                    </td>
+                    <td th:id="productName" th:text="${contract.getProduct().getName()}">service name</td>
+                    <td th:id="sum" th:text="${#numbers.formatDecimal(contract.getSum(),1,2)+' MDL'}"
+                        th:value="${contract.getSum()}">sum
+                    </td>
+                    <td
+                        th:value="${contract.getStatus().name()}"><span th:id="status" class="filter_status_contract" th:text="${contract.getStatus()}"></span>
+                    </td>
 
-            <td sec:authorize="hasAuthority('CUSTOMER')" th:id="company_name"
-                th:text="${contract.getCompany().getName()}">company name
-            </td>
-            <td sec:authorize="hasAuthority('COMPANY')" th:id="customer"
-                th:text="${contract.getCustomer().getFullName()}">customer
-                name
-            </td>
-            <td th:id="issueDate" th:text="${#temporals.format(contract.getIssueDate(),'dd.MM.yyyy')}">issue date</td>
-            <td th:id="expireDate" th:text="${#temporals.format(contract.getExpireDate(),'dd.MM.yyyy')}">expire date
-            </td>
-            <td th:id="productName" th:text="${contract.getProduct().getName()}">service name</td>
-            <td th:id="sum" th:text="${#numbers.formatDecimal(contract.getSum(),1,2)+' MDL'}"
-                th:value="${contract.getSum()}">sum
-            </td>
-            <td class="filter_status_contract" th:id="status" th:text="${contract.getStatus()}"
-                th:value="${contract.getStatus().name()}">Status
-            </td>
+                    <td align="center">
+                        <div class="dropdown">
+                            <a class="dropdown-toggle" type="button" id="menu1" data-toggle="dropdown" title="Actions..">
+                                <span><i class="fas fa-ellipsis-h"></i></span>
+                                </a>
+                            <ul class="dropdown-menu dropdown-menu-right dropdown_action" role="menu" aria-labelledby="menu1">
+                                <li role="presentation" th:if="not ${contract.getStatus().name()=='ACTIVE'}">
+                                    <a role="menuitem" tabindex="-1"
+                                       th:id="'btn_sign_'+${contract.getId()}"
+                                       onclick="askForSignContract(this)">
+                                        <span class="btn_icon_left"><i class="fas fa-check"></i></span>
+                                        <span>SIGN</span>
+                                    </a>
+                                </li>
+                                <li role="presentation" sec:authorize="hasAuthority('COMPANY')"
+                                    th:if="${contract.getStatus().name()=='ACTIVE'}">
+                                    <a role="menuitem" tabindex="-1"
+                                       th:id="'btn_createInvoice_'+${contract.getId()}"
+                                       onclick="createNewInvoice(this)">
+                                        <span class="btn_icon_left"><i class="fas fa-file-alt"></i></span>
+                                        <span>CREATE INVOICE</span>
+                                    </a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1"
+                                       th:id="'btn_delete_'+${contract.getId()}"
+                                       onclick="deleteContract(this)">
+                                        <span class="btn_icon_left"><i class="fas fa-trash-alt"></i></span>
+                                        <span>DELETE</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
-            <td>
-                <div class="dropdown">
-                    <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">
-                        Actions ...
-                        <span class="caret"></span></button>
-                    <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="menu1">
-                        <li role="presentation" th:if="not ${contract.getStatus().name()=='ACTIVE'}">
-                            <a role="menuitem" tabindex="-1"
-                               th:id="'btn_sign_'+${contract.getId()}"
-                               onclick="askForSignContract(this)">Sign</a>
-                        </li>
-                        <li role="presentation" sec:authorize="hasAuthority('COMPANY')"
-                            th:if="${contract.getStatus().name()=='ACTIVE'}">
-                            <a role="menuitem" tabindex="-1"
-                               th:id="'btn_createInvoice_'+${contract.getId()}"
-                               onclick="createNewInvoice(this)">Create invoice</a>
-                        </li>
-                        <li role="presentation">
-                            <a role="menuitem" tabindex="-1"
-                               th:id="'btn_delete_'+${contract.getId()}"
-                               onclick="deleteContract(this)">Delete</a>
-                        </li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-                <button sec:authorize="hasAuthority('COMPANY')" type="button" class="btn btn-success"
-                        onclick="createBulkInvoices()">Bulk Create
-                </button>
-            </td>
-
-        </tr>
-        </tbody>
-    </table>
-
-
+    </div>
 </div>
-
 
 <div class="modal fade" id="createInvoiceDialog" role="dialog">
     <div class="modal-dialog">
@@ -491,8 +512,6 @@
     $(document).ready(function () {
         $('#createInvoiceDialog').on('hidden.bs.modal', function () {
             clearErrorsSecond();
-
-
         })
     });
 
@@ -600,6 +619,7 @@
         var expireDate = $("#expire_inv_date").val();
         var contractID = $("#contract_inv_ID").val();
         var sum = $("#sum_inv").val();
+        // var sum = parseFloat(sum2);
         var status = $("#status_inv_out").val();
 
         var data = {
@@ -889,7 +909,7 @@
         var selectedRows = $('table.table tbody input[type=checkbox]');
 
         if ($("#check_all").prop("checked")) {
-
+            $("#bulk_create_invoices").css("display", "block");
             for (var i = 0; i < selectedRows.length; i++) {
 
                 if ($("#row" + selectedRows[i].id).find("#status").text().toLowerCase() == 'active') {
@@ -898,11 +918,27 @@
             }
         }
         else {
+            $("#bulk_create_invoices").css("display", "none");
             for (var i = 0; i < selectedRows.length; i++) {
                 selectedRows[i].checked = false;
             }
         }
     }
+
+    $(".contracts_active_check").change(function () {
+        var status = false;
+
+        $.each($(".contracts_active_check"), function () {
+            if ($(this).prop("checked") == true) {
+                status = true;
+            }
+        })
+        if (status === true){
+            $("#bulk_create_invoices").css("display", "block");
+        } else {
+            $("#bulk_create_invoices").css("display", "none");
+        }
+    });
 
     function createBulkInvoices() {
         var selectedRows = $('table.table tbody input[type=checkbox]:checked');
@@ -949,5 +985,5 @@
 
 
 </script>
-
+<script>$(".i_contracts").addClass("active_menu_link");</script>
 </html>

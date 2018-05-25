@@ -1,7 +1,6 @@
 
 function selectAllCheckBoxes() {
     var selectedRows = $('table.table tbody input[type=checkbox]');
-    console.log('length 'selectedRows.length);
     // console.log($("#check_all"));
     if ($("#check_all").prop("checked")) {
 
