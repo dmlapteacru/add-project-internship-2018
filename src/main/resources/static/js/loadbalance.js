@@ -33,7 +33,8 @@ function getUserName() {
     )
 }
 function parseBalance(string) {
-    var balance = string.split(":")[1].substring(0, string.split(":")[1].length-1);
+    var balance = string.split("=")[1].substring(0, string.split("=")[1].length-1);
+    $(".balance").text(balance);
     $(".balance_info").text(balance);
     return balance;
 }

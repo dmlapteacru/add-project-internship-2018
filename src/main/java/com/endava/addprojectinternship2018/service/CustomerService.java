@@ -59,7 +59,7 @@ public class CustomerService {
         customerDto.setCustomerId(customer.getId());
         customerDto.setEmail(customer.getEmail());
         customerDto.setCountNumber(customer.getCountNumber());
-        customerDto.setAccessKey(customer.getAccessKey());
+        customerDto.setBankKey(customer.getBankKey());
         customerDto.setUserDto(userService.convertUserToUserDto(customer.getUser()));
         return customerDto;
     }
@@ -71,7 +71,7 @@ public class CustomerService {
         customer.setLastName(customerDto.getLastName());
         customer.setEmail(customerDto.getEmail());
         customer.setCountNumber(customerDto.getCountNumber());
-        customer.setAccessKey(customerDto.getAccessKey());
+        customer.setBankKey(customerDto.getBankKey());
         customer.setUser(userService.convertUserDtoToUser(customerDto.getUserDto()));
         return customer;
     }

@@ -1,6 +1,7 @@
 package com.endava.addprojectinternship2018.model.dto;
 
 
+import com.endava.addprojectinternship2018.model.BankKey;
 import com.endava.addprojectinternship2018.validation.ValidEmail;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,7 +28,7 @@ public class CustomerDto {
     private String email;
 
     private Long countNumber = null;
-    private Long accessKey = null;
+    private BankKey bankKey = null;
 
     @Valid
     private UserDto userDto;

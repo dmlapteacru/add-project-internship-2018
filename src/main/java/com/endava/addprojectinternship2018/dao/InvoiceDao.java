@@ -70,5 +70,4 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
     List<Invoice> findAllByContractCustomerIdAndStatusInAndSumBetweenAndIssueDateBetweenOrderByIssueDate
             (int customerId, List<InvoiceStatus> statuses, double sumFrom, double sumTo, LocalDate dateFrom, LocalDate dateTo);
 
-
 }

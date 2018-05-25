@@ -1,4 +1,4 @@
-package com.endava.addprojectinternship2018.model.dto;
+package com.endava.addprojectinternship2018.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,15 +9,21 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserBankAccountDto {
+@Entity
+@Table(name = "BANK_KEY")
+public class BankKey {
 
-    private Long countNumber;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Column
     private byte[] modulus;
-    private byte[] privateKey;
-    private String bankPublicKeyModulus;
 
-    public UserBankAccountDto(Long countNumber, byte[] modulus, byte[] privateKey) {
-        this.countNumber = countNumber;
+    @Column
+    private byte[] privateKey;
+
+    public BankKey(byte[] modulus, byte[] privateKey) {
         this.modulus = modulus;
         this.privateKey = privateKey;
     }

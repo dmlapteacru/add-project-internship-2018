@@ -23,9 +23,9 @@ function payInvoice(btn) {
         },3000);
     } else {
         var object = {
-            "correspondentCount": $(btn).attr("id"),
-            "sum": $("#row" + $(btn).attr("id")).find("#sum_to_pay").text(),
-            "description": "Invoice from " + $("#row" + $(btn).attr("id")).find("#invoice_date").text() + " is paid. "
+            "c": $(btn).attr("id"),
+            "s": $("#row" + $(btn).attr("id")).find("#sum_to_pay").text(),
+            "d": "Invoice from " + $("#row" + $(btn).attr("id")).find("#invoice_date").text() + " is paid. "
         };
         $.ajax(
             {
@@ -148,9 +148,9 @@ $("#bulk_pay_btn").click(function () {
             var correspondentCount = $(this).attr("value");
             var description = "Invoice from " + $("#row" + $(this).attr("value")).find("#invoice_date").text() + " is paid. ";
             var item = {};
-            item["correspondentCount"] = correspondentCount;
-            item["sum"] = $("#row" + $(this).attr("value")).find("#sum_to_pay").text();
-            item["description"] = description;
+            item["c"] = correspondentCount;
+            item["s"] = $("#row" + $(this).attr("value")).find("#sum_to_pay").text();
+            item["d"] = description;
             invoiceList.push(item);
         });
         $.ajax(
