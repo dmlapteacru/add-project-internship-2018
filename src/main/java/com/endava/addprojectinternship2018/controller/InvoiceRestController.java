@@ -136,10 +136,9 @@ public class InvoiceRestController {
     }
 
     @PostMapping(value = "/createBulkInvoice")
-    public ResponseEntity sendBulkInvoiceToCustomer(@RequestParam("invoiceIds[]") List<Integer> bulkContractIds, Model model) {
+    public ResponseEntity sendBulkInvoiceToCustomer(@RequestParam("invoiceIds[]") List<Integer> bulkContractIds) {
 
         List<Invoice> invoiceList = invoiceService.getCheckedInvoices(bulkContractIds);
-        model.addAttribute("invoiceNrSaved", invoiceList.size());
         System.out.println("invoices size:"+invoiceList);
         invoiceService.save(invoiceList);
         return new ResponseEntity(invoiceList.size(),HttpStatus.OK);
