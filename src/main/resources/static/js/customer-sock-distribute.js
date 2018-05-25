@@ -34,10 +34,10 @@ function printNotifications(data) {
     });
     if (count === 0){
         $("#not_count").text("");
-        $("#not_icon").css("visibility", "hidden");
+        $("#show_not_link_down").css("color", "#fff");
     } else {
         $("#not_count").text(count);
-        $("#not_icon").css("visibility", "visible");
+        $("#show_not_link_down").css("color", "#f15928");
     }
 }
 
@@ -48,10 +48,10 @@ function deleteNotification(link) {
     $("#not_count").text(count);
     if (count === 0){
         $("#not_count").text("");
-        $("#not_icon").css("visibility", "hidden");
+        $("#show_not_link_down").css("color", "#fff");
     } else {
         $("#not_count").text(count);
-        $("#not_icon").css("visibility", "visible");
+        $("#show_not_link_down").css("color", "#f15928");
     }
     $.ajax(
         {

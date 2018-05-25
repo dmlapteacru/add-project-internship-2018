@@ -36,8 +36,8 @@
                 <div class="modal-footer modal_btn">
                     <!--<button type="button" style="display: none;" class="btn"></button>-->
                     <button id="save_btn_message" type="submit" class="btn btn-success">Send</button>
-                    <a id="home_btn" th:href="@{/login}"
-                       class="btn btn-default" role="button">Back Home</a>
+                    <button id="home_btn" th:href="@{/login}"
+                       class="btn btn-default" role="button">Back Home</button>
                 </div>
             </form>
         </div>
@@ -85,5 +85,6 @@
 //        stompClient.send("/app/admin", {}, JSON.stringify(json));
 //    }
 </script>
+<script>$(".i_contact_admin").addClass("active_menu_link");</script>
 </body>
 </html>

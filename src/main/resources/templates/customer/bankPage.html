@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/header.css"/>
     <link rel="stylesheet" type="text/css" href="/css/bank.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
     <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
     <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
@@ -49,7 +48,7 @@
                         <div>
                             <input id="money_sum" pattern="[0-9].{1,}" title="Must be numbers" type="number" value="0.0"/>
                             <br/>
-                            <button id="btn_add_money_req" class="btn btn-success" type="submit">ADD MONEY</button>
+                            <button id="btn_add_money_req" class="btn_add_money" type="submit">ADD MONEY</button>
                         </div>
                     </form>
                 </div>
@@ -62,7 +61,7 @@
                 <div class="statement_date_picker_wrapper">
                     <input id="date_from" type="date" name=""/>
                     <input id="date_to" type="date" name=""/>
-                    <input id="btn_statement_req" type="button" name="" value="Account Activity"/>
+                    <input id="btn_statement_req" type="button" name="" value="ACCOUNT ACTIVITY"/>
                 </div>
             </div>
         </div>
@@ -103,5 +102,6 @@
 <script src="/js/bank.js"></script>
 <script src="/js/user-websock.js"></script>
 <script src="/js/customer-sock-distribute.js"></script>
+<script>$(".i_bank").addClass("active_menu_link");</script>
 </body>
 </html>
