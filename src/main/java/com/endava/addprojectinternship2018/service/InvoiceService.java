@@ -2,6 +2,7 @@ package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
 import com.endava.addprojectinternship2018.dao.InvoiceTransactionDao;
+import com.endava.addprojectinternship2018.model.Contract;
 import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
 import com.endava.addprojectinternship2018.model.dto.InvoiceDescriptionPaymentDto;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,14 +27,17 @@ public class InvoiceService {
     private final InvoiceDao invoiceDao;
     private final InvoiceTransactionDao invoiceTransactionDao;
     private final WebSocketDistributeService webSocketDistributeService;
+    private final ContractService contractService;
 
     private static final Logger LOGGER = Logger.getLogger(InvoiceService.class);
 
     @Autowired
-    public InvoiceService(InvoiceDao invoiceDao, InvoiceTransactionDao invoiceTransactionDao, WebSocketDistributeService webSocketDistributeService) {
+    public InvoiceService(InvoiceDao invoiceDao, InvoiceTransactionDao invoiceTransactionDao,
+                          WebSocketDistributeService webSocketDistributeService, ContractService contractService) {
         this.invoiceDao = invoiceDao;
         this.invoiceTransactionDao = invoiceTransactionDao;
         this.webSocketDistributeService = webSocketDistributeService;
+        this.contractService = contractService;
     }
 
     public List<Invoice> getAllInvoices(){
@@ -46,6 +51,53 @@ public class InvoiceService {
     public List<Invoice> getAllInvoiceByContractId(int id) {
         return invoiceDao.findByContractIdOrderByIssueDate(id);
     }
+
+    public Invoice getInvoiceByContractId(int id) {
+        return invoiceDao.findByContractId(id).get();
+    }
+
+    public List<Invoice> getAllInvoicesByContractId(int id) {
+        return invoiceDao.findAllByContractId(id);
+    }
+
+
+    public List<Invoice> getCheckedInvoices(List<Integer> contractIds) {
+
+        System.out.println("contract_ids:   " + contractIds);
+
+        List<Invoice> invoiceList = new ArrayList<>();
+
+        for (Integer id : contractIds) {
+            System.out.println("contract_id:  "+id);
+            boolean success = true;
+            Contract contract = contractService.getById(id);
+            System.out.println("contractul : "+contract);
+            for (Invoice inv : invoiceDao.findAllByContractId(id)) {
+
+                System.out.println("All invoices by company : "+invoiceDao.findAllByContractId(id));
+
+                if (LocalDate.now().isBefore(inv.getServiceEndDate())) {
+                    success = false;
+                }
+            }
+
+            if (success) {
+                Invoice temp = new Invoice();
+                LocalDate currentDate = LocalDate.now();
+                temp.setSum(contract.getSum());
+                temp.setIssueDate(currentDate);
+                temp.setServiceStartDate(currentDate.withDayOfMonth(1));
+                temp.setServiceEndDate(currentDate.withDayOfMonth(currentDate.lengthOfMonth()));
+                temp.setDueDate(currentDate.withDayOfMonth(currentDate.lengthOfMonth()).plusDays(15));
+                temp.setStatus(InvoiceStatus.ISSUED);
+                temp.setContract(contract);
+                invoiceList.add(temp);
+
+            }
+        }
+        return invoiceList;
+    }
+
 
     public List<Invoice> getAllInvoicesByStatus(InvoiceStatus status) {
         return invoiceDao.findAllByStatusOrderByIssueDate(status);
@@ -71,7 +123,7 @@ public class InvoiceService {
         return invoiceDao.findAllByContract_Company_Name(name);
     }
 
-    public List<Invoice> getInvoicesByPeriodAndCompanyAndStatus(String date, int contract_id, String status){
+    public List<Invoice> getInvoicesByPeriodAndCompanyAndStatus(String date, int contract_id, String status) {
         return invoiceTransactionDao.getInvoiceByPeriodContractStatus(date, contract_id, status);
     }
 
@@ -81,7 +133,12 @@ public class InvoiceService {
     }
 
     @Transactional
-    public void saveInvoiceDto(InvoiceDto invoiceDto){
+    public void save(Iterable<Invoice> invoices){
+        invoiceDao.saveAll(invoices);
+    }
+
+    @Transactional
+    public void saveInvoiceDto(InvoiceDto invoiceDto) {
         Invoice invoice = new Invoice(invoiceDto.getSum(), invoiceDto.getIssueDate()
                 , invoiceDto.getDueDate(), invoiceDto.getStatus(), invoiceDto.getContract());
         invoiceDao.save(invoice);
@@ -130,7 +187,7 @@ public class InvoiceService {
     public void changeInvoiceStatusToSent(int invoiceId) {
         Invoice invoice = invoiceDao.findById(invoiceId).get();
         System.out.println(invoice);
-        LOGGER.info("current invoice status:"+invoice.getStatus());
+        LOGGER.info("current invoice status:" + invoice.getStatus());
         if (invoice.getStatus() == InvoiceStatus.ISSUED) {
             invoice.setStatus(SENT);
             invoiceDao.save(invoice);
@@ -152,7 +209,7 @@ public class InvoiceService {
                 id);
     }
 
-    public InvoiceDescriptionPaymentDto setInvoiceDescription(int id){
+    public InvoiceDescriptionPaymentDto setInvoiceDescription(int id) {
         Object[] objects = invoiceDao.setInvoiceDescriptionPayment(id).get(0);
         return new InvoiceDescriptionPaymentDto(objects[0].toString(), objects[1].toString());
     }
@@ -199,12 +256,12 @@ public class InvoiceService {
                 .collect(Collectors.toList());
     }
 
-    public List<Invoice> getInvoiceInPeriodService(int contract_id, LocalDate issueDate){
+    public List<Invoice> getInvoiceInPeriodService(int contract_id, LocalDate issueDate) {
         return invoiceDao.findInvoiceInPeriod(contract_id, issueDate);
     }
 
     public void setInvoiceBulkAsPaid(List<Integer> idList) {
-        for (Integer i: idList){
+        for (Integer i : idList) {
             setInvoiceAsPaid(i);
         }
     }

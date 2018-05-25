@@ -95,6 +95,8 @@
     <table class="table table-condensed table-stripped">
         <thead>
         <tr class="filters">
+            <th sec:authorize="hasAuthority('COMPANY')"><input type="checkbox" onclick="selectActiveContractkBoxes()"
+                                                               th:id="check_all" name="sel"/></th>
             <th sec:authorize="hasAuthority('CUSTOMER')"><input type="text" class="form-control"
                                                                 placeholder="Company name" disabled></th>
             <th sec:authorize="hasAuthority('COMPANY')"><input type="text" class="form-control"
@@ -116,6 +118,9 @@
         </thead>
         <tbody class="filter_body">
         <tr th:each="contract : ${contractList}" th:id="${'row'+contract.getId()}">
+            <td sec:authorize="hasAuthority('COMPANY')">
+                <input th:if="${contract.getStatus().name() == 'ACTIVE'}" type="checkbox" th:id="${contract.getId()}"
+                       name="sel"/></td>
 
             <td sec:authorize="hasAuthority('CUSTOMER')" th:id="company_name"
                 th:text="${contract.getCompany().getName()}">company name
@@ -161,9 +166,27 @@
                 </div>
             </td>
         </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>
+                <button sec:authorize="hasAuthority('COMPANY')" type="button" class="btn btn-success"
+                        onclick="createBulkInvoices()">Bulk Create
+                </button>
+            </td>
+
+        </tr>
         </tbody>
     </table>
+
+
 </div>
+
 
 <div class="modal fade" id="createInvoiceDialog" role="dialog">
     <div class="modal-dialog">
@@ -213,7 +236,22 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Period time for service</label>
+                        <div class="col-sm-6 input-group ">
+                            <input type="text" class="form-control" id="start_period_inv_date" required="required"/>
+                            <span class="input-group-addon">-</span>
+                            <input type="text" class="form-control" id="end_period_inv_date" required="required"/>
+                        </div>
 
+                    </div>
+                    <div class="form-group" style="display:none;">
+                        <label class="col-sm-3 control-label"></label>
+                        <div class="col-sm-6 input-group ">
+                            <p class="error-message" id="end_period_inv_dateError" style="display: none">validation
+                                error</p>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Service</label>
                         <div class="col-sm-6">
@@ -263,6 +301,23 @@
             </div>
             <div class="modal-footer modal_btn">
                 <button id="btn_delete_contract" type="button" class="btn btn-warning">Delete</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalBulkInvoiceWarning" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">No one checkbox was selected !</h4>
+            </div>
+            <div class="modal-footer modal_btn">
+                <!--<button id="btn_delete_contract" type="button" class="btn btn-danger">Delete</button>-->                <!--<input id="deleteContractI" type="text" hidden="hidden"/>-->
+
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -410,15 +465,34 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="modalInvoiceSavedNr" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" id="nrInvSaved"> invoices were saved !</h4>
+            </div>
+            <div class="modal-footer modal_btn">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="/js/user-websock.js"></script>
 <script src="/js/customer-sock-distribute.js"></script>
 <script src="/js/loadbalance.js"></script>
+<script src="/js/invoice-create-send.js"></script>
 </body>
 <script>
 
     $(document).ready(function () {
         $('#createInvoiceDialog').on('hidden.bs.modal', function () {
             clearErrorsSecond();
+
+
         })
     });
 
@@ -482,9 +556,20 @@
         clearErrorsSecond();
         var rowId = btn.id.substring(18);
         var row = $("#row" + rowId);
-        var issueDate = new Date();
+        var currentDate = new Date(), y = currentDate.getFullYear(), m = currentDate.getMonth();
+        var expireDate = new Date();
+        var firstDay = new Date(y, m, 1);
+        var lastDay = new Date(y, m + 1, 0);
+        expireDate.setDate(lastDay.getDate() + 15);
+
 
         $('#issue_inv_date').val(moment(issueDate).format('YYYY-MM-DD'));
+        // console.log(row.find("#contractId").text());
+
+        $('#issue_inv_date').val(moment(currentDate).format('YYYY-MM-DD'));
+        $('#expire_inv_date').val(moment(expireDate).format('YYYY-MM-DD'));
+        $('#start_period_inv_date').val(moment(firstDay).format('YYYY-MM-DD'));
+        $('#end_period_inv_date').val(moment(lastDay).format('YYYY-MM-DD'));
         $('#company_inv_out').val($('#company_inv_in').val());
         $('#status_inv_out').val($('#status_inv_in').val());
         $('#customer_inv_name').val(row.find("#customer").text());
@@ -499,6 +584,8 @@
         console.log($('#status_inv_out').val());
         console.log($('#issue_inv_date').val());
         console.log($('#expire_inv_date').val());
+        console.log($('#start_period_inv_date').val());
+        console.log($('#end_period_inv_date').val());
 
         $('#createInvoiceDialog').modal({backdrop: "static"});
         $("#createInvoiceDialog").modal('show');
@@ -508,15 +595,18 @@
     function saveInvoiceButton() {
 
         var issueDate = $("#issue_inv_date").val();
+        var startDate = $("#start_period_inv_date").val();
+        var endDate = $("#end_period_inv_date").val();
         var expireDate = $("#expire_inv_date").val();
         var contractID = $("#contract_inv_ID").val();
         var sum = $("#sum_inv").val();
-        // var sum = parseFloat(sum2);
         var status = $("#status_inv_out").val();
 
         var data = {
             issueDate: issueDate,
             dueDate: expireDate,
+            startDate: startDate,
+            endDate: endDate,
             contractId: contractID,
             status: status,
             sum: sum
@@ -546,6 +636,7 @@
                         $('#' + currFieldName + 'Error').text(currErrorMessage);
                         $('#' + currFieldName + 'Error').show();
                     }
+                    $("#end_period_inv_dateError").parent().parent().show();
                 } else {
                     $('#createInvoiceDialog').modal('hide');
                     showAlert('New invoice was added successful', '');
@@ -740,16 +831,15 @@
             $('#issue_inv_date').parent().removeClass('has-error');
             $('#issue_inv_dateError').hide();
         })
-
-        $('#expire_inv_date').focus(function () {
-            $('#expire_inv_date').parent().removeClass('has-error');
-            $('#expire_inv_dateError').hide();
-        })
+        $('#end_period_inv_date').parent().removeClass('has-error');
+        $('#end_period_inv_dateError').hide();
+        $('#end_period_inv_dateError').parent().parent().hide();
+        //})
 
         $('#issue_inv_dateError').hide();
-        $('#expire_inv_dateError').hide();
         $('#issue_inv_date').parent().removeClass('has-error');
-        $('#expire_inv_date').parent().removeClass('has-error');
+        $('#expire_inv_dateError').hide();
+        $('#end_period_inv_date').parent().removeClass('has-error');
 
     }
 
@@ -794,6 +884,69 @@
     $('#btn_sign_contract').click(function(){
         signContract();
     })
+
+    function selectActiveContractkBoxes() {
+        var selectedRows = $('table.table tbody input[type=checkbox]');
+
+        if ($("#check_all").prop("checked")) {
+
+            for (var i = 0; i < selectedRows.length; i++) {
+
+                if ($("#row" + selectedRows[i].id).find("#status").text().toLowerCase() == 'active') {
+                    selectedRows[i].checked = true;
+                }
+            }
+        }
+        else {
+            for (var i = 0; i < selectedRows.length; i++) {
+                selectedRows[i].checked = false;
+            }
+        }
+    }
+
+    function createBulkInvoices() {
+        var selectedRows = $('table.table tbody input[type=checkbox]:checked');
+        if (selectedRows.length == 0) {
+            $("#modalBulkInvoiceWarning").modal();
+        } else {
+
+            console.log('selectedRows:', selectedRows);
+            var ids = [];
+            for (var i = 0; i < selectedRows.length; i++) {
+                console.log("row" + i + "=" + selectedRows[i].id);
+                ids.push(selectedRows[i].id);
+
+            }
+
+            $.ajax(
+                {
+                    url: "/restinvoice/createBulkInvoice",
+                    type: "POST",
+                    data: {invoiceIds: ids},
+                    success: function (length) {
+                        console.log(length);
+                        $("#nrInvSaved").text(length + '  invoice were saved');
+
+                        $("#modalInvoiceSavedNr").modal('show');
+                        var selectedRows = $('table.table tbody input[type=checkbox]');
+                        for (var i = 0; i < selectedRows.length; i++) {
+                            selectedRows[i].checked = false;
+                        }
+                        $("#check_all").prop("checked", false);
+
+                    },
+                    error: function (errMsg, a, b) {
+                        alert("Please call admins")
+                        console.log("fail")
+                        console.log(errMsg)
+                        console.log(a)
+                        console.log(b)
+                    }
+                }
+            )
+        }
+    }
+
 
 </script>
 

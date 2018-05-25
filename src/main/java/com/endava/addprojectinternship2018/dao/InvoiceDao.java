@@ -20,6 +20,10 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
 
     Optional<Invoice> findById(int id);
 
+    Optional<Invoice> findByContractId(int id);
+
+    List<Invoice> findAllByContractId(int id);
+
     List<Invoice> findAll();
 
     List<Invoice> findByContractIdOrderByIssueDate(int id);
@@ -38,7 +42,7 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
 
     List<Invoice> findAllByContract_Company_IdOrderById(int id);
 
-    @Query("select inv from Invoice inv join inv.contract contr where inv.dueDate >=:date AND contr.id =:contract_id")
+    @Query("select inv from Invoice inv join inv.contract contr where inv.serviceEndDate >=:date AND contr.id =:contract_id")
     List<Invoice> findInvoiceInPeriod(@Param("contract_id")int contract_id, @Param(  "date")LocalDate date);
 
     @Query(value = "SELECT com.name as companyName, pr.name as productName FROM invoice i\n" +
@@ -65,5 +69,6 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
 
     List<Invoice> findAllByContractCustomerIdAndStatusInAndSumBetweenAndIssueDateBetweenOrderByIssueDate
             (int customerId, List<InvoiceStatus> statuses, double sumFrom, double sumTo, LocalDate dateFrom, LocalDate dateTo);
+
 
 }
