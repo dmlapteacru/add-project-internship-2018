@@ -4,6 +4,8 @@ import com.endava.addprojectinternship2018.security.config.LoginAuthenticationFa
 import com.endava.addprojectinternship2018.security.config.LoginAuthenticationSuccessHandler;
 import com.endava.addprojectinternship2018.service.EmailServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -12,6 +14,8 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
+
+import javax.annotation.PostConstruct;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import java.security.KeyFactory;
@@ -24,6 +28,9 @@ public class ADDProjectInternship2018Application extends SpringBootServletInitia
     @Value("${bank.connection.endpoint}")
     private String bankEndpoint;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     public static void main(String[] args) {
         SpringApplication.run(ADDProjectInternship2018Application.class, args);
     }
@@ -31,6 +38,11 @@ public class ADDProjectInternship2018Application extends SpringBootServletInitia
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
         return builder.sources(ADDProjectInternship2018Application.class);
+    }
+
+    @PostConstruct
+    public void setUp() {
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Bean
