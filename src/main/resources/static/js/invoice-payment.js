@@ -1,20 +1,21 @@
 //
 
 $(document).ready(function () {
-    // $.each($(".filter_status_invoice"),function () {
-    //     if ($(this).text() === "PAID"){
-    //         $(this).addClass("success");
-    //     } else if ($(this).text() === "SENT"){
-    //         $(this).parent().addClass("warning");
-    //     }else if ($(this).text() === "OVERDUE"){
-    //         $(this).parent().addClass("danger");
-    //     }
-    // })
+    $.each($(".filter_status_invoice"),function () {
+        if ($(this).text() === "PAID"){
+            $(this).addClass("invoice_payed");
+        } else if ($(this).text() === "SENT"){
+            $(this).addClass("invoice_pending");
+        }else if ($(this).text() === "OVERDUE"){
+            $(this).addClass("invoice_overdue");
+        }
+    });
+    $(".i_invoices").addClass("active_menu_link");
 });
 //INVOICE PAYMENT
 
 function payInvoice(btn) {
-    if ($(".balance").text() === " -no connection- "){
+    if ($(".balance_header").css("display") == "none"){
         $("#error_alert_message").text("No connection with bank.");
         $("#alert_error").slideToggle("slow");
         setTimeout(function () {
@@ -62,16 +63,24 @@ function getBulkSum() {
     $.each($(".checkbox_invoice_element[checked='checked']"), function () {
         sum += parseInt($("#row" + $(this).attr("value")).find("#sum_to_pay").text());
     });
-    if (sum > parseInt($(".balance").text())){
+    if ($(".balance_header").css("display") == "none"){
         $("#bulk_pay_sum").css("color", "red");
-        $("#error_alert_message").text("Not enough money.");
+        $("#error_alert_message").text("Not connection with bank.");
         $("#alert_error").slideToggle("slow");
         setTimeout(function () {
             $("#alert_error").slideToggle("slow");
         },3000);
-    } else {
-        $("#bulk_pay_sum").css("color", "green");
-    }
+    }else
+        if (sum > parseInt($(".balance").text())){
+            $("#bulk_pay_sum").css("color", "red");
+            $("#error_alert_message").text("Not enough money.");
+            $("#alert_error").slideToggle("slow");
+            setTimeout(function () {
+                $("#alert_error").slideToggle("slow");
+            },3000);
+        } else {
+            $("#bulk_pay_sum").css("color", "green");
+        }
     $("#bulk_pay_sum").text(sum);
 }
 $("#check_all_invoices").change(function () {

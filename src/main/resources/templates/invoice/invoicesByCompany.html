@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/header.css"/>
     <link rel="stylesheet" href="/css/table-filter.css">
-    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
+    <link rel="stylesheet" href="/css/invoices_customer.css">
+    <link rel="stylesheet" href="/css/custom_radio_buttons.css">
     <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
     <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
@@ -54,6 +55,18 @@
     <script>
 
         $(document).ready(function () {
+            $(".i_invoices").addClass("active_menu_link");
+            $.each($(".filter_status_invoice"),function () {
+                if ($(this).text() === "PAID"){
+                    $(this).addClass("invoice_payed");
+                } else if ($(this).text() === "SENT"){
+                    $(this).addClass("invoice_pending");
+                }else if ($(this).text() === "OVERDUE"){
+                    $(this).addClass("invoice_overdue");
+                } else if ($(this).text()==="ISSUED"){
+                    $(this).addClass("invoice_issued");
+                }
+            })
             console.log("document ready")
             $("table.table tbody input[type=checkbox]").change(function () {
                 calculateTotalSum();
@@ -89,14 +102,14 @@
 
         function selectAllCheckBoxes() {
             var selectedRows = $('table.table tbody input[type=checkbox]');
-            console.log($("#check_all"));
             if ($("#check_all").prop("checked")) {
-
+                $(".bulk_btn_wrapper").css("display", "block");
                 for (var i = 0; i < selectedRows.length; i++) {
                     selectedRows[i].checked = true;
                 }
                 calculateTotalSum();
             } else {
+                $(".bulk_btn_wrapper").css("display", "none");
                 for (var i = 0; i < selectedRows.length; i++) {
                     selectedRows[i].checked = false;
                 }
@@ -251,59 +264,167 @@
 </head>
 
 <body>
-<div th:replace="fragments/header :: header"></div>
 
-<div class="panel panel-default panel-no-border">
-    <div class="panel-body">
-        <form class="pull-right"
-              th:object="${filter}"
-              th:action="@{/company/invoices/filtered}"
-              method="post">
-            <div class="form-row">
-                <div class="col-md-2 mb-3">
-                    <label for="adv_filter_status">status</label>
-                    <select id="adv_filter_status" class="form-control input-sm" th:field="*{invoiceStatus}">
-                        <option value="">--all--</option>
-                        <option th:each="currStatus : ${statusListForFilter}"
-                                th:value="${currStatus.name()}"
-                                th:text="${currStatus.toString()}">
-                        </option>
-                    </select>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label for="adv_filter_sumFrom">sum from</label>
-                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumFrom" type="number"
-                           th:field="*{sumFrom}"
-                           placeholder="sum from" required/>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label for="adv_filter_sumTo">sum to</label>
-                    <input class="form-control input-sm col-sm-2" id="adv_filter_sumTo" type="number"
-                           th:field="*{sumTo}"
-                           placeholder="sum to" required/>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label for="adv_filter_date_from">date from</label>
-                    <input type="date" id="adv_filter_date_from" class="form-control input-sm"
-                           th:field="*{dateFrom}"/>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label for="adv_filter_date_to">date to</label>
-                    <input type="date" id="adv_filter_date_to" class="form-control input-sm"
-                           th:field="*{dateTo}"/>
-                </div>
-
-                <div class="col-md-2 mb-3">
-                    <button type="submit" class="btn btn-info btn-sm">apply
-                        <span class="glyphicon glyphicon-filter"></span>
-                    </button>
-                    <a th:href="@{/company/invoices}"
-                       class="btn btn-default btn-sm">clear</a>
-                </div>
+<div class="wrapper">
+    <div th:replace="fragments/header :: header"></div>
+    <div class="content_wrapper">
+        <div class="filter_wrapper">
+            <div class="filter_title">
+                <span>FILTERS</span>
+                <a th:href="@{/company/invoices}"
+                   class="default_btn"><span class="btn_icon_left"><i class="fas fa-eraser"></i></span><span>Clear all filters</span></a>
             </div>
-        </form>
+            <div class="filter_content">
+                <form class="pull-right"
+                      th:object="${filter}"
+                      th:action="@{/company/invoices/filtered}"
+                      method="post">
+                    <div class="filter_form_status filter_item">
+                        <label for="adv_filter_status">Status</label>
+                        <select id="adv_filter_status" class="form-control input-sm input-br-head" th:field="*{invoiceStatus}">
+                            <option value="">Select invoice status</option>
+                            <option th:each="currStatus : ${statusListForFilter}"
+                                    th:value="${currStatus.name()}"
+                                    th:text="${currStatus.toString()}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="filter_form_range_sum filter_item">
+                        <div class="sum_input">
+                            <label for="adv_filter_sumFrom">Sum from</label>
+                            <input class="form-control input-sm input-br-head" id="adv_filter_sumFrom" type="number"
+                                   th:field="*{sumFrom}"
+                                   placeholder="sum from" required/>
+                        </div>
+                        <div class="sum_input">
+                            <label for="adv_filter_sumTo">Sum to</label>
+                            <input class="form-control input-sm input-br-head" id="adv_filter_sumTo" type="number"
+                                   th:field="*{sumTo}"
+                                   placeholder="sum to" required/>
+                        </div>
+                    </div>
+                    <div class="filter_form_range_date filter_item">
+                        <div class="date_input">
+                            <label for="adv_filter_date_from">Date from</label>
+                            <input type="date" id="adv_filter_date_from" class="form-control input-sm input-br-head"
+                                   th:field="*{dateFrom}"/>
+                        </div>
+                        <div class="date_input">
+                            <label for="adv_filter_date_to">Date to</label>
+                            <input type="date" id="adv_filter_date_to" class="form-control input-sm input-br-head"
+                                   th:field="*{dateTo}"/>
+                        </div>
+                    </div>
+                    <div class="filter_item">
+                        <button type="submit" class="btn_apply"><span>Apply</span>
+                            <span class="btn_icon_right"><i class="fas fa-check"></i></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="filterable">
+            <!--<div class="panel-heading">-->
+            <!--<h3 class="panel-title">Invoices</h3>-->
+            <!--<div class="pull-right">-->
+            <!--<button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter-->
+            <!--</button>-->
+            <!--</div>-->
+            <!--</div>-->
+            <table class="table">
+                <thead>
+                <div class="bulk_btn_wrapper" style="display: none;">
+                    <span>TOTAL SUM: <span id="total_sum"
+                                                  style="font-size:16px;font-weight: bold;border: 1px solid #ddd; padding: 5px; border-radius: 3px;">0.0</span> MDL</span>
+                    <a id="bulk_pay_btn" class="btn_pay" onclick="sendBulkInvoices()">BULK SEND</a>
+                </div>
+                <tr class="filters">
+                    <th>
+                        <div class="checkbox_users_wrapper">
+                            <label class="control control--radio">
+                                <input type="checkbox" onclick="selectAllCheckBoxes()" th:id="check_all" name="sel"/>
+                                <div class="control__indicator"></div>
+                            </label>
+                            <span>Choose to send all invoices</span>
+                        </div>
+                    </th>
+                    <!--<th><input type="text" class="form-control" placeholder="Issue Date" disabled></th>-->
+                    <!--<th><input type="text" class="form-control" placeholder="Expire Date" disabled></th>-->
+                    <!--<th><input type="text" class="form-control" placeholder="Sum" disabled></th>-->
+                    <!--&lt;!&ndash;<th><input type="text" class="form-control" placeholder="Status" disabled></th>&ndash;&gt;-->
+                    <!--<th>-->
+                    <!--<select class="sel_status_invoice" disabled>-->
+                    <!--<option selected value="Status_INV">Status</option>-->
+                    <!--<option>PAID</option>-->
+                    <!--<option>SENT</option>-->
+                    <!--<option>OVERDUE</option>-->
+                    <!--<option>ISSUED</option>-->
+                    <!--</select>-->
+                    <!--</th>-->
+                    <!--<th><input type="text" class="form-control" placeholder="Customer Name" disabled></th>-->
+                    <!--<th><input type="text" class="form-control" placeholder="Service Name" disabled></th>-->
+                    <th></th>
+                    <th></th>
+
+                </tr>
+                </thead>
+
+                <tbody class="filter_body">
+                <!--<tr th:classappend="${(invoice.getStatus().name() == 'ISSUED')? 'bg-primary': (invoice.getStatus().name() == 'SENT') ? 'bg-warning': (invoice.getStatus().name() == 'PAID')?'bg-success':'bg-danger'}"  th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">-->
+                <tr th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">
+                    <!--th:classappend="|${(invoice.getStatus().name() == 'ISSUED') ? 'row_issued_color':''}-->
+                    <!--${(invoice.getStatus().name() == 'SENT') ? 'row_sent_color':''}-->
+                    <!--${(invoice.getStatus().name() == 'PAID')?'row_paid_color':''}-->
+                    <!--${(invoice.getStatus().name() == 'OVERDUE')?'row_overdue_color':''} |"-->
+
+                    <td th:id="invoice_id_hidd" th:text="${invoice.getId()}" style="display: none;"></td>
+                    <td width="3%">
+                        <label class="control control--radio"  th:if="${invoice.getStatus().name() == 'ISSUED'}">
+                            <input type="checkbox" th:id="${invoice.getId()}" name="sel"/>
+                            <div class="control__indicator"></div>
+                        </label>
+                    </td>
+                    <td th:id="${'issueDate'+invoice.getId()}"><span th:text="${#temporals.format(invoice.getIssueDate(), 'dd-MM-yyyy')} "></span>
+                        <br><span class="sub_label">ISSUE DATE</span>
+                    </td>
+                    <td class="table-primary" th:id="${'dueDate'+invoice.getId()}">
+                        <span th:text="${#temporals.format(invoice.getDueDate(), 'dd-MM-yyyy')} "></span><br>
+                        <span class="sub_label">EXPIRE DATE</span>
+                    </td>
+                    <td th:id="${'sum'+invoice.getId()}" >
+                        <span th:text="${#numbers.formatDecimal(invoice.getSum(),1,2)+' MDL'}"></span><br>
+                    </td>
+                    <td
+                        th:classappend="|${(invoice.getStatus().name() == 'ISSUED') ? 'text_issued_color':''}
+                ${(invoice.getStatus().name() == 'SENT') ? 'text_sent_color':''}
+                ${(invoice.getStatus().name() == 'PAID')?'text_paid_color':''}
+                ${(invoice.getStatus().name() == 'OVERDUE')?'text_overdue_color':''} |">
+                        <!--th:class="${invoice.getStatus() == 'ACTIVE'} ? 'success' : (${invoice.getStatus() == 'ISSUED'} ? 'warning' : 'red')"-->
+                        <span class="filter_status_invoice" th:id="${'status'+invoice.getId()}" th:text="${invoice.getStatus()}"></span>
+                    </td>
+                    <td th:id="${'contract_id'+invoice.getId()}"><span th:text="${invoice.getContract().getCustomer().getFullName()}"></span><br><span class="sub_label">CUSTOMER NAME</span></td>
+                    <td th:id="${'fullName'+invoice.getId()}">
+                        <span th:text="${invoice.getContract().getProduct().getName()}"></span><br>
+                        <span class="sub_label">SERVICE NAME</span>
+                    </td>
+                    <td style="display: flex; flex-direction: row-reverse;">
+                        <a th:if="${invoice.getStatus().name() == 'ISSUED'}" th:id="${invoice.id}" onclick="deleteInvoice(this)" class="btn_delete">DELETE</a>
+                    </td>
+                    <td>
+                        <button th:id="${invoice.getId()}" th:if="${invoice.getStatus().name() == 'ISSUED'}" onclick="sendInvoiceToCustomer(this)" class="btn_pay" >SEND</button>
+                    </td>
+                </tr>
+                <!--invoice.getSum()+' MDL'-->
+                </tbody>
+            </table>
+            <!--</div>-->
+        </div>
+
     </div>
 </div>
+<!--<div class="container">-->
+
+
 
 <div class="modal fade" id="editInvoiceDialog" role="dialog">
     <div class="modal-dialog modal-md">
@@ -370,101 +491,6 @@
         </div>
     </div>
 </div>
-<!--<div class="container">-->
-
-<div class="panel panel-primary filterable">
-    <div class="panel-heading">
-        <h3 class="panel-title">Invoices</h3>
-        <div class="pull-right">
-            <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter
-            </button>
-        </div>
-    </div>
-    <table class="table table-striped">
-        <thead >
-        <div>
-           <p class="form-control pt-3">Total Sum: <span id="total_sum"  >0.0</span> </p>
-        </div>
-
-        <tr class="filters">
-            <th hidden="hidden"><input type="text" class="form-control" placeholder="Invoice_id" disabled ></th>
-            <th><input type="checkbox" onclick="selectAllCheckBoxes()" th:id="check_all" name="sel"/></th>
-            <th><input type="text" class="form-control" placeholder="Issue Date" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Expire Date" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
-            <!--<th><input type="text" class="form-control" placeholder="Status" disabled></th>-->
-            <th>
-                <select class="sel_status_invoice" disabled>
-                    <option selected value="Status_INV">Status</option>
-                    <option>PAID</option>
-                    <option>SENT</option>
-                    <option>OVERDUE</option>
-                    <option>ISSUED</option>
-                </select>
-            </th>
-            <th><input type="text" class="form-control" placeholder="Customer Name" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Service Name" disabled></th>
-            <th><input type="text" class="form-control" placeholder="" disabled></th>
-            <th><input type="text" class="form-control" placeholder="" disabled></th>
-
-            </tr>
-            </thead>
-
-            <tbody class="filter_body">
-            <!--<tr th:classappend="${(invoice.getStatus().name() == 'ISSUED')? 'bg-primary': (invoice.getStatus().name() == 'SENT') ? 'bg-warning': (invoice.getStatus().name() == 'PAID')?'bg-success':'bg-danger'}"  th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">-->
-            <tr th:each="invoice: ${invoices}" th:id="${'row'+invoice.getId()}">
-                <!--th:classappend="|${(invoice.getStatus().name() == 'ISSUED') ? 'row_issued_color':''}-->
-                <!--${(invoice.getStatus().name() == 'SENT') ? 'row_sent_color':''}-->
-                <!--${(invoice.getStatus().name() == 'PAID')?'row_paid_color':''}-->
-                <!--${(invoice.getStatus().name() == 'OVERDUE')?'row_overdue_color':''} |"-->
-
-                <td th:id="invoice_id_hidd" th:text="${invoice.getId()}" style="display: none;"></td>
-                <td>
-                    <input th:if="${invoice.getStatus().name() == 'ISSUED'}" type="checkbox" th:id="${invoice.getId()}" name="sel"/></td>
-                <td th:id="${'issueDate'+invoice.getId()}"
-                    th:text="${#temporals.format(invoice.getIssueDate(), 'dd-MM-yyyy')} "> Issue Date
-                </td>
-                <td class="table-primary" th:id="${'dueDate'+invoice.getId()}" th:text="${#temporals.format(invoice.getDueDate(), 'dd-MM-yyyy')} ">Expire Date</td>
-                <td th:id="${'sum'+invoice.getId()}" th:text="${#numbers.formatDecimal(invoice.getSum(),1,2)+' MDL'}">Sum</td>
-                <td class="filter_status_invoice" th:id="${'status'+invoice.getId()}" th:text="${invoice.getStatus()}"
-                    th:classappend="|${(invoice.getStatus().name() == 'ISSUED') ? 'text_issued_color':''}
-                ${(invoice.getStatus().name() == 'SENT') ? 'text_sent_color':''}
-                ${(invoice.getStatus().name() == 'PAID')?'text_paid_color':''}
-                ${(invoice.getStatus().name() == 'OVERDUE')?'text_overdue_color':''} |">
-                    <!--th:class="${invoice.getStatus() == 'ACTIVE'} ? 'success' : (${invoice.getStatus() == 'ISSUED'} ? 'warning' : 'red')"-->
-                </td>
-                <td th:id="${'contract_id'+invoice.getId()}" th:text="${invoice.getContract().getCustomer().getFullName()}">Customer Name</td>
-                <td th:id="${'fullName'+invoice.getId()}" th:text="${invoice.getContract().getProduct().getName()}">
-                    Service Name
-                </td>
-                <td>
-                    <a th:if="${invoice.getStatus().name() == 'ISSUED'}" th:id="${invoice.id}" onclick="deleteInvoice(this)" class="btn btn-sm btn-danger">DELETE</a>
-                </td>
-                <td>
-                    <button th:id="${invoice.getId()}" th:if="${invoice.getStatus().name() == 'ISSUED'}" onclick="sendInvoiceToCustomer(this)" class="btn btn-sm btn-success" >SEND</button>
-                </td>
-            </tr>
-            <!--invoice.getSum()+' MDL'-->
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>
-                    <button class="btn btn-warning" onclick="sendBulkInvoices()">BULK SEND</button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    <!--</div>-->
-
-
-</div>
-
 <script src="/js/loadbalance.js"></script>
 <script src="/js/user-websock.js"></script>
 <script src="/js/customer-sock-distribute.js"></script>

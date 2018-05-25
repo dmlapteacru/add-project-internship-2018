@@ -8,10 +8,10 @@ function connect() {
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         stompClient.subscribe('/user/'+ token + '/queue/messages', function (greeting) {
-            setTimeout(loadNotifications(),1010);
-            $("#not_icon").addClass("cue");
+            setTimeout(loadNotifications(), 1050);
+            $("#show_not_link_down").addClass("cue");
             setTimeout(function () {
-                $("#not_icon").removeClass("cue");
+                $("#show_not_link_down").removeClass("cue");
             }, 1010);
         });
     });

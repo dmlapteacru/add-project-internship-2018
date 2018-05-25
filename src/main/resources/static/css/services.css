@@ -1,0 +1,289 @@
+body {
+    margin: 0 auto;
+}
+.wrapper {
+    background-color: #f2f2f2;
+    height:100vh;
+    display: flex;
+    flex-direction:column;
+}
+.content_wrapper {
+    display: flex;
+    height: 100vh;
+    padding: 50px 80px;
+}
+/*FILTER*/
+.filter_wrapper {
+    display: flex;
+    flex-direction:column;
+    width: 20%;
+    padding: 0 20px;
+}
+.filter_title {
+    display: flex;
+    justify-content: space-between;
+    font-family: Helvetica, sans-serif;
+    font-weight: 600;
+    color: #555;
+    padding: 0 0 25px 0;
+    border-bottom: 1px solid rgba(77, 196, 138, 0.5);
+}
+.default_btn {
+    font-size: 10.4pt;
+    cursor: pointer;
+    font-weight: 400;
+    color: #aaa;
+}
+.default_btn:hover {
+    cursor: pointer;
+    color: #888;
+    text-decoration: none;
+    transform: scale(1.04);
+}
+.filter_content {
+    border-bottom: 1px solid rgba(77, 196, 138, 0.5);
+}
+.filter_form_range_sum {
+    display: flex;
+}
+.sum_input {
+    display: flex;
+    flex-direction:column;
+}
+.filter_form_range_date {
+    display: flex;
+}
+.date_input {
+    display: flex;
+    flex-direction: column;
+}
+.filter_item {
+    margin: 30px 0;
+}
+.filter_item > label, .sum_input > label, .date_input > label {
+    color: #555;
+    font-family: Helvetica, sans-serif;
+    font-weight: 600;
+    font-size: 11pt;
+}
+.input-br-head {
+    padding: 8px;
+    border-color: rgba(77, 196, 138, 0.3);
+}
+/*BUTTONS*/
+.btn_create_service {
+    display: flex;
+    flex-direction:column;
+    justify-content:center;
+    padding: 5px 20px;
+    background-color: #26bda4;
+    border: 1px solid #26bda4;
+    border-radius: 20px;
+    color: #f2f2f2;
+    font-family: Roboto, sans-serif;
+    font-size: 10pt;
+    font-weight: bold;
+    text-decoration: none;
+}
+.btn_create_service:hover {
+    color: #285a68;
+    background-color: #26c195;
+    border: 1px solid #26c195;
+    text-decoration: none;
+}
+.btn_create_contract {
+    display: flex;
+    justify-content:center;
+    padding: 5px 8px;
+    background-color: rgba(82, 184, 213,0.7);
+    border: 1px solid rgba(82, 184, 213,0.7);
+    border-radius: 20px;
+    color: #f2f2f2;
+    font-family: Roboto, sans-serif;
+    font-size: 8pt;
+    font-weight: bold;
+    text-decoration: none;
+    margin: 0;
+}
+.btn_create_contract:hover {
+    color: #285a68;
+    background-color: rgba(82, 184, 213,1);
+    border: 1px solid rgba(82, 184, 213,1);
+    text-decoration: none;
+}
+.btn_apply {
+    display: flex;
+    justify-content:center;
+    font-size: 10pt;
+    padding: 5px 25px;
+    background-color: rgba(77, 196, 138, 0.5);
+    border: 1px solid rgba(77, 196, 138, 0.5);
+    border-radius: 25px;
+    color: #555;
+}
+.btn_icon_right  {
+    margin-left: 3px;
+}
+.btn_icon_left  {
+    margin-right: 3px;
+}
+.btn_apply:hover {
+    background-color: rgba(77, 196, 138, 0.8);
+    border: 1px solid rgba(77, 196, 138, 0.8);
+}
+
+.btn_pay {
+    padding: 5px 20px;
+    background-color: rgba(82, 184, 213,0.7);
+    border: 1px solid rgba(82, 184, 213,0.7);
+    border-radius: 20px;
+    color: #285a68;
+    font-family: Helvetica, sans-serif;
+    font-size: 10.2pt;
+    font-weight: bold;
+    text-decoration: none;
+}
+.btn_pay:hover {
+    color: #285a68;
+    background-color: rgba(82, 184, 213,1);
+    border: 1px solid rgba(82, 184, 213,1);
+    text-decoration: none;
+}
+.btn_delete {
+    padding: 5px 20px;
+    background-color: rgba(217, 83, 79, 0.8);
+    border: 1px solid rgba(217, 83, 79, 0.8);
+    border-radius: 20px;
+    /*color: #a3312d;*/
+    color: #fff;
+    font-family: Helvetica, sans-serif;
+    font-size: 10.2pt;
+    font-weight: bold;
+    text-decoration: none;
+}
+.btn_delete:hover {
+    color: #fff;
+    background-color: rgba(217, 83, 79, 0.9);
+    border: 1px solid rgba(217, 83, 79, 0.9);
+    text-decoration: none;
+}
+/*BULK PAYMENT*/
+.bulk_btn_wrapper {
+    margin: 15px 0 8px 15px;
+}
+.bulk_btn_wrapper > span {
+    font-family: Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+}
+/*--TABLE*/
+.sub_label {
+    font-size: 8pt;
+    color: #aaa;
+}
+
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    padding: 15px 10px;
+    vertical-align: middle;
+    font-family: Helvetica, sans-serif;
+    font-size: 10.2pt;
+    font-weight: bold;
+    color: #666;
+}
+.table>thead>tr>th {
+    padding: 15px 0;
+}
+tr:nth-child(even) {background-color: rgba(240, 240, 240, 0.6);}
+tbody > tr:hover {
+    background-color: rgba(240, 240, 240, 1);
+}
+th > select{
+    font-family: Roboto, sans-serif;
+    font-size: 10.2pt;
+    color: #888;
+}
+th > input::placeholder {
+    font-family: Roboto, sans-serif;
+    font-size: 10.2pt;
+    color: #888;
+}
+.filters select[disabled]{
+    color: #888;
+}
+.filterable .filters input[disabled]::-webkit-input-placeholder {
+    color: #888;
+}
+.filterable .filters input[disabled]::-moz-placeholder {
+    color: #888;
+}
+.filterable .filters input[disabled]:-ms-input-placeholder {
+    color: #888;
+}
+.filterable {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px 0px #888;
+    padding: 0;
+}
+table {
+    margin: 0;
+}
+tbody {
+    display: block;
+    height: 680px;
+    overflow: auto;
+}
+thead, tbody tr {
+    display: table;
+    table-layout:fixed;
+    width: 100%;
+}
+
+.checkbox_users_wrapper {
+    display: flex;
+}
+.checkbox_users_wrapper > span {
+    margin-left: 5px;
+    font-size: 9.5pt;
+    display: flex;
+    flex-direction:column;
+    justify-content:center;
+    color: #bbb;
+}
+
+/*DROPDOWN PDF*/
+.dropdown_pdf {
+    padding: 10px 5px;
+}
+.dropdown_pdf > li > a {
+    font-family: Helvetica, sans-serif;
+    font-weight: 600;
+    font-size: 9pt;
+    color: #888;
+}
+.pdf_error_checked {
+    position: relative;
+}
+.pdf_error_message {
+    display: none;
+    width: 180px;
+    text-align: center;
+    justify-content:center;
+    content: "";
+    border: 1px solid #888;
+    border-radius: 12px;
+    background-color: #888;
+    color: #fff;
+    position: absolute;
+    left: -50%;
+}
+.pdf_error_message:after {
+    content: '';
+    position: absolute;
+    border: 5px solid;
+    bottom: -11px;
+    left: 35px;
+    border-color: #888 transparent transparent transparent;
+}
