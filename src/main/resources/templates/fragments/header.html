@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" th:href="@{/css/header.css}"/>
-    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
+    <link rel="shortcut icon" th:href="@{/img/endava-logo.ico}" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
@@ -18,7 +18,7 @@
 <div class="header_wrapper" th:fragment="header">
         <div class="menu_left">
             <div class="logo_wrapper">
-                <!--<a class="logo" href="#"><img src="/img/endava-loo.png"/></a>-->
+                <a class="logo" href="#"><img src="/img/endava-logo.ico"/></a>
             </div>
             <ul class="menu" sec:authorize="hasAuthority('CUSTOMER')">
                 <li><a th:href="@{/customer/home}" class="menu_item i_home"><div class="menu_icon"><i class="fas fa-home"></i></div> <span>HOME</span> </a></li>
@@ -38,7 +38,7 @@
         <div class="menu_right">
             <ul class="menu" sec:authorize="hasAuthority('CUSTOMER')">
                 <li>
-                    <span class="greeting">Hello, <span id="user"></span>
+                    <span class="greeting">Hello, 	&nbsp;<span id="user"></span>
                         <span class="balance_header">
                             Balance: <span class="balance"></span><span id="mdl">MDL</span>
                         </span>
@@ -48,9 +48,7 @@
                     <div class="notification_wrapper">
                         <div class="notification">
                             <div class="notification_link">
-                                <a id="show_not_link_down" class="notification_icon_chat">
-                                    <i class="fas fa-comment-alt"></i>
-                                    <span id="not_count" value="0"></span>
+                                <a id="show_not_link_down" class="notification_icon_chat" value="0">
                                 </a>
                                 <div class="notification_body">
                                     <div id="notification_">
@@ -66,7 +64,7 @@
             </ul>
             <ul class="menu" sec:authorize="hasAuthority('COMPANY')">
                 <li>
-                    <span class="greeting">Hello, <span id="user"></span>
+                    <span class="greeting">Hello, 	&nbsp;<span id="user"></span>
                         <span class="balance_header">
                             Balance: <span class="balance"></span><span id="mdl">MDL</span>
                         </span>
@@ -77,8 +75,6 @@
                         <div class="notification">
                             <div class="notification_link">
                                 <a id="show_not_link_down" class="notification_icon_chat">
-                                    <i class="fas fa-comment-alt"></i>
-                                    <span id="not_count" value="0"></span>
                                 </a>
                                 <div class="notification_body">
                                     <div id="notification_">
@@ -93,6 +89,9 @@
                 <li><a th:href="@{/logout}" class="menu_item"><span>LOGOUT</span><div class="menu_icon menu_icon_right"><i class="fas fa-sign-out-alt"></i></div></a></li>
             </ul>
         </div>
+    <div class="modal fade" id="load_icon_wrapper" data-backdrop="static" data-keyboard="false">
+        <img id="load" src="/img/load_icon.gif"/>
+    </div>
 </div>
 </body>
 </html>

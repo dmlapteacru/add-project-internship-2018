@@ -1,34 +1,80 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title>Customer contracts list</title>
+    <title>Notifications</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/header.css"/>
-    <link rel="stylesheet" href="/css/table-filter.css">
     <link rel="stylesheet" href="/css/alert.css">
-    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/notifications.css}"/>
     <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
     <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js" integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe" crossorigin="anonymous"></script>
-    <script src="/js/table-filter.js"></script>
 </head>
 
 <body>
-<div th:replace="fragments/header :: header"></div>
 <div class="modal fade" id="load_icon_wrapper" data-backdrop="static" data-keyboard="false">
     <img id="load" src="/img/load_icon.gif"/>
 </div>
-
+<div th:replace="fragments/header :: header"></div>
+<div class="page_title">
+    <div class="title">
+        <span>Notifications</span>
+    </div>
+    <div class="description">
+        <span>Manage your notifications the way you like.</span>
+    </div>
+</div>
 <div class="wrapper">
-    <div class="notifications_wrapper" th:each="notification:${notifications}">
-        <div class="notification">
-
+    <div class="center_">
+        <div class="notifications_wrapper" th:each="notification:${notifications}">
+            <div class="notification_">
+                <div class="notification_message">
+                    <div class="notification_message_content">
+                        <span th:text="${notification.content}"></span>
+                        <p>&nbsp; by &nbsp;</p>
+                        <span th:text="${notification.userFrom}" class="notification_by"></span>
+                    </div>
+                    <div class="date">
+                        <span th:text="${#temporals.format(notification.date, 'dd-MM-yyyy')}"></span>
+                    </div>
+                </div>
+                <div class="notification_buttons">
+                    <div class="mark_as_read">
+                        <button th:if="${notification.status} != ${notification.status.READ}" th:id="${notification.id}">
+                            <span><i class="fas fa-check"></i></span>
+                            <span>Mark as read</span>
+                        </button>
+                    </div>
+                    <div class="view_notification" sec:authorize="hasAuthority('CUSTOMER')">
+                        <a th:if="${notification.notificationCase} == ${notification.notificationCase.NEW_INVOICE}"
+                           th:href="@{/customer/invoices(new-invoice=${notification.idSearch})}"
+                           th:id="${notification.id}">View</a>
+                        <a th:if="${notification.notificationCase} == ${notification.notificationCase.NEW_CONTRACT}"
+                           th:href="@{/customer/contracts(new-contract=${notification.idSearch})}"
+                           th:id="${notification.id}">View</a>
+                        <a th:if="${notification.notificationCase} == ${notification.notificationCase.CONTRACT_SIGNED}"
+                           th:href="@{/customer/contracts(contract-signed=${notification.idSearch})}"
+                           th:id="${notification.id}">View</a>
+                    </div>
+                    <div class="view_notification" sec:authorize="hasAuthority('COMPANY')">
+                        <a th:if="${notification.notificationCase} == ${notification.notificationCase.INVOICE_PAID}"
+                           th:href="@{/company/invoices(invoice-paid=${notification.idSearch})}"
+                           th:id="${notification.id}">View</a>
+                        <a th:if="${notification.notificationCase} == ${notification.notificationCase.NEW_CONTRACT}"
+                           th:href="@{/company/contracts(new-contract=${notification.idSearch})}"
+                           th:id="${notification.id}">View</a>
+                        <a th:if="${notification.notificationCase} == ${notification.notificationCase.CONTRACT_SIGNED}"
+                           th:href="@{/company/contracts(contract-signed=${notification.idSearch})}"
+                           th:id="${notification.id}">View</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -52,6 +98,5 @@
 <script src="/js/loadbalance.js"></script>
 <script src="/js/user-websock.js"></script>
 <script src="/js/customer-sock-distribute.js"></script>
-<script src="/js/invoice-payment.js"></script>
 </body>
 </html>

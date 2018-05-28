@@ -39,18 +39,23 @@ public class Notification {
     private String userTo;
 
     @Column
+    private String userFrom;
+
+    @Column
     private int idSearch;
 
-    public Notification(NotificationCase notificationCase, String content, String userTo) {
+    public Notification(NotificationCase notificationCase, String content, String userTo, String userFrom) {
         this.notificationCase = notificationCase;
         this.content = content;
         this.userTo = userTo;
+        this.userFrom = userFrom;
     }
 
-    public Notification(NotificationCase notificationCase, String content, String userTo, int idSearch) {
+    public Notification(NotificationCase notificationCase, String content, String userTo, int idSearch, String userFrom) {
         this.notificationCase = notificationCase;
         this.content = content;
         this.userTo = userTo;
         this.idSearch = idSearch;
+        this.userFrom = userFrom;
     }
 }

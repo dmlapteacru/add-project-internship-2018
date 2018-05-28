@@ -26,23 +26,27 @@ a:active {
 a:link {
     text-decoration: none;
 }
-a:visited{
-    text-decoration: none;
-    color: #7c7d7e;
-}
 
+.logo > img {
+    width: 75px;
+    height: 30px;
+    margin-right: 30px;
+}
 .header_wrapper {
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     font-style: normal;
     font-weight: 700;
     /*font-family: Roboto, sans-serif;*/
     display: flex;
-    padding: 0 50px;
+    padding: 0 20px;
     justify-content: space-between;
-    background: linear-gradient(to right, #26c385, #25b7c0);
+    background: linear-gradient(to right, #42cca2, #1a5e9d);
 }
 .menu_left {
     display: flex;
+}
+.menu_right {
+    padding: 0 50px 0 0;
 }
 .menu {
     display: flex;
@@ -58,7 +62,7 @@ a:visited{
     flex-direction: column;
     justify-content: center;
     position: relative;
-    padding: 20px 10px;
+    padding: 30px 15px;
 }
 .menu_icon {
     display: flex;
@@ -71,13 +75,13 @@ a:visited{
 }
 .menu_item {
     display: flex;
-    /*color: rgba(255,255,255,0.5);*/
-    color: #7c7d7e;
+    color: #fff;
+    /*color: #7c7d7e;*/
 }
 .menu_item > span {
     display: flex;
     margin-left: 8px;
-    font-size: 9pt;
+    font-size: 10pt;
 }
 .menu_item:hover {
     color: #eee;
@@ -98,31 +102,48 @@ a:visited{
     bottom: -1px;
     left: 55%;
     margin-left: -5px;
-    border: 8px solid;
+    border: 11px solid;
     border-color:  transparent  transparent #fff transparent;
 }
 
 /*NOTIFICATIONS*/
 .notification_icon_chat {
+    display: flex;
+    justify-content:center;
     color: #ffff;
-    font-size: 18pt;
+    font-size: 10pt;
+    padding: 1px 0px;
+    min-height: 20px;
+    min-width: 25px;
+    border-radius: 10%;
     position: relative;
 }
-.notification_icon_chat > span {
+.notification_icon_chat.white:after{
     position: absolute;
-    font-size: 10pt;
-    color: #fff;
-    top: 15%;
-    left: 35%;
+   content: '';
+    border: 5px solid;
+    border-color:  transparent  transparent transparent #fff;
+    left: 8px;
+    bottom: -5px;
+}
+.notification_icon_chat.red:after{
+    position: absolute;
+    content: '';
+    border: 5px solid;
+    border-color:  transparent  transparent transparent #f15928;
+    left: 8px;
+    bottom: -5px;
 }
 .notification_icon_chat:hover {
-    color: #f15928;
+    color: #fff;
     transform: scale(1.2);
+    text-decoration: none;
 }
 /*..........NOTIFICATIONS JS.......*/
 
 .notification_link {
-    position: relative;
+    display: flex;
+    /*position: relative;*/
 }
 .notification_body {
     font-family: Helvetica, sans-serif;
@@ -136,11 +157,11 @@ a:visited{
     text-align: center;
     border: 1px solid #ccc;
     border-radius: 4px;
-    padding: 5px 10px;
+    padding: 5px 0px;
     position: absolute;
     z-index: 1;
-    top: 125%;
-    left: 0;
+    top: 85%;
+    left: 15%;
     /*margin-left: -60px;*/
     opacity: 1;
     transition: opacity 0.8s;
@@ -195,29 +216,24 @@ a:visited{
         transform: scale(1);
     }
     to {
-        transform: scale(2);
+        transform: scale(1.5);
     }
 }
 @keyframes example {
     from {
-        transform: scale(2);
+        transform: scale(1.5);
     }
     to {
         transform: scale(1);
     }
 }
-.cue {
+.cues {
     animation-name: example;
-    animation-duration: 1s;
+    animation-duration: 1.2s;
 }
 .notification {
     display: flex;
 
-}
-.notification_link {
-    display: flex;
-    flex-direction: column;
-    justify-content:center;
 }
 .notification_link > a {
     cursor: pointer;
@@ -226,8 +242,11 @@ a:visited{
 .notification_item {
     display: flex;
     justify-content:space-between;
-    padding: 8px 0;
+    padding: 8px 15px;
     border-bottom: 1px solid #7c7d7e;
+}
+.notification_item:hover {
+    background-color: rgba(0,0,0,0.04);
 }
 .notification_item > a{
     font-size: 15px;
@@ -235,10 +254,16 @@ a:visited{
 }
 .notification_item > a:hover{
     text-decoration: none;
-    transform: scale(1.5);
+    transform: scale(1.2);
 }
 .notification_item>span{
     margin-right: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+}
+.notification_view_all {
+    padding: 7px 0;
 }
 .notification_view_all > button{
     background-color: transparent;
@@ -253,10 +278,16 @@ a:visited{
 .act{
     background-color: #aaa;
 }
-
+.notification_item:hover .not_case {
+    text-decoration: underline;
+}
 .not_case:hover {
     cursor: pointer;
     text-decoration: underline;
+}
+.view_all_not {
+    color: #777;
+    margin: 5px 0;
 }
 /*.............................................*/
 
@@ -286,4 +317,50 @@ a:visited{
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
+}
+
+.balance_header{
+    display: none;
+}
+
+
+
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 1;
+    display: block;
+    width: 12px;
+    color: #888;
+}
+
+.filter_item select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    display: block;
+    width: 100%;
+    padding: 0px 24px;
+    font-size: 10pt;
+    color: #555;
+    background-color: #ffffff;
+    -ms-word-break: normal;
+    word-break: normal;
+}
+.custom_arrow {
+    position: relative;
+}
+.custom_arrow:after {
+    content: "";
+    position: absolute;
+    top: 65%;
+    right: 10px;
+    border: 6px solid;
+    border-color: #888 transparent  transparent  transparent;
+}
+
+input:focus {
+    border-color: #3cbba1 !important;
+}
+select:focus {
+    border-color: #3cbba1 !important;
+    outline: none !important;
 }

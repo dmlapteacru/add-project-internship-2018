@@ -1,21 +1,10 @@
 package com.endava.addprojectinternship2018.controller;
 
-
-import com.endava.addprojectinternship2018.model.Notification;
-import com.endava.addprojectinternship2018.model.dto.InvoiceDescriptionPaymentDto;
-import com.endava.addprojectinternship2018.model.dto.NotificationDto;
-import com.endava.addprojectinternship2018.model.enums.NotificationCase;
-import com.endava.addprojectinternship2018.model.enums.NotificationStatus;
 import com.endava.addprojectinternship2018.service.AdminMessageService;
 import com.endava.addprojectinternship2018.service.NotificationService;
 import com.endava.addprojectinternship2018.service.UserService;
-import com.endava.addprojectinternship2018.testWS.User;
-import com.endava.addprojectinternship2018.testWS.UserResponse;
 import com.endava.addprojectinternship2018.util.UserUtil;
-import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,8 +32,8 @@ public class WebSocketController {
 
     @RequestMapping(value = "/notifications/view-all", method = GET)
     public String showNotifications(Model model){
-
-        return "notifications";
+        model.addAttribute("notifications", notificationService.getAllByRecipient(userUtil.getCurrentUser().getUsername()));
+        return "notifications/notifications";
     }
 
 }

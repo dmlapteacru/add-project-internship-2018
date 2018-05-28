@@ -28,7 +28,9 @@ public class AdminMessageService {
             Date date = new Date();
             adminMessage.setDate(date);
             adminMessageDao.save(adminMessage);
-            webSocketDistributeService.sendNewAdminMessageNotification(adminMessage.getUserEmail(), getFirstAdminMessageByEmailOrderByDate(adminMessage.getUserEmail()).getId());
+            webSocketDistributeService.sendNewAdminMessageNotification(adminMessage.getUserEmail(),
+                            getFirstAdminMessageByEmailOrderByDate(adminMessage.getUserEmail()).getId(),
+                            getFirstAdminMessageByEmailOrderByDate(adminMessage.getUserEmail()).getUserEmail());
         }
     }
     public void deleteById(int id){

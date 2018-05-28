@@ -91,6 +91,7 @@ $("#check_all_invoices").change(function () {
             $(this).prop("checked", true);
         });
         $(".bulk_btn_wrapper").css("display", "block");
+        getBulkSum();
     } else {
         $.each($(".checkbox_invoice_element"), function () {
             $(this).removeAttr("checked");
@@ -98,7 +99,7 @@ $("#check_all_invoices").change(function () {
         });
         $(".bulk_btn_wrapper").css("display", "none");
     }
-    getBulkSum();
+
 });
 
 
@@ -113,12 +114,13 @@ $(".checkbox_invoice_element").change(function () {
 
     if (isAnyChecked === true){
         $(".bulk_btn_wrapper").css("display", "block");
+        getBulkSum();
     } else {
         $(".bulk_btn_wrapper").css("display", "none");
         $("#check_all_invoices").removeAttr("checked");
         $("#check_all_invoices").prop("checked", false);
     }
-    getBulkSum();
+
 });
 
 $("#bulk_pay_btn").click(function () {

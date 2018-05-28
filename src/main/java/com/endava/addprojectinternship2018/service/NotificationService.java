@@ -22,6 +22,11 @@ public class NotificationService {
      return notificationDao.findAllByStatusAndUserToOrderByDateAsc(NotificationStatus.UNREAD, userTo);
     }
 
+    public List<Notification> getAllByRecipient(String username){
+        List<Notification> notifications = notificationDao.findAllByUserToOrderByDateDesc(username);
+        return notifications;
+    }
+
     public void changeNotificationStatusOnRead(int id){
         Notification notification = notificationDao.getOne(id);
         notification.setStatus(NotificationStatus.READ);

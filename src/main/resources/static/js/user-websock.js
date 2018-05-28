@@ -1,21 +1,17 @@
 var stompClient = null;
-var token = "";
 $(document).ready(function () {
     getToken();
 });
-
-function connect() {
+function connect(response) {
     var socket = new SockJS('/user-sock');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
-        stompClient.subscribe('/user/'+token+'/queue/messages', function () {
+        stompClient.subscribe('/user/'+response+'/queue/messages', function () {
+            setTimeout(loadNotifications(), 1100);
+            $("#show_not_link_down").addClass("cues");
             setTimeout(function () {
-                loadNotifications();
-                $("#not_icon").addClass("cue");
-                setTimeout(function () {
-                    $("#not_icon").removeClass("cue");
-                }, 1010);
-            }, 1000);
+                $("#show_not_link_down").removeClass("cues");
+            }, 1010);
         });
     });
 }
@@ -25,8 +21,7 @@ function getToken() {
         {
             url: "/getToken",
             success: function (response) {
-                token = response;
-                connect();
+                connect(response);
             }
         }
     );

@@ -3,12 +3,12 @@
       xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title>Customer contracts list</title>
+    <title>Services</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/table-filter.css"/>
-    <link rel="stylesheet" type="text/css" href="/css/admin.css"/>
+    <!--<link rel="stylesheet" type="text/css" href="/css/admin.css"/>-->
     <link rel="stylesheet" type="text/css" href="/css/header.css"/>
     <link rel="stylesheet" type="text/css" href="/css/services.css"/>
     <link rel="stylesheet" type="text/css" href="/css/custom_radio_buttons.css"/>
@@ -28,6 +28,14 @@
 </div>
 <div class="wrapper">
     <div th:replace="fragments/header :: header"></div>
+    <div class="page_title">
+        <div class="title">
+            <span>Services</span>
+        </div>
+        <div class="description">
+            <span>Here you can find list of services available and choose any of them.</span>
+        </div>
+    </div>
     <div class="content_wrapper">
         <div class="filter_wrapper">
             <div class="filter_title">
@@ -105,7 +113,7 @@
             <table class="table">
                 <thead>
                 <tr class="filters">
-                    <th width="3%" class="pdf_error_checked">
+                    <th width="5%" class="pdf_error_checked" sec:authorize="hasAuthority('CUSTOMER')">
                         <div class="pdf_error_message">Please choose services.</div>
                     </th>
                     <th>
@@ -122,13 +130,13 @@
                     </th>
                     <th><input type="text" class="form-control" placeholder="Price" disabled></th>
                     <th width="30%" align="left"><input type="text" class="form-control" placeholder="Description" disabled></th>
-                    <th></th>
+                    <th width="17%"></th>
                 </tr>
                 </thead>
                 <tbody class="filter_body">
                 <tr th:each="product : ${products}" th:id="'row'+${product.getId()}">
 
-                    <td width="3%">
+                    <td width="5%" sec:authorize="hasAuthority('CUSTOMER')">
                         <label class="control control--radio">
                             <input type="checkbox" name="choice" th:value="${product.getId()}"/>
                             <div class="control__indicator"></div>
@@ -152,16 +160,33 @@
                         th:text="${product.getDescription()}">description
                     </td>
 
-                    <td>
+                    <td width="17%">
                         <button sec:authorize="hasAuthority('CUSTOMER')" data-toggle="modal" data-target="#modalContract"
                            class="btn_create_contract" role="button" th:id="${product.getId()}" data-backdrop="static"
-                           onclick="createNewContract(this)">CREATE NEW CONTRACT</button>
-                        <button sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalDescription"
-                           class="btn_pay" role="button" th:id="${product.getId()}" data-backdrop="static"
-                           onclick="updateProduct(this)">UPDATE</button>
-                        <button sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalDeleteConfirm"
-                           class="btn_delete" role="button" th:id="'btn_delete_'+${product.getId()}"
-                           onclick="deleteService(this)" data-backdrop="static">DELETE</button>
+                           onclick="createNewContract(this)">CREATE CONTRACT</button>
+                        <div class="dropdown" sec:authorize="hasAuthority('COMPANY')">
+                            <a class="dropdown-toggle" type="button" id="menu1" data-toggle="dropdown" title="Actions..">
+                                <span class="dot_3"><i class="fas fa-ellipsis-h"></i></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-right dropdown_action" role="menu" aria-labelledby="menu1">
+                                <li role="presentation">
+                                    <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalDescription"
+                                            role="button" th:id="${product.getId()}" data-backdrop="static"
+                                            onclick="updateProduct(this)">
+                                        <span class="btn_icon_left"><i class="fas fa-pencil-alt"></i></span>
+                                        <span>UPDATE</span>
+                                    </a>
+                                </li>
+                                <li role="presentation">
+                                    <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalDeleteConfirm"
+                                            role="button" th:id="'btn_delete_'+${product.getId()}"
+                                            onclick="deleteService(this)" data-backdrop="static">
+                                        <span class="btn_icon_left"><i class="fas fa-trash-alt"></i></span>
+                                        <span>DELETE</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </td>
 
                 </tr>
@@ -401,11 +426,10 @@
 
 </body>
 
-<script src="/js/loadbalance.js"></script>
 <script src="/js/user-websock.js"></script>
 <script src="/js/customer-sock-distribute.js"></script>
+<script src="/js/loadbalance.js"></script>
 <script>
-
     function getCategories() {
         clearErrors();
         $("#new_service_name").val("");

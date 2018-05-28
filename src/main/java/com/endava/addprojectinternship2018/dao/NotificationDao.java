@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface NotificationDao extends JpaRepository<Notification, Integer>{
     List<Notification> findAllByStatusAndUserToOrderByDateAsc(NotificationStatus status, String userTo);
+    List<Notification> findAllByUserToOrderByDateDesc(String username);
 }

@@ -57,7 +57,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
                 .antMatchers("/status/dev","/login","/test", "/registration/**", "/", "/resetPassword","/reset/password", "/newUserPassword", "/email", "/message/send").permitAll()
-                .antMatchers("/admin/**").access("hasAuthority('ADMIN')")
+                .antMatchers("/admin/**", "/notifications/**").access("hasAuthority('ADMIN')")
                 .antMatchers("/customer/**").access("hasAuthority('CUSTOMER')")
                 .antMatchers("/company/**").access("hasAuthority('COMPANY')")
                 .antMatchers("/invoices/**", "/notifications/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")

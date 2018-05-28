@@ -94,9 +94,9 @@ public class ContractService {
         Contract contract = convertDTOToContract(contractDto);
         contractDao.save(contract);
         if (userUtil.getCurrentUser().getRole() == Role.CUSTOMER) {
-            webSocketDistributeService.sendNewContractNotification(contract.getCompany().getUser().getUsername());
+            webSocketDistributeService.sendNewContractNotification(contract.getCompany().getUser().getUsername(), contract.getCustomer().getFullName());
         } else {
-            webSocketDistributeService.sendNewContractNotification(contract.getCustomer().getUser().getUsername());
+            webSocketDistributeService.sendNewContractNotification(contract.getCustomer().getUser().getUsername(), contract.getCompany().getName());
         }
 
         LOGGER.info(String.format("%s: contract saved: %s - %s",
@@ -174,7 +174,8 @@ public class ContractService {
                 } else {
                     newStatus = UNSIGNED;
                 }
-                webSocketDistributeService.sendSignContractNotification(currentContract.getCompany().getUser().getUsername(), contractId);
+                webSocketDistributeService.sendSignContractNotification(currentContract.getCompany().getUser().getUsername(), contractId,
+                                                currentContract.getCustomer().getFullName());
                 break;
             case COMPANY:
                 if (currentStatus == UNSIGNED) {
@@ -184,7 +185,8 @@ public class ContractService {
                 } else {
                     newStatus = UNSIGNED;
                 }
-                webSocketDistributeService.sendSignContractNotification(currentContract.getCustomer().getUser().getUsername(), contractId);
+                webSocketDistributeService.sendSignContractNotification(currentContract.getCustomer().getUser().getUsername(), contractId,
+                                                currentContract.getCompany().getName());
                 break;
         }
 
