@@ -61,8 +61,8 @@ pipeline {
         stage('Build dockerfile') {
             steps {
                 
-                    sh 'ls -a . '
-                    sh "cp target/add-project-internship-2018-$version.trim().war . "
+                sh 'ls -a ./target '
+                //sh "cp target/add-project-internship-2018-$version.trim().war . "
                 //sh 'docker build -t java_team1 .'
                  
             }
