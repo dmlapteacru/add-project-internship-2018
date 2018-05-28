@@ -1,7 +1,7 @@
 pipeline {
    agent {
         node {
-            label 'Slave03'
+            label 'Slave06'
         }
     }
     
@@ -17,7 +17,7 @@ pipeline {
                     version2 = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.version | grep -e "^[^[]" | sed "s/-SNAPSHOT//g"')
                  }
 
-                sh "mvn versions:set -DnewVersion=$version-$env.BUILD_NUMBER"
+                //sh "mvn versions:set -DnewVersion=$version-$env.BUILD_NUMBER"
                 sh 'mvn clean install -DskipTests'
 
                 script {
@@ -37,13 +37,13 @@ pipeline {
         //     }
         // }
 
-        stage('Sonar scan') {
-            steps {
-                withSonarQubeEnv('New Sonar Endava') {
-                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar'
-                }
-            }
-        }
+        // stage('Sonar scan') {
+        //     steps {
+        //         withSonarQubeEnv('New Sonar Endava') {
+        //             sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar'
+        //         }
+        //     }
+        // }
 
         // stage('Upload artifact') {
         //    steps {
@@ -61,9 +61,7 @@ pipeline {
         stage('Build dockerfile') {
             steps {
                 
-                sh 'ls -a ./target '
-                //sh "cp target/add-project-internship-2018-$version.trim().war . "
-                //sh 'docker build -t java_team1 .'
+                sh 'docker build -t java_team1 .'
                  
             }
         }
