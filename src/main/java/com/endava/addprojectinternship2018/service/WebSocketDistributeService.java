@@ -34,7 +34,7 @@ public class WebSocketDistributeService {
     }
 
     public void sendSignContractNotification(String userTo, int contractId, String userFrom){
-        notificationService.save(new Notification(NotificationCase.CONTRACT_SIGNED, "Contract was signed by", userTo, contractId, userFrom));
+        notificationService.save(new Notification(NotificationCase.CONTRACT_SIGNED, "Contract was signed", userTo, contractId, userFrom));
         messagingTemplate.convertAndSendToUser(userService.getUserByUsername(userTo).get().getSocketToken(), "/queue/messages", "NOTIFICATION");
         LOGGER.info(userService.getUserByUsername(userTo).get().getSocketToken());
     }

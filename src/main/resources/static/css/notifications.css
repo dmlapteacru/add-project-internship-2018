@@ -87,6 +87,9 @@ body {
     background-color: #2a8b9f;
     border-color: #2a8b9f;
 }
+.mark_as_read > button > span{
+    margin-right: 5px;
+}
 .view_notification {
     display: flex;
     flex-direction: column;
