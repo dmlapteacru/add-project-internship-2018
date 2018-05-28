@@ -501,7 +501,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" id="nrInvSaved"> invoices were saved !</h4>
+                <h4 class="modal-title" id="nrInvSaved"></h4>
             </div>
             <div class="modal-footer modal_btn">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -599,10 +599,7 @@ $(document).ready(function () {
         var lastDay = new Date(y, m + 1, 0);
         expireDate.setDate(lastDay.getDate() + 15);
 
-
         $('#issue_inv_date').val(moment(issueDate).format('YYYY-MM-DD'));
-        // console.log(row.find("#contractId").text());
-
         $('#issue_inv_date').val(moment(currentDate).format('YYYY-MM-DD'));
         $('#expire_inv_date').val(moment(expireDate).format('YYYY-MM-DD'));
         $('#start_period_inv_date').val(moment(firstDay).format('YYYY-MM-DD'));
@@ -959,17 +956,15 @@ $(document).ready(function () {
     });
 
     function createBulkInvoices() {
+
         var selectedRows = $('table.table tbody input[type=checkbox]:checked');
+
         if (selectedRows.length == 0) {
             $("#modalBulkInvoiceWarning").modal();
         } else {
-
-            console.log('selectedRows:', selectedRows);
             var ids = [];
             for (var i = 0; i < selectedRows.length; i++) {
-                console.log("row" + i + "=" + selectedRows[i].id);
                 ids.push(selectedRows[i].id);
-
             }
 
             $.ajax(
@@ -979,18 +974,24 @@ $(document).ready(function () {
                     data: {invoiceIds: ids},
                     success: function (length) {
                         console.log(length);
-                        $("#nrInvSaved").text(length + '  invoice were saved');
+                        if(length == 0){
+                            $("#modalInvoiceSavedNr").find('.modal-title').text('NO one invoice could be created !');
+                        }else if(length ==1){
+                            $("#modalInvoiceSavedNr").find('.modal-title').text(length + '  invoice has been created !');
+                        }else {
+                            $("#modalInvoiceSavedNr").find('.modal-title').text(length + '  invoices has been created !');
+                        }
 
+                        $("#bulk_create_invoices").css("display", "none");
                         $("#modalInvoiceSavedNr").modal('show');
                         var selectedRows = $('table.table tbody input[type=checkbox]');
                         for (var i = 0; i < selectedRows.length; i++) {
                             selectedRows[i].checked = false;
                         }
                         $("#check_all").prop("checked", false);
-
                     },
                     error: function (errMsg, a, b) {
-                        alert("Please call admins")
+                        alert("Some tech problems have appeared !")
                         console.log("fail")
                         console.log(errMsg)
                         console.log(a)
