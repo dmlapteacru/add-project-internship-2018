@@ -38,10 +38,13 @@
         <div class="menu_right">
             <ul class="menu" sec:authorize="hasAuthority('CUSTOMER')">
                 <li>
-                    <span class="greeting">Hello, 	&nbsp;<span id="user"></span>
+                    <span class="greeting">
+                        <div>
+                            <span>Hello, 	&nbsp;</span><span id="user"></span>
+                        </div>
                         <span class="balance_header">
                             <div class="balance_header_inf">
-                                <span>Balance:</span> <span class="balance"></span><span id="mdl">MDL</span>
+                                <span>Account balance:</span> <span class="balance"></span><span id="mdl">MDL</span>
                             </div>
                         </span>
                     </span>

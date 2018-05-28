@@ -65,7 +65,7 @@ body {
     justify-content: center;
     width: 50%
 }
-.account_info_balance > div, span {
+.account_info_balance > div,  .account_info_balance > span {
     display: flex;
     justify-content: center;
 }

@@ -324,8 +324,6 @@ a:link {
 }
 .balance_header_inf{
     display: flex;
-    padding: 0 0 0 5px;
-    border-left: 1px solid #fff;
 
 }
 .balance_header_inf > span {
@@ -371,8 +369,4 @@ input:focus {
 select:focus {
     border-color: #3cbba1 !important;
     outline: none !important;
-}
-#user {
-    padding: 0 5px 0 0;
-
 }

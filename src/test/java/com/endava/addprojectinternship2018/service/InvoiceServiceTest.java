@@ -54,6 +54,6 @@ public class InvoiceServiceTest {
        // expectedParam.setContract(contract);
         invoiceService.changeInvoiceStatusToSent(10);
         Mockito.verify(invoiceDao,times(1)).save(expectedParam);
-        Mockito.verify(webSocketDistributeService,times(1)).sendNewInvoiceNotification("login132",10);
+        Mockito.verify(webSocketDistributeService,times(1)).sendNewInvoiceNotification("login132",10, "");
     }
 }
