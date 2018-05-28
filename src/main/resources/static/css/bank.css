@@ -90,7 +90,10 @@ body {
     color: #333;
 }
 .currency {
-    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 15px;
     color: #333;
     margin-left: 7px;
 }

@@ -2,9 +2,7 @@ $(document).ready(function () {
     loadBalance();
     $(".balance_header").css("display", "none");
     $(".balance").text(" -no connection- ");
-    $(".balance_info").text(" -no connection- ");
     $(".balance_info").css("font-size", "18px");
-    $("#mdl").css("display", "none");
     getUserName();
 });
 
@@ -20,6 +18,7 @@ function loadBalance() {
             success: function (result) {
                 $(".balance").text(result);
                 $(".balance_info").text(result);
+                $(".balance_header").css("display","block");
             },
             error: function (result) {
                 $(".balance").text(result.responseText);

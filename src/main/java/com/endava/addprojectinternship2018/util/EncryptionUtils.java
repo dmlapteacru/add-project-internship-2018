@@ -75,12 +75,7 @@ public class EncryptionUtils {
 
     public byte[] decryptBytes(byte[] data) throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
         decrypter.init(Cipher.PRIVATE_KEY, privateKey);
-        byte[] newArr = new byte[data.length - 1];
-        for (int i = 0; i < newArr.length; i++) {
-            newArr[i] = data[i + 1];
-        }
-        byte[] decoded = decrypter.doFinal(newArr);
-        return decoded;
+        return decrypter.doFinal(data);
     }
 
     /**
