@@ -7,9 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentDto {
-    // short names because of encription needs
-    private Long c; // count number
-    private double s; // sum
-    private String d; // description
+public class BalanceDto {
+    private Double balance;
 }

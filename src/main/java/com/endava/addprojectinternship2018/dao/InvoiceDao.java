@@ -1,11 +1,7 @@
 package com.endava.addprojectinternship2018.dao;
 
-import com.endava.addprojectinternship2018.model.dto.InvoiceCustomerViewDto;
-import com.endava.addprojectinternship2018.model.Contract;
-import com.endava.addprojectinternship2018.model.dto.InvoiceDescriptionPaymentDto;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -1,4 +1,4 @@
-$( document ).ready(function () {
+$(document).ready(function () {
     loadBalance();
     $(".balance_header").css("display", "none");
     $(".balance").text(" -no connection- ");
@@ -7,26 +7,33 @@ $( document ).ready(function () {
     $("#mdl").css("display", "none");
     getUserName();
 });
+
 function loadBalance() {
     $.ajax(
         {
             statusCode: {
-              400: function() {
-              }
+                400: function () {
+                }
             },
-            url : "/bankAccount/balance",
-            type : "POST",
-            success : function (result) {
-               return parseBalance(result);
+            url: "/bankAccount/balance",
+            type: "POST",
+            success: function (result) {
+                $(".balance").text(result);
+                $(".balance_info").text(result);
+            },
+            error: function (result) {
+                $(".balance").text(result.responseText);
+                $(".balance_info").text(result.responseText);
             }
         }
     )
 }
+
 function getUserName() {
     $.ajax(
         {
-            url : "/get/username",
-            success : function (response) {
+            url: "/get/username",
+            success: function (response) {
                 $("#user").text(response);
             }
         }

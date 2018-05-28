@@ -122,10 +122,6 @@ public class UserService {
         return userDao.findUsersEmailByUsername(username);
     }
 
-//    public UserBankAccountDto getUserBankAccountByUsername(String username) {
-//        return userDao.findUserBankAccountByUsername(username);
-//    }
-
     public UserBankAccountDto getUserBankAccount() throws NoBankAccountException {
         long countNumber;
         BankKey bankKey;

@@ -30,23 +30,15 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping(value = "contractRest")
 public class ContractRestController {
 
-    @Autowired
-    private UserUtil userUtil;
-
+    private final UserUtil userUtil;
     private final ContractService contractService;
-    private final CustomerService customerService;
-    private final CompanyService companyService;
-    private final ProductService productService;
 
     private static final Logger LOGGER = Logger.getLogger(ContractRestController.class);
 
     @Autowired
-    public ContractRestController(ContractService contractService, ProductService productService,
-                                  CompanyService companyService, CustomerService customerService) {
+    public ContractRestController(ContractService contractService, UserUtil userUtil) {
         this.contractService = contractService;
-        this.productService = productService;
-        this.companyService = companyService;
-        this.customerService = customerService;
+        this.userUtil = userUtil;
     }
 
     @PostMapping(value = "/newContract")

@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentDto {
+public class TransactionRequestDto {
     // short names because of encription needs
-    private Long c; // count number
+    private String d; // date in format ('yyyy-MM-dd')
+    private long m; // main account
+    private long c; // correspondent account
     private double s; // sum
-    private String d; // description
+    private String dr; // description
 }

@@ -2,9 +2,11 @@ package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.InvoiceDao;
 import com.endava.addprojectinternship2018.dao.InvoiceTransactionDao;
+import com.endava.addprojectinternship2018.exception.NoBankAccountException;
 import com.endava.addprojectinternship2018.model.Contract;
 import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
 import com.endava.addprojectinternship2018.model.dto.InvoiceDescriptionPaymentDto;
+import com.endava.addprojectinternship2018.model.dto.PaymentDto;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
 import com.endava.addprojectinternship2018.model.dto.InvoiceDto;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +43,7 @@ public class InvoiceService {
         this.contractService = contractService;
     }
 
-    public List<Invoice> getAllInvoices(){
+    public List<Invoice> getAllInvoices() {
         return invoiceDao.findAll();
     }
 
@@ -60,7 +63,6 @@ public class InvoiceService {
         return invoiceDao.findAllByContractId(id);
     }
 
-
     public List<Invoice> getCheckedInvoices(List<Integer> contractIds) {
 
         System.out.println("contract_ids:   " + contractIds);
@@ -68,13 +70,13 @@ public class InvoiceService {
         List<Invoice> invoiceList = new ArrayList<>();
 
         for (Integer id : contractIds) {
-            System.out.println("contract_id:  "+id);
+            System.out.println("contract_id:  " + id);
             boolean success = true;
             Contract contract = contractService.getById(id);
-            System.out.println("contractul : "+contract);
+            System.out.println("contractul : " + contract);
             for (Invoice inv : invoiceDao.findAllByContractId(id)) {
 
-                System.out.println("All invoices by company : "+invoiceDao.findAllByContractId(id));
+                System.out.println("All invoices by company : " + invoiceDao.findAllByContractId(id));
 
                 if (LocalDate.now().isBefore(inv.getServiceEndDate())) {
                     success = false;
@@ -133,7 +135,7 @@ public class InvoiceService {
     }
 
     @Transactional
-    public void save(Iterable<Invoice> invoices){
+    public void save(Iterable<Invoice> invoices) {
         invoiceDao.saveAll(invoices);
     }
 
@@ -265,4 +267,20 @@ public class InvoiceService {
             setInvoiceAsPaid(i);
         }
     }
+
+    public PaymentDto createPaymentDto(int invoiceId) {
+        Invoice currentInvoice = getInvoiceById(invoiceId);
+        Contract currentContract = currentInvoice.getContract();
+        Long companyCount = currentContract.getCompany().getCountNumber();
+        PaymentDto paymentDto = new PaymentDto();
+        paymentDto.setC(companyCount);
+        paymentDto.setS(currentInvoice.getSum());
+        if (companyCount == null) {
+            paymentDto.setD("Company " + currentContract.getCompany().getName() + " has not bank account!");
+        } else {
+            paymentDto.setD("invoiceId=" + invoiceId);
+        }
+        return paymentDto;
+    }
+
 }

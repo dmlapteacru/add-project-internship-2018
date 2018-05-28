@@ -145,7 +145,7 @@ public class ContractService {
         return result;
     }
 
-    public Contract convertDTOToContract(ContractDto contractDto) {
+    private Contract convertDTOToContract(ContractDto contractDto) {
         Contract contract = new Contract();
         contract.setIssueDate(contractDto.getIssueDate());
         contract.setExpireDate(contractDto.getExpireDate());
