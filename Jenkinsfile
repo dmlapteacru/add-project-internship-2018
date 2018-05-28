@@ -65,6 +65,7 @@ pipeline {
         }
 
         stage('Push image on ECR') {
+            steps {
             withCredentials([usernamePassword(credentialsId: '1829e512-98c0-4c98-9293-253d5a7a3704', passwordVariable: 'aws_secret_access_key', usernameVariable: 'aws_access_key_id')]) {
                         sh "aws configure set aws_access_key_id $aws_access_key_id "
                         sh "aws configure set aws_secret_access_key $aws_secret_access_key "
@@ -76,6 +77,7 @@ pipeline {
                         sh 'docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/java_team1:v0.1'
             }
         }
+    }
         
-        }     
+    }     
 }
