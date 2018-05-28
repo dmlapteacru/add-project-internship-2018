@@ -60,7 +60,7 @@ pipeline {
 
         stage('Build dockerfile') {
             steps {
-                
+                sh 'ls -a .'
                 sh 'docker build -t java_team1 .'
                  
             }
