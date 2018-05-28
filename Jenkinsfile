@@ -62,7 +62,7 @@ pipeline {
             steps {
                 script {
                     ls -a .
-                    cp 'target/add-project-internship-2018-' + version.trim() + '.war' . 
+                    cp "target/add-project-internship-2018-$version.trim().war" . 
                 }
                 //sh 'docker build -t java_team1 .'
                  
