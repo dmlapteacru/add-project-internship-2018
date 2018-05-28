@@ -417,26 +417,202 @@ a{
     border: 1px solid #ee4c48;
     border-radius: 14px;
 }
+/*!*NOTIFICATIONS*!*/
+/*.notification_icon_chat {*/
+    /*color: #f15928;*/
+    /*font-size: 18pt;*/
+    /*position: relative;*/
+/*}*/
+/*.notification_icon_chat > span {*/
+    /*position: absolute;*/
+    /*font-size: 10pt;*/
+    /*color: #fff;*/
+    /*top: 15%;*/
+    /*left: 35%;*/
+/*}*/
+/*.notification_icon_chat:hover {*/
+    /*color: #f15928;*/
+    /*transform: scale(1.2);*/
+/*}*/
+/*!*..........NOTIFICATIONS JS.......*!*/
+
+/*.notification_link {*/
+    /*position: relative;*/
+/*}*/
+/*.notification_body {*/
+    /*font-family: Helvetica, sans-serif;*/
+    /*font-weight: 600;*/
+    /*display: none;*/
+    /*font-size: 12px;*/
+    /*visibility: visible;*/
+    /*width: 400px;*/
+    /*background-color: #f2f2f2;*/
+    /*color: #7c7d7e;*/
+    /*text-align: center;*/
+    /*border: 1px solid #ccc;*/
+    /*border-radius: 4px;*/
+    /*padding: 5px 10px;*/
+    /*position: absolute;*/
+    /*z-index: 1;*/
+    /*top: 125%;*/
+    /*right: 0;*/
+    /*!*margin-left: -60px;*!*/
+    /*opacity: 1;*/
+    /*transition: opacity 0.8s;*/
+/*}*/
+/*#notification_ {*/
+    /*display: flex;*/
+    /*flex-direction:column-reverse;*/
+/*}*/
+/*.visible {*/
+    /*visibility: visible;*/
+    /*opacity: 1;*/
+/*}*/
+/*.notification_body::after {*/
+    /*content: "";*/
+    /*position: absolute;*/
+    /*bottom: 100%;*/
+    /*right: 2%;*/
+    /*margin-left: -5px;*/
+    /*border: 8px solid;*/
+    /*border-color:  transparent  transparent #f2f2f2 transparent;*/
+/*}*/
+/*.notification_wrapper{*/
+    /*display: flex;*/
+    /*flex-direction:column;*/
+    /*justify-content:center;*/
+/*}*/
+/*!*.notification_icon {*!*/
+/*!*position: absolute;*!*/
+/*!*padding: 2px 2px;*!*/
+/*!*border: 1px solid #f4a742;*!*/
+/*!*border-radius: 4px;*!*/
+/*!*background-color: #f4a742;*!*/
+/*!*display: flex;*!*/
+/*!*justify-content: center;*!*/
+/*!*font-size: 12px;*!*/
+/*!*color: #fff;*!*/
+/*!*margin: 2px;*!*/
+/*!*visibility: visible;*!*/
+/*!*}*!*/
+/*!*.notification_icon::after {*!*/
+/*!*content: "";*!*/
+/*!*position: absolute;*!*/
+/*!*width: 15px;*!*/
+/*!*height: 22px;*!*/
+/*!*border: 0px solid #f4a742;*!*/
+/*!*border-radius: 6px;*!*/
+/*!*top: -2px;*!*/
+
+/*!*}*!*/
+/*@keyframes example {*/
+    /*from {*/
+        /*transform: scale(1);*/
+    /*}*/
+    /*to {*/
+        /*transform: scale(2);*/
+    /*}*/
+/*}*/
+/*@keyframes example {*/
+    /*from {*/
+        /*transform: scale(2);*/
+    /*}*/
+    /*to {*/
+        /*transform: scale(1);*/
+    /*}*/
+/*}*/
+/*.cues {*/
+    /*animation-name: example;*/
+    /*animation-duration: 1s;*/
+/*}*/
+/*.notification {*/
+    /*display: flex;*/
+
+/*}*/
+/*.notification_link {*/
+    /*display: flex;*/
+    /*flex-direction: column;*/
+    /*justify-content:center;*/
+/*}*/
+/*.notification_link > a {*/
+    /*cursor: pointer;*/
+/*}*/
+
+/*.notification_item {*/
+    /*display: flex;*/
+    /*justify-content:space-between;*/
+    /*padding: 8px 0;*/
+    /*border-bottom: 1px solid #7c7d7e;*/
+/*}*/
+/*.notification_item > a{*/
+    /*font-size: 15px;*/
+    /*color: #7c7d7e;*/
+/*}*/
+/*.notification_item > a:hover{*/
+    /*text-decoration: none;*/
+    /*transform: scale(1.5);*/
+/*}*/
+/*.notification_item>span{*/
+    /*margin-right: 5px;*/
+/*}*/
+/*.notification_view_all > button{*/
+    /*background-color: transparent;*/
+    /*border: none;*/
+
+/*}*/
+/*.notification_view_all > button:hover{*/
+    /*cursor: pointer;*/
+    /*text-decoration: underline;*/
+/*}*/
+
+/*.act{*/
+    /*background-color: #aaa;*/
+/*}*/
+
+/*.not_case:hover {*/
+    /*cursor: pointer;*/
+    /*text-decoration: underline;*/
+/*}*/
+/*.............................................*/
+
 /*NOTIFICATIONS*/
 .notification_icon_chat {
-    color: #f15928;
-    font-size: 18pt;
-    position: relative;
-}
-.notification_icon_chat > span {
-    position: absolute;
-    font-size: 10pt;
+    display: flex;
+    justify-content:center;
     color: #fff;
-    top: 15%;
-    left: 35%;
+    font-size: 10pt;
+    padding: 1px 0px;
+    min-height: 20px;
+    min-width: 25px;
+    border-radius: 10%;
+    position: relative;
+    background-color:#f15928;
+}
+.notification_icon_chat.white:after{
+    position: absolute;
+    content: '';
+    border: 5px solid;
+    border-color:  transparent  transparent transparent #f15928;
+    left: 8px;
+    bottom: -5px;
+}
+.notification_icon_chat:after{
+    position: absolute;
+    content: '';
+    border: 5px solid;
+    border-color:  transparent  transparent transparent #f15928;
+    left: 8px;
+    bottom: -5px;
 }
 .notification_icon_chat:hover {
-    color: #f15928;
+    color: #fff;
     transform: scale(1.2);
+    text-decoration: none;
 }
 /*..........NOTIFICATIONS JS.......*/
 
 .notification_link {
+    display: flex;
     position: relative;
 }
 .notification_body {
@@ -451,10 +627,10 @@ a{
     text-align: center;
     border: 1px solid #ccc;
     border-radius: 4px;
-    padding: 5px 10px;
+    padding: 5px 0px;
     position: absolute;
-    z-index: 1;
-    top: 125%;
+    z-index: 50;
+    top: 150%;
     right: 0;
     /*margin-left: -60px;*/
     opacity: 1;
@@ -473,7 +649,7 @@ a{
     position: absolute;
     bottom: 100%;
     right: 2%;
-    margin-left: -5px;
+    margin-right: -5px;
     border: 8px solid;
     border-color:  transparent  transparent #f2f2f2 transparent;
 }
@@ -510,12 +686,12 @@ a{
         transform: scale(1);
     }
     to {
-        transform: scale(2);
+        transform: scale(1.5);
     }
 }
 @keyframes example {
     from {
-        transform: scale(2);
+        transform: scale(1.5);
     }
     to {
         transform: scale(1);
@@ -523,16 +699,11 @@ a{
 }
 .cues {
     animation-name: example;
-    animation-duration: 1s;
+    animation-duration: 1.2s;
 }
 .notification {
     display: flex;
 
-}
-.notification_link {
-    display: flex;
-    flex-direction: column;
-    justify-content:center;
 }
 .notification_link > a {
     cursor: pointer;
@@ -541,8 +712,11 @@ a{
 .notification_item {
     display: flex;
     justify-content:space-between;
-    padding: 8px 0;
+    padding: 8px 15px;
     border-bottom: 1px solid #7c7d7e;
+}
+.notification_item:hover {
+    background-color: rgba(0,0,0,0.04);
 }
 .notification_item > a{
     font-size: 15px;
@@ -550,10 +724,13 @@ a{
 }
 .notification_item > a:hover{
     text-decoration: none;
-    transform: scale(1.5);
+    transform: scale(1.2);
 }
 .notification_item>span{
     margin-right: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
 }
 .notification_view_all > button{
     background-color: transparent;
@@ -568,9 +745,10 @@ a{
 .act{
     background-color: #aaa;
 }
-
+.notification_item:hover .not_case {
+    text-decoration: underline;
+}
 .not_case:hover {
     cursor: pointer;
     text-decoration: underline;
 }
-/*.............................................*/

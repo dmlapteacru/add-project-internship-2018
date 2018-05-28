@@ -7,6 +7,21 @@ body {
     display: flex;
     flex-direction:column;
 }
+.page_title {
+    display: flex;
+    flex-direction:column;
+    padding: 15px 100px;
+    background-color: #fff;
+    font-family: Helvetica, sans-serif;
+    color: #777;
+}
+.title > span {
+    font-size: 16pt;
+    font-weight: 600;
+}
+.description > span {
+    font-size: 10pt;
+}
 .content_wrapper {
     display: flex;
     height: 100vh;
@@ -32,7 +47,7 @@ body {
     font-size: 10.4pt;
     cursor: pointer;
     font-weight: 400;
-    color: #aaa;
+    color: #888;
 }
 .default_btn:hover {
     cursor: pointer;
@@ -68,7 +83,6 @@ body {
 }
 .input-br-head {
     padding: 8px;
-    border-color: rgba(77, 196, 138, 0.3);
 }
 /*BUTTONS*/
 .btn_create_service {
@@ -183,7 +197,7 @@ body {
 }
 
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
-    padding: 15px 10px;
+    padding: 15px 30px;
     vertical-align: middle;
     font-family: Helvetica, sans-serif;
     font-size: 10.2pt;
@@ -191,7 +205,7 @@ body {
     color: #666;
 }
 .table>thead>tr>th {
-    padding: 15px 10px;
+    padding: 15px 28px;
 }
 tr:nth-child(even) {background-color: rgba(240, 240, 240, 0.6);}
 tbody > tr:hover {
@@ -224,16 +238,17 @@ th > input::placeholder {
     height: 100%;
     background: #fff;
     border-radius: 5px;
-    box-shadow: 0px 0px 5px 0px #888;
+    box-shadow: 0px 0px 25px 1px rgba(0,0,0,0.2);
     padding: 0;
 }
 table {
-    margin: 0;
+    width: 100%;
+    height: 80%;
 }
 tbody {
+    height: 100%;
+    overflow-y: auto;
     display: block;
-    height: 680px;
-    overflow: auto;
 }
 thead, tbody tr {
     display: table;
@@ -263,6 +278,23 @@ thead, tbody tr {
     font-size: 9pt;
     color: #888;
 }
+.dropdown_action {
+    padding: 10px 5px;
+}
+.dropdown_action > li > a {
+    font-family: Helvetica, sans-serif;
+    font-weight: 600;
+    font-size: 9pt;
+    color: #888;
+}
+.dot_3 {
+    font-size: 15pt;
+    color: #26b5bd;
+}
+.dot_3:hover{
+    transform: scale(1.5);
+    color: #6b93f1;
+}
 .pdf_error_checked {
     position: relative;
 }
@@ -286,4 +318,17 @@ thead, tbody tr {
     bottom: -11px;
     left: 35px;
     border-color: #888 transparent transparent transparent;
+}
+#load {
+    position: absolute;
+    display: block;
+    top: 50%;
+    left: 50%;
+    width: 75px;
+    height: 75px;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 }

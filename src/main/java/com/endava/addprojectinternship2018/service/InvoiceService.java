@@ -192,7 +192,7 @@ public class InvoiceService {
             invoice.setStatus(SENT);
             invoiceDao.save(invoice);
             webSocketDistributeService.sendNewInvoiceNotification(invoice.getContract().getCustomer().getUser().getUsername(),
-                    invoiceId);
+                    invoiceId, invoice.getContract().getCompany().getName());
         } else System.out.println("Status not corresponding to ISSUED !!!");
     }
 
@@ -206,7 +206,7 @@ public class InvoiceService {
         invoice.setStatus(PAID);
         invoiceDao.save(invoice);
         webSocketDistributeService.sendNewInvoicePaidNotification(invoice.getContract().getCompany().getUser().getUsername(),
-                id);
+                id, invoice.getContract().getCustomer().getFullName());
     }
 
     public InvoiceDescriptionPaymentDto setInvoiceDescription(int id) {

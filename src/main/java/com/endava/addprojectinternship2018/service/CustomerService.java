@@ -2,8 +2,10 @@ package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.CustomerDao;
 import com.endava.addprojectinternship2018.model.Customer;
+import com.endava.addprojectinternship2018.model.User;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -15,11 +17,15 @@ public class CustomerService {
 
     private final CustomerDao customerDao;
     private final UserService userService;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final WebSocketDistributeService webSocketDistributeService;
 
     @Autowired
-    public CustomerService(CustomerDao customerDao, UserService userService) {
+    public CustomerService(CustomerDao customerDao, UserService userService, BCryptPasswordEncoder passwordEncoder, WebSocketDistributeService webSocketDistributeService) {
         this.customerDao = customerDao;
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+        this.webSocketDistributeService = webSocketDistributeService;
     }
 
     public List<Customer> getAllCustomers() {
@@ -45,6 +51,9 @@ public class CustomerService {
     @Transactional
     public void saveCustomer(CustomerDto customerDto) {
         customerDao.save(convertCustomerDtoToCustomer(customerDto));
+        User user = userService.getUserByUsername(customerDto.getUserDto().getUsername()).get();
+        user.setSocketToken(passwordEncoder.encode(webSocketDistributeService.generateSocketToken()).replace('/','a'));
+        userService.save(user);
     }
 
     @Transactional

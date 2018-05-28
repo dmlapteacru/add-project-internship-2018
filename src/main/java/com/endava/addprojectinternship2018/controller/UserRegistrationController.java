@@ -127,7 +127,7 @@ public class UserRegistrationController {
             return "registration/company";
         }
 
-        notificationService.save(new Notification(NotificationCase.NEW_USER, "New company - "+companyDto.getName()+" registered.", "admin"));
+        notificationService.save(new Notification(NotificationCase.NEW_USER, "New company - "+companyDto.getName()+" registered.", "admin", companyDto.getName()));
         messagingTemplate.convertAndSendToUser("admin","/queue/messages", "NOTIFICATION");
         companyService.saveCompany(companyDto);
         LOGGER.info(String.format("new company %s was registered", companyDto.getName()));
@@ -163,9 +163,9 @@ public class UserRegistrationController {
             return "registration/customer";
         }
 
-        notificationService.save(new Notification(NotificationCase.NEW_USER, "New company - "+customerDto.getFirstName()
+        notificationService.save(new Notification(NotificationCase.NEW_USER, "New customer - "+customerDto.getFirstName()
                                     +" "+
-                                    customerDto.getLastName()+" registered.", "admin"));
+                                    customerDto.getLastName()+" registered.", "admin", customerDto.getUserDto().getUsername()));
         messagingTemplate.convertAndSendToUser("admin","/queue/messages", "NOTIFICATION");
         customerService.saveCustomer(customerDto);
         LOGGER.info(String.format("new customer %s %s was registered", customerDto.getFirstName(), customerDto.getLastName()));

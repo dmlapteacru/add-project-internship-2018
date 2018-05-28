@@ -195,4 +195,8 @@ public class CustomerController {
         return "customer/bankPage";
     }
 
+    @GetMapping(value = "notifications")
+    public String showNotifications(){
+        return "customer/notifications";
+    }
 }

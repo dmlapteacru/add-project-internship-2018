@@ -2,8 +2,10 @@ package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.CompanyDao;
 import com.endava.addprojectinternship2018.model.Company;
+import com.endava.addprojectinternship2018.model.User;
 import com.endava.addprojectinternship2018.model.dto.CompanyDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,11 +17,15 @@ public class CompanyService {
 
     private final CompanyDao companyDao;
     private final UserService userService;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final WebSocketDistributeService webSocketDistributeService;
 
     @Autowired
-    public CompanyService(CompanyDao companyDao, UserService userService) {
+    public CompanyService(CompanyDao companyDao, UserService userService, BCryptPasswordEncoder passwordEncoder, WebSocketDistributeService webSocketDistributeService) {
         this.companyDao = companyDao;
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+        this.webSocketDistributeService = webSocketDistributeService;
     }
 
     public List<Company> getAllCompanies() {
@@ -43,8 +49,11 @@ public class CompanyService {
     }
 
     @Transactional
-    public Company saveCompany(CompanyDto companyDto) {
-        return companyDao.save(convertCompanyDtoToCompany(companyDto));
+    public void saveCompany(CompanyDto companyDto) {
+        companyDao.save(convertCompanyDtoToCompany(companyDto));
+        User user = userService.getUserByUsername(companyDto.getUserDto().getUsername()).get();
+        user.setSocketToken(passwordEncoder.encode(webSocketDistributeService.generateSocketToken()).replace('/','a'));
+        userService.save(user);
     }
 
     @Transactional

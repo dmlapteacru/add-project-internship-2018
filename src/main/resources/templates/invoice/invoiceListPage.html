@@ -3,7 +3,7 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Invoices page</title>
+    <title>Invoices</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -27,6 +27,14 @@
 
 <div class="wrapper">
     <div th:replace="fragments/header :: header"></div>
+    <div class="page_title">
+        <div class="title">
+            <span>Invoices</span>
+        </div>
+        <div class="description">
+            <span>Here you can find list of invoices available for you and make any operations.</span>
+        </div>
+    </div>
     <div class="content_wrapper">
         <div class="filter_wrapper">
             <div class="filter_title">
@@ -39,7 +47,7 @@
                       th:object="${filter}"
                       th:action="@{/customer/invoices/filtered}"
                       method="post">
-                    <div class="filter_form_status filter_item">
+                    <div class="filter_form_status filter_item custom_arrow">
                         <label for="adv_filter_status">Status</label>
                         <select id="adv_filter_status" class="form-control input-sm input-br-head" th:field="*{invoiceStatus}">
                             <option value="">Select invoice status</option>
@@ -85,13 +93,13 @@
         </div>
 
         <div class="filterable">
-            <!--<div class="panel-heading">-->
-                <!--&lt;!&ndash;<h3 class="panel-title" style="visibility: hidden">INVOICES</h3>&ndash;&gt;-->
-                <!--<div class="pull-right">-->
-                    <!--<button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Search-->
-                    <!--</button>-->
-                <!--</div>-->
-            <!--</div>-->
+            <div class="panel-heading">
+                <!--<h3 class="panel-title" style="visibility: hidden">INVOICES</h3>-->
+                <div class="pull-right">
+                    <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Search
+                    </button>
+                </div>
+            </div>
             <table class="table">
                 <thead>
                 <div class="bulk_btn_wrapper" style="display: none;">
@@ -109,19 +117,19 @@
                             <span>Choose to pay all invoices</span>
                         </div>
                     </th>
-                    <!--<th><input type="text" class="form-control" placeholder="ISSUE DATE" disabled></th>-->
-                    <!--<th><input type="text" class="form-control" placeholder="EXPIRE DATE" disabled></th>-->
-                    <!--<th><input type="text" class="form-control" placeholder="SUM" disabled></th>-->
-                    <!--<th>-->
-                        <!--<select class="sel_status_invoice" disabled>-->
-                            <!--<option selected value="Status_INV">STATUS</option>-->
-                            <!--<option>PAID</option>-->
-                            <!--<option>SENT</option>-->
-                            <!--<option>OVERDUE</option>-->
-                        <!--</select>-->
-                    <!--</th>-->
-                    <!--<th><input type="text" class="form-control" placeholder="COMPANY" disabled></th>-->
-                    <!--<th><input type="text" class="form-control" placeholder="SERVICE" disabled></th>-->
+                    <th><input type="text" class="form-control" placeholder="ISSUE DATE" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="EXPIRE DATE" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="SUM" disabled></th>
+                    <th>
+                        <select class="sel_status_invoice" disabled>
+                            <option selected value="Status_INV">STATUS</option>
+                            <option>PAID</option>
+                            <option>SENT</option>
+                            <option>OVERDUE</option>
+                        </select>
+                    </th>
+                    <th><input type="text" class="form-control" placeholder="COMPANY" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="SERVICE" disabled></th>
                     <th></th>
                 </tr>
                 </thead>

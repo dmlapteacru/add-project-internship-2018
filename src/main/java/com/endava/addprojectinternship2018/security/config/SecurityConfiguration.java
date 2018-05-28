@@ -60,7 +60,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/**").access("hasAuthority('ADMIN')")
                 .antMatchers("/customer/**").access("hasAuthority('CUSTOMER')")
                 .antMatchers("/company/**").access("hasAuthority('COMPANY')")
-                .antMatchers("/invoices/**", "/notifications/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
+                .antMatchers("/invoices/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
                 .antMatchers("/service/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
                 .antMatchers("/bankAccount/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
                 .anyRequest().authenticated()

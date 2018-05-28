@@ -17,41 +17,47 @@ function loadNotifications() {
 }
 function printNotifications(data) {
     $("#notification_").html("");
-    $("#not_count").attr("value", "0");
+    $("#show_not_link_down").attr("value", "0");
     $("#notification_").append("<div class='notification_view_all'>" +
-        "<button>View all</button>" +
+        "<a href='notifications' class='view_all_not'>View all</a>" +
         "</div>");
-    var count = parseInt($("#not_count").attr("value"));
+    var count = parseInt($("#show_not_link_down").attr("value"));
     $.each(data, function (id, object) {
-        $("#notification_").append("<div class='notification_item' >" +
-            "<span class='not_case' style='cursor: pointer;' onclick='goThrough(this,"+object.idSearch+")'>"+object.notificationCase.split("_").join(" ")+"!"+"</span>" +
+        $("#notification_").append("<div class='notification_item'>" +
+            "<span class='not_case' onclick='goThrough(this,"+object.idSearch+")'>" + object.notificationCase.split("_").join(" ")+"!"+"</span>" +
             "<span>"+object.content+"</span>" +
-            "<a id='" +object.id+ "' onclick='deleteNotification(this)'>&times;</a>" +
+            "<a id='" +object.id+ "' onclick='deleteNotification(this)' style='font-size: 13pt;'>&times;</a>" +
             "</div>");
-
-        $("#not_count").attr("value", ++count);
-        $("#not_count").text(count);
+        $("#show_not_link_down").attr("value", ++count);
+        $("#show_not_link_down").text(count);
     });
     if (count === 0){
-        $("#not_count").text("");
-        $("#show_not_link_down").css("color", "#fff");
+        $("#show_not_link_down").text("");
+        $("#show_not_link_down").css("background-color", "#fff");
+        $("#show_not_link_down").addClass("white");
+        $("#show_not_link_down").removeClass("red");
     } else {
-        $("#not_count").text(count);
-        $("#show_not_link_down").css("color", "#f15928");
+        $("#show_not_link_down").text(count);
+        $("#show_not_link_down").css("background-color", "#f15928");
+        $("#show_not_link_down").addClass("red");
+        $("#show_not_link_down").removeClass("white");
     }
 }
 
 function deleteNotification(link) {
     $(link).parent().remove();
-    var count = parseInt($("#not_count").attr("value"));
-    $("#not_count").attr("value", --count);
-    $("#not_count").text(count);
+    var count = parseInt($("#show_not_link_down").attr("value"));
+    count-=1;
+    $("#show_not_link_down").attr("value", count);
+    $("#show_not_link_down").text(count);
     if (count === 0){
-        $("#not_count").text("");
-        $("#show_not_link_down").css("color", "#fff");
+        $("#show_not_link_down").text("");
+        $("#show_not_link_down").css("background-color", "#fff");
+        $("#show_not_link_down").toggleClass("white");
+        $("#show_not_link_down").toggleClass("red");
     } else {
-        $("#not_count").text(count);
-        $("#show_not_link_down").css("color", "#f15928");
+        $("#show_not_link_down").text(count);
+        $("#show_not_link_down").css("background-color", "#f15928");
     }
     $.ajax(
         {
@@ -61,23 +67,59 @@ function deleteNotification(link) {
     );
 }
 
+function markAsRead(obj) {
+    $.ajax(
+        {
+            url: "/notifications/changeStatus?id=" + $(obj).attr("id"),
+            type: "PUT"
+        }
+    );
+    $(obj).css("display", "none");
+    $.each($(".notification_item > a"), function (id, link) {
+        if ($(link).attr("id") === $(obj).attr("id")){
+            $(link).click();
+        }
+    })
+};
+
+$(".view_notification a").click(function () {
+    $.ajax(
+        {
+            url: "/notifications/changeStatus?id=" + $(this).attr("id"),
+            type: "PUT"
+        }
+    );
+});
 //GO THROUGH NOTIFICATIONS
 //
 function goThrough(obj, id) {
-    if ($(obj).text()==="NEW CONTRACT!"){
-        location.href = '/customer/contracts?new-contract='+id;
+    if ($(obj).parent().find(".not_case").text()==="NEW CONTRACT!"){
+        location.href = 'contracts?new-contract='+id;
     }
-    if ($(obj).text()==="CONTRACT SIGNED!"){
-        location.href = '/customer/contracts?contract-signed='+id;
+    if ($(obj).parent().find(".not_case").text()==="CONTRACT SIGNED!"){
+        location.href ='contracts?contract-signed='+id;
     }
-    if ($(obj).text()==="NEW INVOICE!"){
-        location.href = '/customer/invoices?new-invoice='+id;
+    if ($(obj).parent().find(".not_case").text()==="NEW INVOICE!"){
+        location.href = 'invoices?new-invoice='+id;
     }
-    if ($(obj).text()==="INVOICE PAID!"){
-        location.href = '/customer/invoices?invoice-paid='+id;
+    if ($(obj).parent().find(".not_case").text()==="INVOICE PAID!"){
+        location.href = 'invoices?invoice-paid='+id;
     }
-
     $(obj).parent().find("a").click();
+}
+function goThroughView(obj, id) {
+    if ($(obj).attr("data-case")==="NEW_CONTRACT"){
+        location.href = 'contracts?new-contract='+id;
+    }
+    if ($(obj).attr("data-case")==="CONTRACT_SIGNED"){
+        location.href ='contracts?contract-signed='+id;
+    }
+    if ($(obj).attr("data-case")==="NEW_INVOICE"){
+        location.href = 'invoices?new-invoice='+id;
+    }
+    if ($(obj).attr("data-case")==="INVOICE_PAID") {
+        location.href = 'invoices?invoice-paid=' + id;
+    }
 }
 $(document).ready(function () {
     var url = new URL(window.location.href);

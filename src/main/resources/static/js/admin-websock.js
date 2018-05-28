@@ -1,5 +1,4 @@
 var stompClient = null;
-var token ="";
 $(document).ready(function () {
     getToken();
 });

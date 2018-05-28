@@ -204,4 +204,8 @@ public class CompanyController {
         return "company/bankPage";
     }
 
+    @GetMapping(value = "notifications")
+    public String showNotifications(){
+        return "company/notifications";
+    }
 }

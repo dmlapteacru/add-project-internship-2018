@@ -1,0 +1,110 @@
+body {
+    margin: 0;
+    background-color: #f2f2f2;
+}
+
+.wrapper {
+    min-height: 100vh;
+    width: 100%;
+    background-color: #f2f2f2;
+    display: flex;
+    justify-content: center;
+}
+
+.page_title {
+    display: flex;
+    flex-direction:column;
+    padding: 15px 100px;
+    background-color: #fff;
+    font-family: Helvetica, sans-serif;
+    color: #777;
+    margin: 0 0 10px 0;
+}
+.title > span {
+    font-size: 16pt;
+    font-weight: 600;
+}
+.description > span {
+    font-size: 10pt;
+}
+.center_ {
+    width: 30%;
+}
+.notifications_wrapper {
+    display: flex;
+    flex-direction: column;
+}
+.notification_ {
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 15px;
+    height: 80px;
+    box-shadow: 0 0 15px 1px rgba(0,0,0,0.1);
+    margin: 0 0 2px 0;
+}
+
+.notification_by {
+    font-weight: bold;
+}
+.notification_message {
+    display: flex;
+    flex-direction:column;
+    justify-content:center;
+    width: 60%;
+}
+.notification_message_content {
+    display: flex;
+    color: #666;
+    font-size: 12pt;
+}
+.date {
+    color: #777;
+    font-size: 9pt;
+}
+.notification_buttons {
+    display: flex;
+    flex-direction:column;
+    justify-content:space-between;
+    height: 100%;
+    width: 35%;
+}
+.mark_as_read {
+    display: flex;
+    justify-content:center;
+}
+.mark_as_read >button {
+    font-size: 10pt;
+    background-color: #33a2a0;
+    color: #fff;
+    padding: 2px;
+    border: 1px solid #33a2a0;
+    border-radius: 5px;
+}
+.mark_as_read >button:hover {
+    background-color: #2a8b9f;
+    border-color: #2a8b9f;
+}
+.view_notification {
+    display: flex;
+    flex-direction: column;
+    justify-content:flex-end;
+}
+
+.view_notification > a{
+    color: #2b8da0;
+    display: flex;
+    justify-content:center;
+}
+.view_notification > a:hover{
+    color: #1b619d;
+    transform: scale(1.1);
+}
+#load_notifications {
+    display: flex;
+    justify-content: center;
+    margin: 25px 0;
+    text-decoration: underline;
+}

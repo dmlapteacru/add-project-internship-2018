@@ -65,17 +65,7 @@
 
         $(document).ready(function () {
             $(".i_invoices").addClass("active_menu_link");
-            $.each($(".filter_status_invoice"),function () {
-                if ($(this).text() === "PAID"){
-                    $(this).addClass("invoice_payed");
-                } else if ($(this).text() === "SENT"){
-                    $(this).addClass("invoice_pending");
-                }else if ($(this).text() === "OVERDUE"){
-                    $(this).addClass("invoice_overdue");
-                } else if ($(this).text()==="ISSUED"){
-                    $(this).addClass("invoice_issued");
-                }
-            })
+            setStatusColors();
             console.log("document ready")
             $("table.table tbody input[type=checkbox]").change(function () {
                 calculateTotalSum();
@@ -108,7 +98,19 @@
                 )
             });
         })
-
+        function setStatusColors() {
+            $.each($(".filter_status_invoice"),function () {
+                if ($(this).text() === "PAID"){
+                    $(this).addClass("invoice_payed");
+                } else if ($(this).text() === "SENT"){
+                    $(this).addClass("invoice_pending");
+                }else if ($(this).text() === "OVERDUE"){
+                    $(this).addClass("invoice_overdue");
+                } else if ($(this).text()==="ISSUED"){
+                    $(this).addClass("invoice_issued");
+                }
+            })
+        }
         function selectAllCheckBoxes() {
             var selectedRows = $('table.table tbody input[type=checkbox]');
             if ($("#check_all").prop("checked")) {
@@ -279,11 +281,11 @@
                     success: function () {
                         console.log("Success !!!")
                         $('#status' + id).text("SENT");
-                        $('#row' + id + " .btn-danger").remove();
-                        $('#row' + id).find(".btn.btn-success").remove();
-                        $('#row' + id).find("input[type='checkbox']").remove();
-                        $('#status' + id).removeClass('text_issued_color');
-                        $('#status' + id).addClass('text_sent_color');
+                        $('#row' + id + " .btn_delete").remove();
+                        $('#row' + id).find(".btn_pay").remove();
+                        $('#row' + id).find(".control").remove();
+                        $('#status' + id).removeClass('invoice_issued');
+                        $('#status' + id).addClass('invoice_pending');
                         calculateTotalSum();
                     },
                     error: function (errMsg, a, b) {
@@ -305,6 +307,14 @@
 
 <div class="wrapper">
     <div th:replace="fragments/header :: header"></div>
+    <div class="page_title">
+        <div class="title">
+            <span>Invoices</span>
+        </div>
+        <div class="description">
+            <span>Here you can find list of invoices available for you and make any operations.</span>
+        </div>
+    </div>
     <div class="content_wrapper">
         <div class="filter_wrapper">
             <div class="filter_title">
@@ -313,11 +323,11 @@
                    class="default_btn"><span class="btn_icon_left"><i class="fas fa-eraser"></i></span><span>Clear all filters</span></a>
             </div>
             <div class="filter_content">
-                <form class="pull-right"
+                <form class="filter_form"
                       th:object="${filter}"
                       th:action="@{/company/invoices/filtered}"
                       method="post">
-                    <div class="filter_form_status filter_item">
+                    <div class="filter_form_status filter_item custom_arrow">
                         <label for="adv_filter_status">Status</label>
                         <select id="adv_filter_status" class="form-control input-sm input-br-head" th:field="*{invoiceStatus}">
                             <option value="">Select invoice status</option>
@@ -362,13 +372,13 @@
             </div>
         </div>
         <div class="filterable">
-            <!--<div class="panel-heading">-->
+            <div class="panel-heading">
             <!--<h3 class="panel-title">Invoices</h3>-->
-            <!--<div class="pull-right">-->
-            <!--<button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter-->
-            <!--</button>-->
-            <!--</div>-->
-            <!--</div>-->
+            <div class="pull-right">
+            <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filter
+            </button>
+            </div>
+            </div>
             <table class="table">
                 <thead>
                 <div class="bulk_btn_wrapper" style="display: none;">
@@ -377,30 +387,29 @@
                     <a id="bulk_pay_btn" class="btn_pay" onclick="sendBulkInvoices()">BULK SEND</a>
                 </div>
                 <tr class="filters">
-                    <th>
+                    <th width="3%">
                         <div class="checkbox_users_wrapper">
                             <label class="control control--radio">
                                 <input type="checkbox" onclick="selectAllCheckBoxes()" th:id="check_all" name="sel"/>
                                 <div class="control__indicator"></div>
                             </label>
-                            <span>Choose to send all invoices</span>
                         </div>
                     </th>
-                    <!--<th><input type="text" class="form-control" placeholder="Issue Date" disabled></th>-->
-                    <!--<th><input type="text" class="form-control" placeholder="Expire Date" disabled></th>-->
-                    <!--<th><input type="text" class="form-control" placeholder="Sum" disabled></th>-->
-                    <!--&lt;!&ndash;<th><input type="text" class="form-control" placeholder="Status" disabled></th>&ndash;&gt;-->
-                    <!--<th>-->
-                    <!--<select class="sel_status_invoice" disabled>-->
-                    <!--<option selected value="Status_INV">Status</option>-->
-                    <!--<option>PAID</option>-->
-                    <!--<option>SENT</option>-->
-                    <!--<option>OVERDUE</option>-->
-                    <!--<option>ISSUED</option>-->
-                    <!--</select>-->
-                    <!--</th>-->
-                    <!--<th><input type="text" class="form-control" placeholder="Customer Name" disabled></th>-->
-                    <!--<th><input type="text" class="form-control" placeholder="Service Name" disabled></th>-->
+                    <th><input type="text" class="form-control" placeholder="Issue Date" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Expire Date" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
+                    <!--<th><input type="text" class="form-control" placeholder="Status" disabled></th>-->
+                    <th>
+                    <select class="sel_status_invoice" disabled>
+                    <option selected value="Status_INV">Status</option>
+                    <option>PAID</option>
+                    <option>SENT</option>
+                    <option>OVERDUE</option>
+                    <option>ISSUED</option>
+                    </select>
+                    </th>
+                    <th><input type="text" class="form-control" placeholder="Customer Name" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Service Name" disabled></th>
                     <th></th>
                     <th></th>
 

@@ -51,6 +51,10 @@ public class UserService {
     public User saveUser(UserDto userDto) {
         return userDao.save(convertUserDtoToUser(userDto));
     }
+    @Transactional
+    public User save(User user) {
+        return userDao.save(user);
+    }
 
     public User convertUserDtoToUser(UserDto userDto) {
         User user = userDao.findById(userDto.getUserId())
@@ -142,7 +146,7 @@ public class UserService {
 
     public void setSocketToken() {
         User currentUser = userUtil.getCurrentUser();
-        currentUser.setSocketToken(passwordEncoder.encode(webSocketDistributeService.generateSocketToken()));
+        currentUser.setSocketToken(passwordEncoder.encode(webSocketDistributeService.generateSocketToken()).replace('/','a'));
         userDao.save(currentUser);
     }
 

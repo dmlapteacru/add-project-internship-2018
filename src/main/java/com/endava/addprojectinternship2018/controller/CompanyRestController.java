@@ -1,24 +1,17 @@
 package com.endava.addprojectinternship2018.controller;
 
 import com.endava.addprojectinternship2018.model.Company;
-import com.endava.addprojectinternship2018.model.Product;
+import com.endava.addprojectinternship2018.model.Notification;
 import com.endava.addprojectinternship2018.model.dto.CompanyDtoLight;
-import com.endava.addprojectinternship2018.model.dto.ProductDto;
 import com.endava.addprojectinternship2018.service.CompanyService;
-import com.endava.addprojectinternship2018.service.ProductService;
-import com.endava.addprojectinternship2018.validation.ErrorMessage;
-import com.endava.addprojectinternship2018.validation.ValidationResponse;
+import com.endava.addprojectinternship2018.service.NotificationService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 @RequestMapping(value = "companyRest")
@@ -27,10 +20,12 @@ public class CompanyRestController {
     private static final Logger LOGGER = Logger.getLogger(CompanyRestController.class);
 
     private final CompanyService companyService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public CompanyRestController(CompanyService companyService) {
+    public CompanyRestController(CompanyService companyService, NotificationService notificationService) {
         this.companyService = companyService;
+        this.notificationService = notificationService;
     }
 
     @GetMapping(value = "/getNameById")
@@ -46,4 +41,8 @@ public class CompanyRestController {
                 .collect(Collectors.toCollection(LinkedList::new));
     }
 
+    @GetMapping(value = "notifications/view")
+    public List<Notification> showNotificationByPages(@RequestParam(value = "page") int page){
+        return notificationService.getByRecipientAndPages(page);
+    }
 }

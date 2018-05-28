@@ -183,6 +183,7 @@ $("#messages_read_req").click(function () {
 });
 function loadMessages(data) {
     $("#table-messages tbody").html("");
+    console.log(data);
     $.each(data, function (id, object) {
         var messageID = object.id;
         if (object.status.toLowerCase()=="unread"){
@@ -242,14 +243,11 @@ function showMessage(col) {
 }
 
 function parseDate(date) {
-    var date_time_array = date.toString().split("T");
-    var date = date_time_array[0].split("-");
-    var reformated_date = date[1] + "-" + date[2]+ "-" + date[0];
-    var time_array = date_time_array[1].split(":");
-
-    if (new Date().toDateString() === new Date(date_time_array[0]).toDateString()){
-        return time_array[0]+ ":" +time_array[1];
-    } else return reformated_date;
+    var minutes = "";
+    if (date[4]<10){
+        minutes = "0" + date[4];
+    } else minutes = date[4];
+    return date[2] + "-" + date[1] + "-" + date[0] + " " + date[3] + ":" + minutes;
 }
 
 $("#check_all_users").change(function () {

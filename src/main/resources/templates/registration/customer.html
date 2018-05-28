@@ -4,8 +4,8 @@
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="stylesheet" type="text/css" href="/css/default.css"  />
     <link rel="stylesheet" type="text/css" href="/css/header.css"  />
+    <link rel="stylesheet" type="text/css" href="/css/default.css"  />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
     <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
@@ -17,132 +17,146 @@
     <title>Registration</title>
 </head>
 <body>
-<div th:replace="fragments/header :: header" sec:authorize="hasAuthority('CUSTOMER')"></div>
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 col-md-offset-3">
-
-            <div th:if="${update}">
-                <h2 th:text="${customerDto.userDto.getUsername()}+', update profile'"></h2> <br>
-
-            </div>
-
-            <div th:if="not ${update}">
-                <h2>New customer registration</h2> <br>
-                <div th:if="${param.success}">
-                    <div class="alert alert-info">
-                        You have successfully registered in our system!
-                    </div>
-                </div>
-            </div>
-
-            <form th:action="${update} ? @{/customer/updateProfile} : @{/registration/customer}"
-                  th:object="${customerDto}"
-                  method="post">
-
-                <p class="error-message"
-                   th:if="${#fields.hasGlobalErrors()}"
-                   th:each="error : ${#fields.errors('global')}"
-                   th:text="${error}">Validation error</p>
-
-                <input type="hidden" th:field="*{customerId}">
-                <input type="hidden" th:field="*{userDto.userId}">
-                <input type="hidden" th:field="*{userDto.role}">
-                <input type="hidden" th:field="*{userDto.status}">
-
-                <div class="form-group"
-                     th:classappend="${#fields.hasErrors('firstName')}? 'has-error':''">
-                    <label for="firstName" class="control-label">First name</label>
-                    <input id="firstName"
-                           class="form-control"
-                           th:field="*{firstName}"/>
-                    <p class="error-message"
-                       th:each="error: ${#fields.errors('firstName')}"
-                       th:text="${error}">Validation error</p>
-                </div>
-
-                <div class="form-group"
-                     th:classappend="${#fields.hasErrors('lastName')}? 'has-error':''">
-                    <label for="lastName" class="control-label">Last name</label>
-                    <input id="lastName"
-                           class="form-control"
-                           th:field="*{lastName}"/>
-                    <p class="error-message"
-                       th:each="error: ${#fields.errors('lastName')}"
-                       th:text="${error}">Validation error</p>
-                </div>
-
-                <div class="form-group"
-                     th:classappend="${#fields.hasErrors('email')}? 'has-error':''">
-                    <label for="email" class="control-label">E-mail</label>
-                    <input id="email"
-                           class="form-control"
-                           th:field="*{email}"/>
-                    <p class="error-message"
-                       th:each="error: ${#fields.errors('email')}"
-                       th:text="${error}">Validation error</p>
-                </div>
-
-                <div class="form-group"
-                     th:classappend="${#fields.hasErrors('userDto.username')}? 'has-error':''">
-                    <label for="username" class="control-label">Username</label>
-                    <input id="username"
-                           class="form-control" th:readonly="${update}"
-                           th:field="*{userDto.username}"/>
-                    <p class="error-message"
-                       th:each="error: ${#fields.errors('userDto.username')}"
-                       th:text="${error}">Validation error</p>
-                </div>
-
-                <div class="form-group"
-                     th:classappend="${#fields.hasErrors('userDto.password')}? 'has-error':''">
-                    <label for="password" class="control-label">Password</label>
-                    <div class="pass_wrapper">
-                        <input id="password"
-                               class="form-control"
-                               type="password"
-                               th:field="*{userDto.password}"/>
-                        <a class="show_pass_btn">SHOW</a>
-                    </div>
-                    <p class="error-message"
-                       th:each="error : ${#fields.errors('userDto.password')}"
-                       th:text="${error}">Validation error</p>
-                </div>
-
-                <div class="form-group"
-                     th:classappend="${#fields.hasErrors('userDto.confirmPassword')}? 'has-error':''">
-                    <label for="confirmPassword" class="control-label">Confirm password</label>
-                    <div class="confirm_pass_wrapper">
-                        <input id="confirmPassword"
-                               class="form-control"
-                               type="password"
-                               th:field="*{userDto.confirmPassword}"/>
-                        <a class="show_confirm_pass_btn">SHOW</a>
-                    </div>
-                    <p class="error-message"
-                       th:each="error : ${#fields.errors('userDto.confirmPassword')}"
-                       th:text="${error}">Validation error</p>
-                </div>
-
-                <div th:if="not ${update}" class="form-group">
-                    <button type="submit" class="btn btn-success">Register</button>
-                    <span>Already registered? <a href="/" th:href="@{/login}">Login here</a></span>
-                </div>
-
-                <div th:if="${update}">
-                    <button type="submit" class="btn btn-success">Update</button>
-                    <button th:href="@{/customer/home}"
-                       class="btn btn-default" role="button">Cancel</button>
-                </div>
-
-            </form>
+<div class="body_wrapper_">
+    <div th:replace="fragments/header :: header" sec:authorize="hasAuthority('CUSTOMER')"></div>
+    <div class="page_title" sec:authorize="hasAuthority('CUSTOMER')">
+        <div class="title">
+            <span>Personal cabinet</span>
         </div>
+        <div class="description">
+            <span>Manage your personal information.</span>
+        </div>
+    </div>
+    <div class="container_">
+        <div class="container_content">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+
+                    <div th:if="${update}">
+                        <h2 th:text="${customerDto.userDto.getUsername()}+', update profile'"></h2> <br>
+
+                    </div>
+
+                    <div th:if="not ${update}">
+                        <h2>New customer registration</h2> <br>
+                        <div th:if="${param.success}">
+                            <div class="alert alert-info">
+                                You have successfully registered in our system!
+                            </div>
+                        </div>
+                    </div>
+
+                    <form th:action="${update} ? @{/customer/updateProfile} : @{/registration/customer}"
+                          th:object="${customerDto}"
+                          method="post">
+
+                        <p class="error-message"
+                           th:if="${#fields.hasGlobalErrors()}"
+                           th:each="error : ${#fields.errors('global')}"
+                           th:text="${error}">Validation error</p>
+
+                        <input type="hidden" th:field="*{customerId}">
+                        <input type="hidden" th:field="*{userDto.userId}">
+                        <input type="hidden" th:field="*{userDto.role}">
+                        <input type="hidden" th:field="*{userDto.status}">
+
+                        <div class="form-group"
+                             th:classappend="${#fields.hasErrors('firstName')}? 'has-error':''">
+                            <label for="firstName" class="control-label">First name</label>
+                            <input id="firstName"
+                                   class="form-control"
+                                   th:field="*{firstName}"/>
+                            <p class="error-message"
+                               th:each="error: ${#fields.errors('firstName')}"
+                               th:text="${error}">Validation error</p>
+                        </div>
+
+                        <div class="form-group"
+                             th:classappend="${#fields.hasErrors('lastName')}? 'has-error':''">
+                            <label for="lastName" class="control-label">Last name</label>
+                            <input id="lastName"
+                                   class="form-control"
+                                   th:field="*{lastName}"/>
+                            <p class="error-message"
+                               th:each="error: ${#fields.errors('lastName')}"
+                               th:text="${error}">Validation error</p>
+                        </div>
+
+                        <div class="form-group"
+                             th:classappend="${#fields.hasErrors('email')}? 'has-error':''">
+                            <label for="email" class="control-label">E-mail</label>
+                            <input id="email"
+                                   class="form-control"
+                                   th:field="*{email}"/>
+                            <p class="error-message"
+                               th:each="error: ${#fields.errors('email')}"
+                               th:text="${error}">Validation error</p>
+                        </div>
+
+                        <div class="form-group"
+                             th:classappend="${#fields.hasErrors('userDto.username')}? 'has-error':''">
+                            <label for="username" class="control-label">Username</label>
+                            <input id="username"
+                                   class="form-control" th:readonly="${update}"
+                                   th:field="*{userDto.username}"/>
+                            <p class="error-message"
+                               th:each="error: ${#fields.errors('userDto.username')}"
+                               th:text="${error}">Validation error</p>
+                        </div>
+
+                        <div class="form-group"
+                             th:classappend="${#fields.hasErrors('userDto.password')}? 'has-error':''">
+                            <label for="password" class="control-label">Password</label>
+                            <div class="pass_wrapper">
+                                <input id="password"
+                                       class="form-control"
+                                       type="password"
+                                       th:field="*{userDto.password}"/>
+                                <a class="show_pass_btn">SHOW</a>
+                            </div>
+                            <p class="error-message"
+                               th:each="error : ${#fields.errors('userDto.password')}"
+                               th:text="${error}">Validation error</p>
+                        </div>
+
+                        <div class="form-group"
+                             th:classappend="${#fields.hasErrors('userDto.confirmPassword')}? 'has-error':''">
+                            <label for="confirmPassword" class="control-label">Confirm password</label>
+                            <div class="confirm_pass_wrapper">
+                                <input id="confirmPassword"
+                                       class="form-control"
+                                       type="password"
+                                       th:field="*{userDto.confirmPassword}"/>
+                                <a class="show_confirm_pass_btn">SHOW</a>
+                            </div>
+                            <p class="error-message"
+                               th:each="error : ${#fields.errors('userDto.confirmPassword')}"
+                               th:text="${error}">Validation error</p>
+                        </div>
+
+                        <div th:if="not ${update}" class="form-group">
+                            <button type="submit" class="btn btn-success">Register</button>
+                            <span>Already registered? <a href="/" th:href="@{/login}">Login here</a></span>
+                        </div>
+
+                        <div th:if="${update}">
+                            <button type="submit" class="btn btn-success">Update</button>
+                            <button th:href="@{/customer/home}"
+                                    class="btn btn-default" role="button">Cancel</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <script src="/js/show_pass.js"></script>
 <script src="/js/user-websock.js"></script>
 <script src="/js/customer-sock-distribute.js"></script>
+<script src="/js/loadbalance.js"></script>
 <script>$(".i_personal_cabinet").addClass("active_menu_link");</script>
 </body>
 </html>

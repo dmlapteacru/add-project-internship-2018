@@ -3,7 +3,7 @@
       xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title>Contract list</title>
+    <title>Contracts</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -30,6 +30,14 @@
 
 <div class="wrapper">
     <div th:replace="fragments/header :: header"></div>
+    <div class="page_title">
+        <div class="title">
+            <span>Contracts</span>
+        </div>
+        <div class="description">
+            <span>Manage your contracts. Create new, sign, delete.</span>
+        </div>
+    </div>
     <div class="content_wrapper">
         <div class="filter_wrapper">
             <div class="filter_title">
@@ -42,7 +50,7 @@
                       th:object="${filter}"
                       th:action="${companyId==0} ? @{/customer/contracts/filtered} : @{/company/contracts/filtered}"
                       method="post">
-                    <div class="filter_form_status filter_item">
+                    <div class="filter_form_status filter_item custom_arrow">
                         <label for="adv_filter_status">Status</label>
                         <select id="adv_filter_status" class="form-control input-sm" th:field="*{contractStatus}">
                             <option value="">--all--</option>
@@ -129,7 +137,7 @@
                     <th><input type="text" class="form-control" placeholder="Expire date" disabled></th>
                     <th><input type="text" class="form-control" placeholder="Service name" disabled></th>
                     <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
-                    <th>
+                    <th width="20%">
                         <select class="sel_status_contract" disabled>
                             <option selected value="Status">Status</option>
                             <option th:each="status : ${statusListForFilter}"
@@ -163,7 +171,7 @@
                     <td th:id="sum" th:text="${#numbers.formatDecimal(contract.getSum(),1,2)+' MDL'}"
                         th:value="${contract.getSum()}">sum
                     </td>
-                    <td
+                    <td width="20%"
                         th:value="${contract.getStatus().name()}"><span th:id="status" class="filter_status_contract" th:text="${contract.getStatus()}"></span>
                     </td>
 
@@ -504,10 +512,21 @@
 
 <script src="/js/user-websock.js"></script>
 <script src="/js/customer-sock-distribute.js"></script>
+<script src="/js/loadbalance.js"></script>
 <script src="/js/invoice-create-send.js"></script>
 </body>
 <script>
-
+$(document).ready(function () {
+    $.each($(".filter_status_contract"),function () {
+        if ($(this).text() === "Unsigned"){
+            $(this).addClass("contract_unsigned");
+        } else if ($(this).text() === "Active"){
+            $(this).addClass("contract_active");
+        }else {
+            $(this).addClass("contract_pending");
+        }
+    });
+})
     $(document).ready(function () {
         $('#createInvoiceDialog').on('hidden.bs.modal', function () {
             clearErrorsSecond();
