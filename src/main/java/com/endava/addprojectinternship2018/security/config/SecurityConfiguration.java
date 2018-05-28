@@ -29,6 +29,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private LoginAuthenticationSuccessHandler loginAuthenticationSuccessHandler;
+    @Autowired
+    private LoginAuthenticationFailureHandler loginAuthenticationFailureHandler;
 
     @Autowired
     private LoginAuthenticationFailureHandler loginAuthenticationFailureHandler;
@@ -40,6 +42,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
+
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -60,7 +63,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/**").access("hasAuthority('ADMIN')")
                 .antMatchers("/customer/**").access("hasAuthority('CUSTOMER')")
                 .antMatchers("/company/**").access("hasAuthority('COMPANY')")
-                .antMatchers("/invoices/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
+                .antMatchers("/invoices/**", "/notifications/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
                 .antMatchers("/service/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
                 .antMatchers("/bankAccount/**").access("hasAnyAuthority('COMPANY', 'CUSTOMER')")
                 .anyRequest().authenticated()
