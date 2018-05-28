@@ -28,7 +28,7 @@ pipeline {
 
         stage('Build dockerfile') {
             steps {
-                sh 'docker build -t internship_java_team1_spring_2018 .'  
+                sh 'docker build -t final-1 .'  
             }
         }
 
@@ -41,11 +41,14 @@ pipeline {
 
                         sh 'aws ecr get-login --no-include-email | bash'
                         
-                        sh 'docker tag internship_java_team1_spring_2018:latest 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:latest'
-                        sh 'docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:latest'
+                        //sh 'docker tag internship_java_team1_spring_2018:latest 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:latest'
+                        //sh 'docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:latest'
 
-                        sh 'docker tag internship_java_team1_spring_2018 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:v0.1.0'
-                        sh 'docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:v0.1.0'
+                       // sh 'docker tag internship_java_team1_spring_2018 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:v0.1.0'
+                        //sh 'docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:v0.1.0'
+
+                        sh 'docker tag final-1:latest 543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:latest'
+                        sh 'docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:latest'
             }
         }
     }
