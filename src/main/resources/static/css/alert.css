@@ -10,6 +10,9 @@
     transform: translate(-50%, -50%);
     z-index: 9999;
 }
+#load_icon_wrapper{
+    z-index: 9998;
+}
 #load {
     position: absolute;
     display: block;

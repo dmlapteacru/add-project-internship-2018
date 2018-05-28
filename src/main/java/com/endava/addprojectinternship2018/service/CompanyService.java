@@ -2,8 +2,10 @@ package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.CompanyDao;
 import com.endava.addprojectinternship2018.model.Company;
+import com.endava.addprojectinternship2018.model.User;
 import com.endava.addprojectinternship2018.model.dto.CompanyDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,14 +13,20 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
 public class CompanyService {
 
-    @Autowired
-    private CompanyDao companyDao;
+    private final CompanyDao companyDao;
+    private final UserService userService;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final WebSocketDistributeService webSocketDistributeService;
 
     @Autowired
-    private UserService userService;
+    public CompanyService(CompanyDao companyDao, UserService userService, BCryptPasswordEncoder passwordEncoder, WebSocketDistributeService webSocketDistributeService) {
+        this.companyDao = companyDao;
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+        this.webSocketDistributeService = webSocketDistributeService;
+    }
 
     public List<Company> getAllCompanies() {
         return companyDao.findAllByOrderByName();
@@ -40,10 +48,15 @@ public class CompanyService {
         return companyDao.findByUserId(id);
     }
 
-    public Company saveCompany(CompanyDto companyDto) {
-        return companyDao.save(convertCompanyDtoToCompany(companyDto));
+    @Transactional
+    public void saveCompany(CompanyDto companyDto) {
+        companyDao.save(convertCompanyDtoToCompany(companyDto));
+        User user = userService.getUserByUsername(companyDto.getUserDto().getUsername()).get();
+        user.setSocketToken(passwordEncoder.encode(webSocketDistributeService.generateSocketToken()).replace('/','a'));
+        userService.save(user);
     }
 
+    @Transactional
     public void save(Company company){
         companyDao.save(company);
     }
@@ -54,7 +67,7 @@ public class CompanyService {
         companyDto.setCompanyId(company.getId());
         companyDto.setEmail(company.getEmail());
         companyDto.setCountNumber(company.getCountNumber());
-        companyDto.setAccessKey(company.getAccessKey());
+        companyDto.setBankKey(company.getBankKey());
         companyDto.setUserDto(userService.convertUserToUserDto(company.getUser()));
         return companyDto;
     }
@@ -64,7 +77,7 @@ public class CompanyService {
                 .orElseGet(Company::new);
         company.setName(companyDto.getName());
         company.setEmail(companyDto.getEmail());
-        company.setAccessKey(companyDto.getAccessKey());
+        company.setBankKey(companyDto.getBankKey());
         company.setCountNumber(companyDto.getCountNumber());
         company.setUser(userService.convertUserDtoToUser(companyDto.getUserDto()));
         return company;

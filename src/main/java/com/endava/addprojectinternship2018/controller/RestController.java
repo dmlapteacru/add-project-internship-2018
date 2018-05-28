@@ -2,6 +2,7 @@ package com.endava.addprojectinternship2018.controller;
 
 import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.service.*;
+import com.endava.addprojectinternship2018.util.UserUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,13 +16,19 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @org.springframework.web.bind.annotation.RestController
 public class RestController {
 
-    @Autowired
-    private CompanyService companyService;
+    private final CompanyService companyService;
+    private final CategoryService categoryService;
 
     @Autowired
-    private CategoryService categoryService;
+    private UserUtil userUtil;
 
     private static final Logger LOGGER = Logger.getLogger(RestController.class);
+
+    @Autowired
+    public RestController(CompanyService companyService, CategoryService categoryService) {
+        this.companyService = companyService;
+        this.categoryService = categoryService;
+    }
 
     //  -----   REST Company
     @GetMapping("/rest/getCompanyByEmail/{name}")
@@ -42,5 +49,10 @@ public class RestController {
     @RequestMapping(value = "/status/dev", method = GET)
     public ResponseEntity<?> devOpsCheckStatus(){
         return new ResponseEntity<>("STATUS CHECKED ;) I AM A TEAPOT",HttpStatus.I_AM_A_TEAPOT);
+    }
+
+    @RequestMapping(value = "/getToken", method = GET)
+    public String getSocketToken(){
+        return userUtil.getCurrentUser().getSocketToken();
     }
 }

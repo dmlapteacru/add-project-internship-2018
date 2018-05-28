@@ -4,15 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class StatementDto {
-    private LocalDate date;
-    private Long mainCount;
-    private Long correspondentCount;
-    private Long sum;
-    private String description;
+    private double startBalance; // balance before
+    private double endBalance; // balance after
+    private List<TransactionDto> listOfTransactions;
 }

@@ -1,11 +1,7 @@
 package com.endava.addprojectinternship2018.dao;
 
-import com.endava.addprojectinternship2018.model.dto.InvoiceCustomerViewDto;
-import com.endava.addprojectinternship2018.model.Contract;
-import com.endava.addprojectinternship2018.model.dto.InvoiceDescriptionPaymentDto;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.model.Invoice;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,6 +15,10 @@ import java.util.Optional;
 public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
 
     Optional<Invoice> findById(int id);
+
+    Optional<Invoice> findByContractId(int id);
+
+    List<Invoice> findAllByContractId(int id);
 
     List<Invoice> findAll();
 
@@ -38,7 +38,7 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
 
     List<Invoice> findAllByContract_Company_IdOrderById(int id);
 
-    @Query("select inv from Invoice inv join inv.contract contr where inv.dueDate >=:date AND contr.id =:contract_id")
+    @Query("select inv from Invoice inv join inv.contract contr where inv.serviceEndDate >=:date AND contr.id =:contract_id")
     List<Invoice> findInvoiceInPeriod(@Param("contract_id")int contract_id, @Param(  "date")LocalDate date);
 
     @Query(value = "SELECT com.name as companyName, pr.name as productName FROM invoice i\n" +
@@ -65,5 +65,6 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
 
     List<Invoice> findAllByContractCustomerIdAndStatusInAndSumBetweenAndIssueDateBetweenOrderByIssueDate
             (int customerId, List<InvoiceStatus> statuses, double sumFrom, double sumTo, LocalDate dateFrom, LocalDate dateTo);
+
 
 }

@@ -3,7 +3,6 @@ package com.endava.addprojectinternship2018.controller;
 import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
 import com.endava.addprojectinternship2018.model.dto.CompanyDto;
-import com.endava.addprojectinternship2018.model.dto.ContractDto;
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
 import com.endava.addprojectinternship2018.service.*;
@@ -29,23 +28,22 @@ public class CompanyController {
     @Autowired
     private UserUtil userUtil;
 
-    @Autowired
-    private CompanyService companyService;
+    private final CompanyService companyService;
+    private final ContractService contractService;
+    private final InvoiceService invoiceService;
+    private final UserService userService;
+    private final ProductService productService;
+    private final CategoryService categoryService;
 
     @Autowired
-    private ContractService contractService;
-
-    @Autowired
-    private InvoiceService invoiceService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private CategoryService categoryService;
+    public CompanyController(CompanyService companyService, ContractService contractService, InvoiceService invoiceService, UserService userService, ProductService productService, CategoryService categoryService) {
+        this.companyService = companyService;
+        this.contractService = contractService;
+        this.invoiceService = invoiceService;
+        this.userService = userService;
+        this.productService = productService;
+        this.categoryService = categoryService;
+    }
 
     @GetMapping(value = "home")
     public String showCompanyPage(Model model) {
@@ -113,7 +111,6 @@ public class CompanyController {
         model.addAttribute("filter", filter);
 
         return "contract/contractListPage";
-
     }
 
     @GetMapping(value = "invoices")
@@ -207,4 +204,8 @@ public class CompanyController {
         return "company/bankPage";
     }
 
+    @GetMapping(value = "notifications")
+    public String showNotifications(){
+        return "company/notifications";
+    }
 }

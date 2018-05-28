@@ -1,11 +1,15 @@
 package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.UserDao;
+import com.endava.addprojectinternship2018.exception.NoBankAccountException;
 import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.model.dto.*;
+import com.endava.addprojectinternship2018.model.enums.Role;
+import com.endava.addprojectinternship2018.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,13 +21,19 @@ import static com.endava.addprojectinternship2018.model.enums.UserStatus.INACTIV
 public class UserService {
 
     @Autowired
+    private PasswordTokenService passwordTokenService;
+
+    @Autowired
     private UserDao userDao;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    private PasswordTokenService passwordTokenService;
+    private UserUtil userUtil;
+
+    @Autowired
+    private WebSocketDistributeService webSocketDistributeService;
 
     public Optional<User> getUserByUsername(String username) {
         return userDao.findUserByUsername(username);
@@ -37,13 +47,18 @@ public class UserService {
         return userDao.findAll();
     }
 
+    @Transactional
     public User saveUser(UserDto userDto) {
         return userDao.save(convertUserDtoToUser(userDto));
+    }
+    @Transactional
+    public User save(User user) {
+        return userDao.save(user);
     }
 
     public User convertUserDtoToUser(UserDto userDto) {
         User user = userDao.findById(userDto.getUserId())
-                .orElseGet(User :: new);
+                .orElseGet(User::new);
         user.setUsername(userDto.getUsername());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setRole(userDto.getRole());
@@ -60,6 +75,7 @@ public class UserService {
         return userDto;
     }
 
+    @Transactional
     public void changeUserStatus(String username) {
         User user = userDao.findUserByUsername(username).get();
         if (user.getUserStatus() == ACTIVE) {
@@ -68,19 +84,22 @@ public class UserService {
         userDao.save(user);
     }
 
+    @Transactional
     public void changeUserStatusOnActive(List<ChangeUserStatusDto> changeUserStatusDtoList) {
         User user;
-        for (ChangeUserStatusDto u:changeUserStatusDtoList
-             ) {
+        for (ChangeUserStatusDto u : changeUserStatusDtoList
+                ) {
             user = userDao.findUserByUsername(u.getUsername()).get();
             user.setUserStatus(ACTIVE);
             userDao.save(user);
         }
     }
+
+    @Transactional
     public void changeUserStatusOnInactive(List<ChangeUserStatusDto> changeUserStatusDtoList) {
         User user;
-        for (ChangeUserStatusDto u:changeUserStatusDtoList
-             ) {
+        for (ChangeUserStatusDto u : changeUserStatusDtoList
+                ) {
             user = userDao.findUserByUsername(u.getUsername()).get();
             user.setUserStatus(INACTIVE);
             userDao.save(user);
@@ -91,18 +110,40 @@ public class UserService {
         return userDao.findAllUsersWithProfile();
     }
 
-    public void changeUserPassword(UserDto user){
+    @Transactional
+    public void changeUserPassword(UserDto user) {
         User oldUser = getUserByUsername(user.getUsername()).get();
         oldUser.setPassword(passwordEncoder.encode(user.getPassword()));
         userDao.save(oldUser);
         passwordTokenService.deleteToken(user.getUsername());
     }
 
-    public UserEmailDto getUserEmailByUsername(String username){
-       return userDao.findUsersEmailByUsername(username);
+    public UserEmailDto getUserEmailByUsername(String username) {
+        return userDao.findUsersEmailByUsername(username);
     }
 
-    public UserBankAccountDto getUserBankAccountByUsername(String username){
-       return userDao.findUserBankAccountByUsername(username);
+    public UserBankAccountDto getUserBankAccount() throws NoBankAccountException {
+        long countNumber;
+        BankKey bankKey;
+        if (userUtil.getCurrentUser().getRole() == Role.COMPANY) {
+            Company currentCompany = userUtil.getCurrentCompany();
+            countNumber = currentCompany.getCountNumber();
+            bankKey = currentCompany.getBankKey();
+        } else {
+            Customer currentCustomer = userUtil.getCurrentCustomer();
+            countNumber = currentCustomer.getCountNumber();
+            bankKey = currentCustomer.getBankKey();
+        }
+        if (countNumber == 0) {
+            throw new NoBankAccountException();
+        }
+        return new UserBankAccountDto(countNumber, bankKey.getModulus(), bankKey.getPrivateKey());
     }
+
+    public void setSocketToken() {
+        User currentUser = userUtil.getCurrentUser();
+        currentUser.setSocketToken(passwordEncoder.encode(webSocketDistributeService.generateSocketToken()).replace('/','a'));
+        userDao.save(currentUser);
+    }
+
 }

@@ -10,6 +10,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -37,8 +39,7 @@ public class AdminMessage {
     private String subject;
 
     @Column
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private Date date;
+    private LocalDateTime date;
 
     @Column
     @Enumerated(value = EnumType.STRING)

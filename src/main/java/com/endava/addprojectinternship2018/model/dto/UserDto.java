@@ -3,6 +3,7 @@ package com.endava.addprojectinternship2018.model.dto;
 import com.endava.addprojectinternship2018.model.enums.Role;
 import com.endava.addprojectinternship2018.model.enums.UserStatus;
 import com.endava.addprojectinternship2018.validation.PasswordMatches;
+import com.endava.addprojectinternship2018.validation.ValidUsername;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class UserDto {
     private int userId;
 
     @NotEmpty
+    @ValidUsername
     private String username;
 
     @NotEmpty

@@ -23,6 +23,11 @@ public class InvoiceSaveNewDto {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dueDate;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate endDate;
 
     private int contractId;
 

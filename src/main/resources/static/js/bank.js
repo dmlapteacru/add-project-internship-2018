@@ -8,103 +8,116 @@ $(document).ready(function () {
     date_from.max = new Date().toISOString().split("T")[0];
 });
 $("#create_account").click(function () {
+    $("#load_icon_wrapper").modal("show");
     $.ajax(
         {
-            url : "/bankAccount/create",
-            type : "POST",
+            url: "/bankAccount/create",
+            type: "POST",
             success: function () {
+                $("#load_icon_wrapper").modal("hide");
+                showAlert('Success', 'Bank account was created');
                 location.reload();
+            },
+            error: function () {
+                $("#load_icon_wrapper").modal("hide");
+                showAlert('Error', 'No connection with bank');
             }
         }
     )
 });
 $(".add_money").submit(function (e) {
     e.preventDefault();
+    $("#load_icon_wrapper").modal("show");
     $.ajax(
         {
-            url : "/bankAccount/addmoney?sum=" + $("#money_sum").val(),
-            type : "POST",
+            url: "/bankAccount/addmoney?sum=" + $("#money_sum").val(),
+            type: "POST",
             success: function () {
-                $("#confirm_alert_message").text("Money added.");
-                $("#alert_success").slideToggle("slow");
-                setTimeout(function () {
-                    $("#alert_success").slideToggle("slow");
-                },3000);
+                $("#load_icon_wrapper").modal("hide");
+                showAlert('Success', 'Money was added!');
                 $(".btn_add_money_toggle").click();
                 $("#money_sum").val("0.0");
                 loadBalance();
+                location.reload();
             },
             error: function (response) {
-                $("#error_alert_message").text(response.responseText);
-                $("#alert_error").slideToggle("slow");
-                setTimeout(function () {
-                    $("#alert_error").slideToggle("slow");
-                },3000);
+                $("#load_icon_wrapper").modal("hide");
+                showAlert('Error', response.responseText);
             }
         }
     )
 });
+
 $("#btn_statement_req").click(function () {
-    if (($("#date_from").val() === "") || ($("#date_to").val() === "")){
-        $("#error_alert_message").text("Dates can't be empty.");
-        $("#alert_error").slideToggle("slow");
-        setTimeout(function () {
-            $("#alert_error").slideToggle("slow");
-        },5000);
+    if (($("#date_from").val() === "") || ($("#date_to").val() === "")) {
+        showAlert('Error', 'Dates can not be empty');
     } else {
+        $("#load_icon_wrapper").modal("show");
         var body = {
-            "date" : $("#date_from").val(),
-            "dateTo" : $("#date_to").val()
+            "date": $("#date_from").val(),
+            "dateTo": $("#date_to").val()
         };
         $.ajax(
             {
                 url: "/bankAccount/statement",
                 type: "POST",
                 contentType: "application/json",
-                data : JSON.stringify(body),
+                data: JSON.stringify(body),
                 success: function (result) {
+                    $("#load_icon_wrapper").modal("hide");
                     loadStatement(result);
-                    console.log(result);
                 },
-                error : function (response) {
-                    $("#error_alert_message").text(response.responseText);
-                    $("#alert_error").slideToggle("slow");
-                    setTimeout(function () {
-                        $("#alert_error").slideToggle("slow");
-                    },3000);
+                error: function (response) {
+                    showAlert('error', response.responseText);
+                    $("#load_icon_wrapper").modal("hide");
                 }
             }
         )
     }
 });
+
 function loadStatement(data) {
-    $("#bal-change").html("+/-");
     $(".table_statement tbody").html("");
-    $("#bal-change").append("<br><span style='color: orange'>" + data.balanceBefore+ " MDL</span>");
-    var sumFinal = data.balanceBefore;
+    //$("#curr_balance").append("<br><span style='color: orange'>" + data.startBalance + " MDL</span>");
+    addRowToTable("a" , "", "", "start balance", "", data.startBalance.toFixed(2));
+    var endBalance = data.startBalance;
     $.each(data.listOfTransactions, function (id, object) {
-        $(".table_statement tbody").append("<tr id='"+id+"'></tr>");
-        $(".table_statement tbody tr[id='"+id+"']").append("<td>"+ dateParse(object.date)+"</td><td>"+object.description+"</td>");
-        if (object.correspondentCount === 1){
-            $(".table_statement tbody tr[id='"+id+"']").append("<td class='income'>"+ object.sum+"</td>");
-        } else {
-            $(".table_statement tbody tr[id='"+id+"']").append("<td class='loss'>"+ object.sum+"</td>");
-        }
-        sumFinal+=object.sum;
+        addRowToTable(id, object.date, object.partnerName, object.description, object.sum.toFixed(2), object.currentBalance.toFixed(2));
+        endBalance = object.currentBalance;
     });
-    $(".table_statement tbody").append("<tr" +
-                                "><td></td><td style='color: orange; font-weight: bold;'>Current SUM :</td>" +
-                                "<td style='color: orange; font-weight: bold;'><span>"+sumFinal+" MDL</span></td>" +
-                                "</tr>");
+    addRowToTable("z", "", "", "end balance", "", endBalance.toFixed(2));
 }
 
+function addRowToTable(id, date, name, description, sum, balance) {
+    $(".table_statement tbody").append("<tr id='" + id + "'></tr>");
+    $(".table_statement tbody tr[id='" + id + "']").append("<td>" + date + "</td>" +
+                                                           "<td>" + name + "</td>" +
+                                                           "<td>" + description + "</td>");
+    if (sum > 0) {
+        $(".table_statement tbody tr[id='" + id + "']").append("<td class='income'>" + sum + "</td>");
+    } else {
+        $(".table_statement tbody tr[id='" + id + "']").append("<td class='loss'>" + sum + "</td>");
+    }
+    $(".table_statement tbody tr[id='" + id + "']").append("<td style='color: orange; font-weight: bold;'>" + balance + "</td>");
+}
 
 function dateParse(date) {
-    var dateList = date.split("-");
+    var dateList = date.split('-');
     var year = dateList[0];
     var month = dateList[1];
     var day = dateList[2].split("T")[0];
+    return day + "." + month + "." + year;
+}
 
-    return day + "-" + month + "-"+ year;
-
+function showAlert(title, message) {
+    var alertWindow = $('#modalAlert');
+    $('#alertTitle').text(title);
+    var alertBody = alertWindow.find('.modal-body');
+    alertBody.find('p').empty();
+    var strings = message.split('\n');
+    for (i = 0; i < strings.length; i++) {
+        alertBody.append('<p>' + strings[i] + '</p>');
+    }
+    alertWindow.modal({backdrop: "static"});
+    alertWindow.modal('show');
 }

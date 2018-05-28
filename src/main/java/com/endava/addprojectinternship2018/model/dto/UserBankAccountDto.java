@@ -12,5 +12,13 @@ import javax.persistence.*;
 public class UserBankAccountDto {
 
     private Long countNumber;
-    private Long accessKey;
+    private byte[] modulus;
+    private byte[] privateKey;
+    private String bankPublicKeyModulus;
+
+    public UserBankAccountDto(Long countNumber, byte[] modulus, byte[] privateKey) {
+        this.countNumber = countNumber;
+        this.modulus = modulus;
+        this.privateKey = privateKey;
+    }
 }

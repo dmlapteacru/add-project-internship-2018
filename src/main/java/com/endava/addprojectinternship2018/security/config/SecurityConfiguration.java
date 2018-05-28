@@ -33,6 +33,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private LoginAuthenticationFailureHandler loginAuthenticationFailureHandler;
 
     @Autowired
+    private LoginAuthenticationFailureHandler loginAuthenticationFailureHandler;
+
+    @Autowired
     public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService);
         auth.authenticationProvider(authenticationProvider());

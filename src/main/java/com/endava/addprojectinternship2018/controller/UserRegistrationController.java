@@ -12,8 +12,8 @@ import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.CustomerService;
 import com.endava.addprojectinternship2018.service.NotificationService;
 import com.endava.addprojectinternship2018.service.UserService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,18 +35,24 @@ public class UserRegistrationController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private CustomerService customerService;
+    private final CustomerService customerService;
+    private final CompanyService companyService;
+    private final LoginAuthenticationSuccessHandler loginAuthenticationSuccessHandler;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final NotificationService notificationService;
+
+    private static final Logger LOGGER = Logger.getLogger(UserRegistrationController.class);
+    private static final String PATTERN = "(.*<\\s*script\\s*>.*)|(.*alert\\s*\\(\\s*\\).*)";
 
     @Autowired
-    private CompanyService companyService;
+    public UserRegistrationController(CustomerService customerService, CompanyService companyService, LoginAuthenticationSuccessHandler loginAuthenticationSuccessHandler, SimpMessagingTemplate messagingTemplate, NotificationService notificationService) {
+        this.customerService = customerService;
+        this.companyService = companyService;
+        this.loginAuthenticationSuccessHandler = loginAuthenticationSuccessHandler;
+        this.messagingTemplate = messagingTemplate;
+        this.notificationService = notificationService;
+    }
 
-    @Autowired
-    private LoginAuthenticationSuccessHandler loginAuthenticationSuccessHandler;
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
-    @Autowired
-    private NotificationService notificationService;
     @GetMapping(value = "")
     public String showRegistrationForm() {
         return "redirect:/login";
@@ -62,6 +68,7 @@ public class UserRegistrationController {
         }
         return "redirect:/login";
     }
+
     @GetMapping(value = "customer")
     public String showCustomerRegistrationForm(Model model) {
         UserDto userDto = new UserDto();
@@ -105,6 +112,11 @@ public class UserRegistrationController {
             return "registration/company";
         }
 
+        if (companyDto.getName().matches(PATTERN)) {
+            result.rejectValue("name", "name.error", "Name contains illegal characters");
+            return "registration/company";
+        }
+
         if (userService.getUserByUsername(companyDto.getUserDto().getUsername()).isPresent()) {
             result.rejectValue("username", "username.error", "Username is not unique");
             return "registration/company";
@@ -115,9 +127,10 @@ public class UserRegistrationController {
             return "registration/company";
         }
 
-        notificationService.save(new Notification(NotificationCase.NEW_USER, "New company - "+companyDto.getName()+" registered.", "admin"));
+        notificationService.save(new Notification(NotificationCase.NEW_USER, "New company - "+companyDto.getName()+" registered.", "admin", companyDto.getName()));
         messagingTemplate.convertAndSendToUser("admin","/queue/messages", "NOTIFICATION");
         companyService.saveCompany(companyDto);
+        LOGGER.info(String.format("new company %s was registered", companyDto.getName()));
         return "redirect:/login?error=reg_approval";
 
     }
@@ -127,6 +140,16 @@ public class UserRegistrationController {
                                   BindingResult result, Model model) {
 
         if (result.hasErrors()) {
+            return "registration/customer";
+        }
+
+        if (customerDto.getFirstName().matches(PATTERN)) {
+            result.rejectValue("firstName", "firstName.error", "First name contains illegal characters");
+            return "registration/customer";
+        }
+
+        if (customerDto.getLastName().matches(PATTERN)) {
+            result.rejectValue("lastName", "lastName.error", "Last name contains illegal characters");
             return "registration/customer";
         }
 
@@ -140,11 +163,12 @@ public class UserRegistrationController {
             return "registration/customer";
         }
 
-        notificationService.save(new Notification(NotificationCase.NEW_USER, "New company - "+customerDto.getFirstName()
+        notificationService.save(new Notification(NotificationCase.NEW_USER, "New customer - "+customerDto.getFirstName()
                                     +" "+
-                                    customerDto.getLastName()+" registered.", "admin"));
+                                    customerDto.getLastName()+" registered.", "admin", customerDto.getUserDto().getUsername()));
         messagingTemplate.convertAndSendToUser("admin","/queue/messages", "NOTIFICATION");
         customerService.saveCustomer(customerDto);
+        LOGGER.info(String.format("new customer %s %s was registered", customerDto.getFirstName(), customerDto.getLastName()));
         return "redirect:/login";
     }
 

@@ -1,203 +1,289 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.model.dto.PaymentDto;
-import com.endava.addprojectinternship2018.model.dto.StatementDateReqDto;
-import com.endava.addprojectinternship2018.model.dto.StatementDto;
-import com.endava.addprojectinternship2018.model.dto.UserBankAccountDto;
-import com.endava.addprojectinternship2018.service.CompanyService;
+import com.endava.addprojectinternship2018.exception.NoBankAccountException;
+import com.endava.addprojectinternship2018.exception.NoBankConnectionException;
+import com.endava.addprojectinternship2018.model.dto.*;
 import com.endava.addprojectinternship2018.service.InvoiceService;
 import com.endava.addprojectinternship2018.service.UserBankAccountService;
 import com.endava.addprojectinternship2018.service.UserService;
+import com.endava.addprojectinternship2018.util.EncryptionUtils;
 import com.endava.addprojectinternship2018.util.UserUtil;
 import com.endava.addprojectinternship2018.validation.Validator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.ConnectException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.util.*;
 
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 public class BankRestController {
-    @Autowired
-    @Qualifier("bank_ip")
-    private String bankIP;
-
-    @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
-    private UserBankAccountService userBankAccountService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private InvoiceService invoiceService;
-
-    @Autowired
-    private CompanyService companyService;
 
     @Autowired
     private UserUtil userUtil;
 
-    @Autowired
-    private Validator validator;
+    private final String bankIP;
+    private final RestTemplate restTemplate;
+    private final UserBankAccountService userBankAccountService;
+    private final UserService userService;
+    private final InvoiceService invoiceService;
+    private final Validator validator;
+    private final EncryptionUtils encryptionUtils;
 
     private static final Logger LOGGER = Logger.getLogger(com.endava.addprojectinternship2018.controller.BankRestController.class);
 
-    @RequestMapping(value = "/bankAccount/create", method = POST)
-    public ResponseEntity<UserBankAccountDto> newAccount() throws ConnectException {
-        HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        HttpEntity<String> request = new HttpEntity<>("param", headers);
-        UserBankAccountDto response = restTemplate.postForObject(bankIP + "/bankaccount/create", request, UserBankAccountDto.class);
-        userBankAccountService.save(response);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @Autowired
+    public BankRestController(@Qualifier("bank_ip") String bankIP, RestTemplate restTemplate,
+                              UserBankAccountService userBankAccountService, UserService userService,
+                              InvoiceService invoiceService, Validator validator, EncryptionUtils encryptionUtils) {
+        this.bankIP = bankIP;
+        this.restTemplate = restTemplate;
+        this.userBankAccountService = userBankAccountService;
+        this.userService = userService;
+        this.invoiceService = invoiceService;
+        this.validator = validator;
+        this.encryptionUtils = encryptionUtils;
     }
 
-    @RequestMapping(value = "/bankAccount/balance", method = POST)
-    public ResponseEntity<?> getBalance() throws ConnectException {
-        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
+    @PostMapping(value = "/bankAccount/create")
+    public ResponseEntity<UserBankAccountDto> newAccount() {
+
+        KeyPair keyPair = encryptionUtils.generateKeyPair();
+        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+        String modulus = encryptionUtils.getModulus(publicKey);
+        UserBankAccountDto dto = new UserBankAccountDto();
+        try {
+            encryptionUtils.init(null, keyPair.getPrivate().getEncoded());
+        } catch (InvalidKeySpecException e) {
+            LOGGER.error(e.getMessage());
+            return new ResponseEntity<>(dto, BAD_REQUEST);
+        }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        HttpEntity request = new HttpEntity<>(modulus, headers);
+        ResponseEntity<Object> response = restTemplate.postForEntity(bankIP + "/bankaccount/create", request, Object.class);
         try {
-            headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
-            headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
-        } catch (NullPointerException ex){
-            LOGGER.error(ex.getMessage());
+            dto = (UserBankAccountDto) encryptionUtils.decryptData(response.getBody().toString(), UserBankAccountDto.class);
+            userBankAccountService.save(dto, keyPair);
+        } catch (BadPaddingException | IllegalBlockSizeException | IOException | InvalidKeyException e) {
+            LOGGER.error(e.getMessage());
+            return new ResponseEntity<>(dto, BAD_REQUEST);
         }
-        HttpEntity<String> request = new HttpEntity<>("param", headers);
-        String response;
-        try {
-            response = restTemplate.postForObject(bankIP + "/bankaccount/balance", request, String.class);
-        } catch (Exception ex){
-            LOGGER.error(ex.getMessage());
-            return new ResponseEntity<>("No connection", HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(response, HttpStatus.OK);
+
+        return new ResponseEntity<>(OK);
     }
 
-    @RequestMapping(value = "/bankAccount/addmoney", method = POST)
+    @PostMapping(value = "/bankAccount/balance")
+    public ResponseEntity<?> getBalanceResponseEntity() {
+        try {
+            return new ResponseEntity<>(getBalance(), OK);
+        } catch (NoBankAccountException | NoBankConnectionException ex) {
+            return new ResponseEntity<>(ex.getMessage(), BAD_REQUEST);
+        }
+    }
+
+    @PostMapping(value = "/bankAccount/addmoney")
     public ResponseEntity<?> addMoney(@RequestParam Double sum) {
 
         if (sum == null || sum < 0.01) {
-            return new ResponseEntity<>("Must be greater than 0.01 MDL.", HttpStatus.BAD_REQUEST);
+            LOGGER.warn("add money validation error");
+            return new ResponseEntity<>("Sum must be greater than 0.01 MDL.", BAD_REQUEST);
         }
-        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
-        HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-            headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
-            headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
+        HttpHeaders headers;
+        try {
+            headers = initEncriptedHeaders();
+        } catch (NoBankAccountException | NoBankConnectionException ex) {
+            LOGGER.error(ex.getMessage());
+            return new ResponseEntity<>(ex.getMessage(), BAD_REQUEST);
+        }
         Map<String, Double> body = new HashMap<>();
         body.put("sum", sum);
-        HttpEntity<Map> request = new HttpEntity<>(body, headers);
         try {
+            String encryptedData = encryptionUtils.encryptData(body);
+            HttpEntity<String> request = new HttpEntity<>(encryptedData, headers);
             restTemplate.postForObject(bankIP + "/bankaccount/addmoney", request, String.class);
-        } catch (Exception ex){
-            return new ResponseEntity<>("No connection with bank.", HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            LOGGER.error("add money error: " + ex.getMessage());
+            return new ResponseEntity<>("No connection with bank", BAD_REQUEST);
         }
 
-        return new ResponseEntity<>("Money added.", HttpStatus.OK);
+        LOGGER.info(userUtil.getCurrentUser().getUsername() + " added money successful");
+        return new ResponseEntity<>("Money added", OK);
     }
 
-    @RequestMapping(value = "/bankAccount/payinvoice", method = POST)
-    public ResponseEntity<?> payInvoice(@RequestParam(name = "bal") Double balance, @RequestBody PaymentDto paymentDto, BindingResult error) {
-        validator.validateInvoicePayment(balance, paymentDto, error);
-        if (error.hasErrors()) {
-            return new ResponseEntity<>(error.getFieldError().getCode(), HttpStatus.NOT_FOUND);
-        }
-        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
-        HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-            headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
-            headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
+    @PostMapping(value = "/bankAccount/payinvoice")
+    public ResponseEntity<?> payInvoice(@RequestBody int invoiceId) throws NoBankAccountException {
 
-        int idInvoice = paymentDto.getCorrespondentCount().intValue();
-        paymentDto.setDescription(paymentDto.getDescription() + invoiceService.setInvoiceDescription(paymentDto.getCorrespondentCount().intValue()).getFullDescription());
-        paymentDto.setCorrespondentCount(companyService.getCompanyByInvoiceId(paymentDto.getCorrespondentCount().intValue()).getCountNumber());
-        HttpEntity<PaymentDto> request = new HttpEntity<>(paymentDto, headers);
-        System.out.println(paymentDto);
+        String currentCustomerName = userUtil.getCurrentCustomer().getFullName();
+
+        HttpHeaders headers;
+
+        double balance;
+        try {
+            balance = getBalance();
+            headers = initEncriptedHeaders();
+        } catch (NoBankAccountException | NoBankConnectionException ex) {
+            return new ResponseEntity<>(ex.getMessage(), PRECONDITION_FAILED);
+        }
+
+        PaymentDto paymentDto = invoiceService.createPaymentDto(invoiceId);
+        List<PaymentDto> paymentDtoList = new ArrayList<>();
+        paymentDtoList.add(paymentDto);
+        List<String> errors = validator.validateInvoicePayment(balance, paymentDtoList);
+        ResponseEntity<?> errorsResponse = checkErrors(currentCustomerName, errors);
+        if (errorsResponse != null) return errorsResponse;
+
         ResponseEntity<Object> response;
         try {
-           response = restTemplate.postForEntity(bankIP + "/sendmoney/sendmoney", request, Object.class);
-        } catch (Exception ex){
-            return new ResponseEntity<>("No connection with bank.", HttpStatus.BAD_REQUEST);
+            String encrypted = encryptionUtils.encryptData(paymentDto);
+            HttpEntity<String> request = new HttpEntity<>(encrypted, headers);
+            response = restTemplate.postForEntity(bankIP + "/sendmoney/sendmoney", request, Object.class);
+        } catch (Exception ex) {
+            LOGGER.error(currentCustomerName + ": " + ex.getMessage());
+            return new ResponseEntity<>("No connection with bank", BAD_REQUEST);
         }
 
-        if (response.getStatusCode().equals(HttpStatus.OK)){
-            invoiceService.setInvoiceAsPaid(idInvoice);
+        if (response.getStatusCode() == OK) {
+            LOGGER.info(currentCustomerName + " paid invoice: " + paymentDto);
+            invoiceService.setInvoiceAsPaid(invoiceId);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+
+        return new ResponseEntity<>(OK);
     }
 
-    @RequestMapping(value = "/bankAccount/payinvoice/bulk", method = POST)
-    public ResponseEntity<?> payInvoice(@RequestParam(name = "bal") Double balance, @RequestBody List<PaymentDto> paymentDtoList, BindingResult error) {
-        System.out.println(paymentDtoList);
-        validator.validateBulkInvoicePayment(balance, paymentDtoList, error);
-        if (error.hasErrors()) {
-            return new ResponseEntity<>("Not enough money.", HttpStatus.BAD_REQUEST);
+    private ResponseEntity<?> checkErrors(String currentCustomerName, List<String> errors) {
+        if (!errors.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (String error : errors) {
+                LOGGER.error(currentCustomerName + " payment validation error: " + error);
+                sb.append(error + "\n");
+            }
+            return new ResponseEntity<>(sb.toString(), PRECONDITION_FAILED);
         }
-        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
-        headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
-        List<Integer> idList = new ArrayList<>();
-        for (PaymentDto p : paymentDtoList
-                ) {
-            idList.add(p.getCorrespondentCount().intValue());
-            p.setDescription(p.getDescription() +
-                    invoiceService.setInvoiceDescription(p.getCorrespondentCount().intValue())
-                            .getFullDescription());
-            p.setCorrespondentCount(companyService.getCompanyByInvoiceId(p.getCorrespondentCount().intValue())
-                    .getCountNumber());
+        return null;
+    }
+
+    @PostMapping(value = "/bankAccount/payinvoice/bulk")
+    public ResponseEntity<?> payInvoice(@RequestBody List<Integer> invoiceIdList) {
+
+        String currentCustomerName = userUtil.getCurrentCustomer().getFullName();
+
+        HttpHeaders headers;
+
+        double balance;
+        try {
+            balance = getBalance();
+            headers = initEncriptedHeaders();
+        } catch (NoBankAccountException | NoBankConnectionException ex) {
+            return new ResponseEntity<>(ex.getMessage(), PRECONDITION_FAILED);
         }
-        HttpEntity<List<PaymentDto>> request = new HttpEntity<>(paymentDtoList, headers);
+
+        List<PaymentDto> paymentDtoList = new ArrayList<>();
+        for (Integer invoiceId : invoiceIdList) {
+            paymentDtoList.add(invoiceService.createPaymentDto(invoiceId));
+        }
+
+        List<String> errors = validator.validateInvoicePayment(balance, paymentDtoList);
+        ResponseEntity<?> errorsResponse = checkErrors(currentCustomerName, errors);
+        if (errorsResponse != null) return errorsResponse;
+
         ResponseEntity<Object> response;
         try {
+            String encrypted = encryptionUtils.encryptData(paymentDtoList);
+            HttpEntity<String> request = new HttpEntity<>(encrypted, headers);
             response = restTemplate.postForEntity(bankIP + "/sendmoney/bulkpayment", request, Object.class);
-        } catch (Exception ex){
-            return new ResponseEntity<>("No connection with bank.", HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            LOGGER.error(currentCustomerName + " bulk payment: " + ex.getMessage());
+            return new ResponseEntity<>("No connection with bank", PRECONDITION_FAILED);
+        }
+        if (response.getStatusCode().equals(OK)) {
+            LOGGER.info(currentCustomerName + " success bulk payment, invoices id: " + invoiceIdList);
+            invoiceService.setInvoiceBulkAsPaid(invoiceIdList);
         }
 
-        if (response.getStatusCode().equals(HttpStatus.OK)){
-            invoiceService.setInvoiceBulkAsPaid(idList);
-        }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(OK);
     }
 
-    @RequestMapping(value = "/bankAccount/statement", method = POST)
+    @PostMapping(value = "/bankAccount/statement")
     public ResponseEntity<?> getStatement(@RequestBody StatementDateReqDto dateReqDto, BindingResult error) {
+
+        HttpHeaders headers;
+        try {
+            headers = initEncriptedHeaders();
+        } catch (NoBankAccountException | NoBankConnectionException ex) {
+            LOGGER.error(ex.getMessage());
+            return new ResponseEntity<>(ex.getMessage(), PRECONDITION_FAILED);
+        }
+
         validator.validateStatementDates(dateReqDto, error);
         if (error.hasErrors()) {
-            return new ResponseEntity<>(error.getFieldError().getCode(), HttpStatus.BAD_REQUEST);
+            LOGGER.error(error.getFieldError().getDefaultMessage());
+            return new ResponseEntity<>(error.getFieldError().getCode(), PRECONDITION_FAILED);
         }
-        UserBankAccountDto userBankAccountDto = userService.getUserBankAccountByUsername(userUtil.getCurrentUser().getUsername());
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.add("countNumber", userBankAccountDto.getCountNumber().toString());
-        headers.add("accessKey", userBankAccountDto.getAccessKey().toString());
-        HttpEntity<StatementDateReqDto> request = new HttpEntity<>(dateReqDto, headers);
-        ResponseEntity<Object> response;
-        try {
-            response = restTemplate.exchange(bankIP + "/statement/statement", HttpMethod.POST, request, Object.class);
-        } catch (Exception ex){
-            return new ResponseEntity<>("No connection with bank.", HttpStatus.BAD_REQUEST);
+
+        List<TransactionRequestDto> allTransactions = new LinkedList<>();
+        int totalPages = 1;
+        double balanceBefore = 0;
+        for (int i = 1; i <= totalPages; i++) {
+            dateReqDto.setPages(i);
+            try {
+                String encrypted = encryptionUtils.encryptData(dateReqDto);
+                HttpEntity<String> request = new HttpEntity<>(encrypted, headers);
+                String encoded = restTemplate.postForObject(bankIP + "/statement/statement", request, Object.class).toString();
+                StatementRequestDto statementRequestDto = (StatementRequestDto) encryptionUtils.decryptData(encoded, StatementRequestDto.class);
+                totalPages = statementRequestDto.getP();
+                balanceBefore = statementRequestDto.getBf();
+                allTransactions.addAll(statementRequestDto.getListOfTransactions());
+            } catch (Exception ex) {
+                LOGGER.error(ex.getMessage());
+                return new ResponseEntity<>("No connection with bank.", BAD_REQUEST);
+            }
         }
-        return new ResponseEntity<>(response.getBody(), HttpStatus.OK);
+
+        StatementDto statementDto = userBankAccountService.createStatementDto(balanceBefore, allTransactions);
+
+        return new ResponseEntity<>(statementDto, OK);
     }
+
+    private HttpHeaders initEncriptedHeaders() throws NoBankAccountException, NoBankConnectionException {
+        HttpHeaders headers = new HttpHeaders();
+        try {
+            UserBankAccountDto dto = userService.getUserBankAccount();
+            encryptionUtils.init(dto.getModulus(), dto.getPrivateKey());
+            headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+            headers.add("countNumber", String.valueOf(dto.getCountNumber()));
+        } catch (InvalidKeySpecException
+                | NullPointerException e) {
+            LOGGER.error(e.getMessage());
+            throw new NoBankConnectionException();
+        }
+        return headers;
+    }
+
+    private double getBalance() throws NoBankAccountException, NoBankConnectionException {
+        HttpEntity request = new HttpEntity<>(initEncriptedHeaders());
+        BalanceDto balanceDto;
+        try {
+            String encoded = restTemplate.postForObject(bankIP + "/bankaccount/balance", request, Object.class).toString();
+            balanceDto = (BalanceDto) encryptionUtils.decryptData(encoded, BalanceDto.class);
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage());
+            throw new NoBankConnectionException();
+        }
+        return balanceDto.getBalance();
+    }
+
 }

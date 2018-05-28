@@ -5,9 +5,9 @@ $(document).ready(function () {
     loadNotifications();
     $.each($(".filter_status"),function () {
         if ($(this).children().text() === "ACTIVE"){
-            $(this).parent().addClass("success");
+            $(this).children().addClass("user-status-active");
         } else {
-            $(this).parent().addClass("danger");
+            $(this).children().addClass("user-status-inactive");
         }
     })
 });
@@ -24,11 +24,9 @@ function loadNotifications() {
 }
 function printNotifications(data) {
     $("#notification_").html("");
-    $("#not_count").attr("value", "0");
-    $("#notification_").append("<div class='notification_view_all'>" +
-        "<button>View all</button>" +
-        "</div>");
-    var count = parseInt($("#not_count").attr("value"));
+    $("#show_not_link_down").attr("value", "0");
+
+    var count = parseInt($("#show_not_link_down").attr("value"));
     $.each(data, function (id, object) {
         $("#notification_").append("<div class='notification_item' >" +
             "<span class='not_case' style='cursor: pointer;' onclick='goThrough(this,"+object.idSearch+")'>"+object.notificationCase.split("_").join(" ")+"!"+"</span>" +
@@ -36,15 +34,12 @@ function printNotifications(data) {
             "<a id='" +object.id+ "' onclick='deleteNotification(this)'>&times;</a>" +
             "</div>");
 
-        $("#not_count").attr("value", ++count);
-        $("#not_count").text(count);
+        $("#show_not_link_down").attr("value", ++count);
     });
     if (count === 0){
-        $("#not_count").text("");
-        $("#not_icon").css("visibility", "hidden");
+        $("#show_not_link_down").text("");
     } else {
-        $("#not_count").text(count);
-        $("#not_icon").css("visibility", "visible");
+        $("#show_not_link_down").text(count);
     }
 }
 
@@ -65,15 +60,13 @@ function showNotificatedMessage(id) {
 }
 function deleteNotification(link) {
     $(link).parent().remove();
-    var count = parseInt($("#not_count").attr("value"));
-    $("#not_count").attr("value", --count);
-    $("#not_count").text(count);
+    var count = parseInt($("#show_not_link_down").attr("value"));
+    $("#show_not_link_down").attr("value", --count);
+    $("#show_not_link_down").text(count);
     if (count === 0){
-        $("#not_count").text("");
-        $("#not_icon").css("visibility", "hidden");
+        $("#show_not_link_down").text(0);
     } else {
-        $("#not_count").text(count);
-        $("#not_icon").css("visibility", "visible");
+        $("#show_not_link_down").text(count);
     }
     $.ajax(
         {

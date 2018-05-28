@@ -3,12 +3,11 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>ADD login page</title>
+    <title>Contact Admin</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="/css/header.css"  />
     <link rel="stylesheet" type="text/css" href="/css/default.css"  />
-    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
     <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
     <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
@@ -17,29 +16,37 @@
 </head>
 
 <body>
-<div th:replace="fragments/header :: header">
-</div>
-
-<div class="main_wrapper">
-    <div style="display: flex; flex-direction: column;" class="wrapper">
-        <div class="reset_password_body">
-            <form>
-                <div class="modal_body_custom">
-                    <label>Email</label>
-                    <input id="new_message_email" type="text"
-                           pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Email is invalid" th:value="${user}" disabled required/>
-                    <label>Subject</label>
-                    <input id="new_message_subject" type="text" placeholder="Subject.." required/>
-                    <label>Message</label>
-                    <textarea maxlength="250" placeholder="Your message.." id="new_message" required></textarea>
-                </div>
-                <div class="modal-footer modal_btn">
-                    <!--<button type="button" style="display: none;" class="btn"></button>-->
-                    <button id="save_btn_message" type="submit" class="btn btn-success">Send</button>
-                    <a id="home_btn" th:href="@{/login}"
-                       class="btn btn-default" role="button">Back Home</a>
-                </div>
-            </form>
+<div class="body_wrapper_">
+    <div th:replace="fragments/header :: header"></div>
+    <div class="page_title">
+        <div class="title">
+            <span>Contact Admin</span>
+        </div>
+        <div class="description">
+            <span>Here you can send a message to Admin.</span>
+        </div>
+    </div>
+    <div class="main_wrapper_">
+        <div style="display: flex; flex-direction: column; width: 40%; font-size: 12pt;" class="wrapper">
+            <div class="reset_password_body">
+                <form>
+                    <div class="modal_body_custom">
+                        <label>Email</label>
+                        <input id="new_message_email" type="text"
+                               pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Email is invalid" th:value="${user}" disabled required/>
+                        <label>Subject</label>
+                        <input id="new_message_subject" type="text" placeholder="Subject.." required/>
+                        <label>Message</label>
+                        <textarea maxlength="250" placeholder="Your message.." id="new_message" required ></textarea>
+                    </div>
+                    <div class="modal-footer modal_btn">
+                        <!--<button type="button" style="display: none;" class="btn"></button>-->
+                        <button id="save_btn_message" type="submit" class="btn btn-success">Send</button>
+                        <button id="home_btn" th:href="@{/login}"
+                                class="btn btn-default" role="button">Back Home</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -85,5 +92,6 @@
 //        stompClient.send("/app/admin", {}, JSON.stringify(json));
 //    }
 </script>
+<script>$(".i_contact_admin").addClass("active_menu_link");</script>
 </body>
 </html>

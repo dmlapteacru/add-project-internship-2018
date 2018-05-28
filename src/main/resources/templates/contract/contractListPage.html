@@ -3,157 +3,218 @@
       xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title>Contract list</title>
+    <title>Contracts</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/table-filter.css">
     <link rel="stylesheet" type="text/css" href="/css/header.css"/>
-    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>-->
-    <link rel="stylesheet" type="text/css" href="/css/notification.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/contracts.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/custom_radio_buttons.css"/>
     <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
     <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
-    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js" integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe" crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"
+            integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe"
+            crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="/js/table-filter.js"></script>
     <script th:src="@{/js/moment.js}"></script>
 </head>
 
 <body>
-<div th:replace="fragments/header :: header">
 
+<div class="modal fade" id="load_icon_wrapper" data-backdrop="static" data-keyboard="false">
+    <img id="load" src="/img/load_icon.gif"/>
 </div>
 
-<div class="panel panel-default panel-no-border">
-    <div class="panel-body">
-        <a sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalContract"
-           class="btn btn-info btn-sm" role="button" th:id="${companyId}"
-           onclick="createNewContract(this)">Create new contract</a>
-        <form class="pull-right"
-              th:object="${filter}"
-              th:action="${companyId==0} ? @{/customer/contracts/filtered} : @{/company/contracts/filtered}"
-              method="post">
-            <div class="form-row">
-                <div class="col-md-2 mb-3">
-                    <label for="adv_filter_status">status</label>
-                    <select id="adv_filter_status" class="form-control input-sm" th:field="*{contractStatus}">
-                        <option value="">--all--</option>
-                        <option th:each="currStatus : ${statusListForFilter}"
-                                th:value="${currStatus.name()}"
-                                th:text="${currStatus.toString()}">
-                        </option>
-                    </select>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label for="adv_filter_sumFrom">sum from</label>
-                    <input class="form-control input-sm" id="adv_filter_sumFrom" type="number" th:field="*{sumFrom}"
-                           placeholder="sum from" required/>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label for="adv_filter_sumTo">sum from</label>
-                    <input class="form-control input-sm" id="adv_filter_sumTo" type="number" th:field="*{sumTo}"
-                           placeholder="sum to" required/>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label for="adv_filter_date_from">date from</label>
-                    <input type="date" id="adv_filter_date_from" class="form-control input-sm col-sm-2"
-                           th:field="*{dateFrom}"/>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label for="adv_filter_date_to">date to</label>
-                    <input type="date" id="adv_filter_date_to" class="form-control input-sm col-sm-2"
-                           th:field="*{dateTo}"/>
-                </div>
-
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-info btn-sm">apply
-                        <span class="glyphicon glyphicon-filter"></span>
-                    </button>
-                    <a th:href="${companyId==0} ? @{/customer/contracts} : @{/company/contracts}"
-                       class="btn btn-default btn-sm">clear</a>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="panel panel-primary filterable">
-    <div class="panel-heading">
-        <h3 class="panel-title">Contracts</h3>
-        <div class="pull-right">
-            <button class="btn btn-default btn-xs btn-filter">
-                <span class="glyphicon glyphicon-filter"></span> quick filter
-            </button>
+<div class="wrapper">
+    <div th:replace="fragments/header :: header"></div>
+    <div class="page_title">
+        <div class="title">
+            <span>Contracts</span>
+        </div>
+        <div class="description">
+            <span>Manage your contracts. Create new, sign, delete.</span>
         </div>
     </div>
-    <table class="table table-condensed table-stripped">
-        <thead>
-        <tr class="filters">
-            <th sec:authorize="hasAuthority('CUSTOMER')"><input type="text" class="form-control"
-                                                                placeholder="Company name" disabled></th>
-            <th sec:authorize="hasAuthority('COMPANY')"><input type="text" class="form-control"
-                                                               placeholder="Customer name" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Issue date" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Expire date" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Service name" disabled></th>
-            <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
-            <th>
-                <select class="sel_status_contract" disabled>
-                    <option selected value="Status">Status</option>
-                    <option th:each="status : ${statusListForFilter}"
-                            th:text="${status.toString()}">
-                    </option>
-                </select>
-            </th>
-        </tr>
+    <div class="content_wrapper">
+        <div class="filter_wrapper">
+            <div class="filter_title">
+                <span>FILTERS</span>
+                <a th:href="${companyId==0} ? @{/customer/contracts} : @{/company/contracts}"
+                   class="default_btn"><span class="btn_icon_left"><i class="fas fa-eraser"></i></span><span>Clear all filters</span></a>
+            </div>
+            <div class="filter_content">
+                <form class="filter_form"
+                      th:object="${filter}"
+                      th:action="${companyId==0} ? @{/customer/contracts/filtered} : @{/company/contracts/filtered}"
+                      method="post">
+                    <div class="filter_form_status filter_item custom_arrow">
+                        <label for="adv_filter_status">Status</label>
+                        <select id="adv_filter_status" class="form-control input-sm" th:field="*{contractStatus}">
+                            <option value="">--all--</option>
+                            <option th:each="currStatus : ${statusListForFilter}"
+                                    th:value="${currStatus.name()}"
+                                    th:text="${currStatus.toString()}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="filter_form_range_sum filter_item">
+                        <div class="sum_input">
+                            <label for="adv_filter_sumFrom">Sum from</label>
+                            <input class="form-control input-sm input-br-head" id="adv_filter_sumFrom" type="number"
+                                   th:field="*{sumFrom}"
+                                   placeholder="sum from" required/>
+                        </div>
+                        <div class="sum_input">
+                            <label for="adv_filter_sumTo">Sum to</label>
+                            <input class="form-control input-sm input-br-head" id="adv_filter_sumTo" type="number"
+                                   th:field="*{sumTo}"
+                                   placeholder="sum to" required/>
+                        </div>
+                    </div>
+                    <div class="filter_form_range_date filter_item">
+                        <div class="date_input">
+                            <label for="adv_filter_date_from">Date from</label>
+                            <input type="date" id="adv_filter_date_from" class="form-control input-sm input-br-head"
+                                   th:field="*{dateFrom}"/>
+                        </div>
+                        <div class="date_input">
+                            <label for="adv_filter_date_to">Date to</label>
+                            <input type="date" id="adv_filter_date_to" class="form-control input-sm input-br-head"
+                                   th:field="*{dateTo}"/>
+                        </div>
+                    </div>
+                    <div class="filter_item">
+                        <button type="submit" class="btn_apply"><span>Apply</span>
+                            <span class="btn_icon_right"><i class="fas fa-check"></i></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="filterable">
+            <div class="panel-heading">
+                <!--<h3 class="panel-title">Contracts</h3>-->
+                <div class="contracts_btn_wrapper">
+                    <button sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalContract" data-backdrop="static"
+                            class="btn_create_service" role="button" th:id="${companyId}"
+                            onclick="createNewContract(this)">
+                        <div>
+                            <span class="btn_icon_left"><i class="fas fa-plus-circle"></i></span>
+                            <span>NEW CONTRACT</span>
+                        </div>
+                    </button>
+                    <button id="bulk_create_invoices" sec:authorize="hasAuthority('COMPANY')" type="button" class="btn_create_service"
+                            onclick="createBulkInvoices()">
+                        <div>
+                            <span class="btn_icon_left"><i class="fas fa-plus-circle"></i></span>
+                            <span>CREATE INVOICES</span>
+                        </div>
+                    </button>
+                </div>
+                <div class="pull-right">
+                    <button class="btn btn-default btn-xs btn-filter">
+                        <span class="glyphicon glyphicon-filter"></span>Search
+                    </button>
+                </div>
+            </div>
+            <table class="table">
+                <thead>
+                <tr class="filters">
+                    <th sec:authorize="hasAuthority('COMPANY')" width="3%">
+                        <label class="control control--radio">
+                            <input type="checkbox" onclick="selectActiveContractkBoxes()" th:id="check_all" name="sel"/>
+                            <div class="control__indicator"></div>
+                        </label>
+                    </th>
+                    <th sec:authorize="hasAuthority('CUSTOMER')"><input type="text" class="form-control"
+                                                                        placeholder="Company name" disabled></th>
+                    <th sec:authorize="hasAuthority('COMPANY')"><input type="text" class="form-control"
+                                                                       placeholder="Customer name" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Issue date" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Expire date" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Service name" disabled></th>
+                    <th><input type="text" class="form-control" placeholder="Sum" disabled></th>
+                    <th width="20%">
+                        <select class="sel_status_contract" disabled>
+                            <option selected value="Status">Status</option>
+                            <option th:each="status : ${statusListForFilter}"
+                                    th:text="${status.toString()}">
+                            </option>
+                        </select>
+                    </th>
+                    <th></th>
+                </tr>
 
         </thead>
         <tbody class="filter_body">
         <tr th:each="contract : ${contractList}" th:id="${'row'+contract.getId()}">
+                    <td sec:authorize="hasAuthority('COMPANY')" width="3%">
+                        <label class="control control--radio" th:if="${contract.getStatus().name() == 'ACTIVE'}">
+                            <input class="contracts_active_check" type="checkbox" th:id="${contract.getId()}" name="sel"/>
+                            <div class="control__indicator"></div>
+                        </label>
+                    </td>
+                    <td sec:authorize="hasAuthority('CUSTOMER')" th:id="company_name"
+                        th:text="${contract.getCompany().getName()}">company name
+                    </td>
+                    <td sec:authorize="hasAuthority('COMPANY')" th:id="customer"
+                        th:text="${contract.getCustomer().getFullName()}">customer
+                        name
+                    </td>
+                    <td th:id="issueDate" th:text="${#temporals.format(contract.getIssueDate(),'dd.MM.yyyy')}">issue date</td>
+                    <td th:id="expireDate" th:text="${#temporals.format(contract.getExpireDate(),'dd.MM.yyyy')}">expire date
+                    </td>
+                    <td th:id="productName" th:text="${contract.getProduct().getName()}">service name</td>
+                    <td th:id="sum" th:text="${#numbers.formatDecimal(contract.getSum(),1,2)+' MDL'}"
+                        th:value="${contract.getSum()}">sum
+                    </td>
+                    <td width="20%"
+                        th:value="${contract.getStatus().name()}"><span th:id="status" class="filter_status_contract" th:text="${contract.getStatus()}"></span>
+                    </td>
 
-            <td sec:authorize="hasAuthority('CUSTOMER')" th:text="${contract.getCompany().getName()}">company name</td>
-            <td sec:authorize="hasAuthority('COMPANY')" th:id="customer"
-                th:text="${contract.getCustomer().getFullName()}">customer
-                name
-            </td>
-            <td th:id="issueDate" th:text="${#temporals.format(contract.getIssueDate(),'dd.MM.yyyy')}">issue date</td>
-            <td th:id="expireDate" th:text="${#temporals.format(contract.getExpireDate(),'dd.MM.yyyy')}">expire date
-            </td>
-            <td th:id="productName" th:text="${contract.getProduct().getName()}">service name</td>
-            <td th:id="sum" th:text="${#numbers.formatDecimal(contract.getSum(),1,2)+' MDL'}" th:value="${contract.getSum()}">sum</td>
-            <td class="filter_status_contract" th:id="status" th:text="${contract.getStatus()}"
-                th:value="${contract.getStatus().name()}">Status
-            </td>
+                    <td align="center">
+                        <div class="dropdown">
+                            <a class="dropdown-toggle" type="button" id="menu1" data-toggle="dropdown" title="Actions..">
+                                <span><i class="fas fa-ellipsis-h"></i></span>
+                                </a>
+                            <ul class="dropdown-menu dropdown-menu-right dropdown_action" role="menu" aria-labelledby="menu1">
+                                <li role="presentation" th:if="not ${contract.getStatus().name()=='ACTIVE'}">
+                                    <a role="menuitem" tabindex="-1"
+                                       th:id="'btn_sign_'+${contract.getId()}"
+                                       onclick="askForSignContract(this)">
+                                        <span class="btn_icon_left"><i class="fas fa-check"></i></span>
+                                        <span>SIGN</span>
+                                    </a>
+                                </li>
+                                <li role="presentation" sec:authorize="hasAuthority('COMPANY')"
+                                    th:if="${contract.getStatus().name()=='ACTIVE'}">
+                                    <a role="menuitem" tabindex="-1"
+                                       th:id="'btn_createInvoice_'+${contract.getId()}"
+                                       onclick="createNewInvoice(this)">
+                                        <span class="btn_icon_left"><i class="fas fa-file-alt"></i></span>
+                                        <span>CREATE INVOICE</span>
+                                    </a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1"
+                                       th:id="'btn_delete_'+${contract.getId()}"
+                                       onclick="deleteContract(this)">
+                                        <span class="btn_icon_left"><i class="fas fa-trash-alt"></i></span>
+                                        <span>DELETE</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
-            <td>
-                <div class="dropdown">
-                    <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">
-                        Actions ...
-                        <span class="caret"></span></button>
-                    <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="menu1">
-                        <li role="presentation" th:if="not ${contract.getStatus().name()=='ACTIVE'}">
-                            <a role="menuitem" tabindex="-1"
-                               th:id="'btn_sign_'+${contract.getId()}"
-                               onclick="askForSignContract(this)">Sign</a>
-                        </li>
-                        <li role="presentation" sec:authorize="hasAuthority('COMPANY')"
-                            th:if="${contract.getStatus().name()=='ACTIVE'}">
-                            <a role="menuitem" tabindex="-1"
-                               th:id="'btn_createInvoice_'+${contract.getId()}"
-                               onclick="createNewInvoice(this)">Create invoice</a>
-                        </li>
-                        <li role="presentation">
-                            <a role="menuitem" tabindex="-1"
-                               th:id="'btn_delete_'+${contract.getId()}"
-                               onclick="deleteContract(this)">Delete</a>
-                        </li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    </div>
 </div>
 
 <div class="modal fade" id="createInvoiceDialog" role="dialog">
@@ -204,7 +265,22 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Period time for service</label>
+                        <div class="col-sm-6 input-group ">
+                            <input type="text" class="form-control" id="start_period_inv_date" required="required"/>
+                            <span class="input-group-addon">-</span>
+                            <input type="text" class="form-control" id="end_period_inv_date" required="required"/>
+                        </div>
 
+                    </div>
+                    <div class="form-group" style="display:none;">
+                        <label class="col-sm-3 control-label"></label>
+                        <div class="col-sm-6 input-group ">
+                            <p class="error-message" id="end_period_inv_dateError" style="display: none">validation
+                                error</p>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Service</label>
                         <div class="col-sm-6">
@@ -232,27 +308,10 @@
                             <button id="save_btn" onclick="saveInvoiceButton()" type="button" class="btn btn-success">
                                 Save
                             </button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="uncheckAllCheckBoxes()">Close</button>
                         </div>
                     </div>
                 </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="modalDeleteInvoice" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Are you sure?</h4>
-                <input id="deleteInvoiceId" type="text" hidden="hidden"/>
-            </div>
-            <div class="modal-footer modal_btn">
-                <button id="btn_delete_invoice" type="button" class="btn btn-danger">Delete</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -264,11 +323,30 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Are you sure?</h4>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
                 <input id="deleteContractId" type="text" hidden="hidden"/>
             </div>
             <div class="modal-footer modal_btn">
-                <button id="btn_delete_contract" type="button" class="btn btn-danger">Delete</button>
+                <button id="btn_delete_contract" type="button" class="btn btn-warning">Delete</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalBulkInvoiceWarning" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">No one checkbox was selected !</h4>
+            </div>
+            <div class="modal-footer modal_btn">
+                <!--<button id="btn_delete_contract" type="button" class="btn btn-danger">Delete</button>-->                <!--<input id="deleteContractI" type="text" hidden="hidden"/>-->
+
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -402,7 +480,28 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 id="alertMessage"></h4>
+                <h4 id="alertTitle"></h4>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer modal_btn">
+                <button type="button" class="btn btn-default" data-dismiss="modal"
+                        onclick="location.reload()">Ok
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalInvoiceSavedNr" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" id="nrInvSaved"></h4>
             </div>
             <div class="modal-footer modal_btn">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -410,30 +509,69 @@
         </div>
     </div>
 </div>
+
 <script src="/js/user-websock.js"></script>
 <script src="/js/customer-sock-distribute.js"></script>
 <script src="/js/loadbalance.js"></script>
+<script src="/js/invoice-create-send.js"></script>
 </body>
 <script>
-
+$(document).ready(function () {
+    $.each($(".filter_status_contract"),function () {
+        if ($(this).text() === "Unsigned"){
+            $(this).addClass("contract_unsigned");
+        } else if ($(this).text() === "Active"){
+            $(this).addClass("contract_active");
+        }else {
+            $(this).addClass("contract_pending");
+        }
+    });
+})
     $(document).ready(function () {
         $('#createInvoiceDialog').on('hidden.bs.modal', function () {
-            console.log('modal is closing');
             clearErrorsSecond();
-
-
         })
-    })
+    });
 
     function deleteContract(btn) {
+        var contractId = btn.id.substring(11);
+        var row = $('#row' + contractId);
+        var modalConfirm = $('#modalDeleteConfirm');
+        modalConfirm.find('.modal-title').text('Are you sure to delete the contract?');
+        var modalBody = modalConfirm.find('.modal-body');
+        modalBody.find('p').empty();
+        var companyName = row.find('#company_name').text();
+        if (companyName !== '') {
+            modalBody.append('<p>Company: ' + companyName + '</p>');
+        }
+        var customerName = row.find('#customer').text();
+        if (customerName !== '') {
+            modalBody.append('<p>Customer: ' + customerName + '</p>');
+        }
+        modalBody.append('<p>Service: ' + row.find('#productName').text() + '</p>');
+        modalBody.append('<p>Sum: ' + row.find('#sum').text() + '</p>');
+        modalBody.append('<p>Status: ' + row.find('#status').text() + '</p>');
+        modalConfirm.modal({backdrop: "static"});
+        modalConfirm.modal('show');
+        $('#deleteContractId').val(contractId);
+        $("#btn_delete_contract").attr("disabled", false);
+    }
 
-        var rowId = btn.id.substring(11);
-        $('#modalDeleteConfirm').modal('show');
-        $('#deleteContractId').val(rowId);
-
+    function showAlert(title, message) {
+        var alertWindow = $('#modalAlert');
+        $('#alertTitle').text(title);
+        var alertBody = alertWindow.find('.modal-body');
+        alertBody.find('p').empty();
+        var strings = message.split('\n');
+        for (i = 0; i < strings.length; i++) {
+            alertBody.append('<p>' + strings[i] + '</p>');
+        }
+        alertWindow.modal({backdrop: "static"});
+        alertWindow.modal('show');
     }
 
     $('#btn_delete_contract').click(function () {
+        $("#btn_delete_contract").attr("disabled", true);
         $.ajax(
             {
                 url: "/contractRest/deleteContract",
@@ -441,35 +579,31 @@
                 data: {"contractId": $('#deleteContractId').val()},
                 success: function () {
                     $("#modalDeleteConfirm").modal("hide");
-                    location.reload();
-                }
-            }
-        )
-    })
-
-    $('#btn_delete_invoice').click(function () {
-        $.ajax(
-            {
-                url: "/restinvoice/deleteInvoice",
-                type: "POST",
-                data: {"invoiceId": $('#deleteInvoiceId').val()},
-                success: function () {
+                    showAlert('Contract was deleted', '');
+                },
+                error: function (result) {
                     $("#modalDeleteConfirm").modal("hide");
-                    location.reload();
+                    showAlert('Contract can not be deleted', result.responseText);
                 }
             }
         )
-    })
+    });
 
     function createNewInvoice(btn) {
         clearErrorsSecond();
         var rowId = btn.id.substring(18);
         var row = $("#row" + rowId);
-        var issueDate = new Date();
-
-        // console.log(row.find("#contractId").text());
+        var currentDate = new Date(), y = currentDate.getFullYear(), m = currentDate.getMonth();
+        var expireDate = new Date();
+        var firstDay = new Date(y, m, 1);
+        var lastDay = new Date(y, m + 1, 0);
+        expireDate.setDate(lastDay.getDate() + 15);
 
         $('#issue_inv_date').val(moment(issueDate).format('YYYY-MM-DD'));
+        $('#issue_inv_date').val(moment(currentDate).format('YYYY-MM-DD'));
+        $('#expire_inv_date').val(moment(expireDate).format('YYYY-MM-DD'));
+        $('#start_period_inv_date').val(moment(firstDay).format('YYYY-MM-DD'));
+        $('#end_period_inv_date').val(moment(lastDay).format('YYYY-MM-DD'));
         $('#company_inv_out').val($('#company_inv_in').val());
         $('#status_inv_out').val($('#status_inv_in').val());
         $('#customer_inv_name').val(row.find("#customer").text());
@@ -484,15 +618,19 @@
         console.log($('#status_inv_out').val());
         console.log($('#issue_inv_date').val());
         console.log($('#expire_inv_date').val());
+        console.log($('#start_period_inv_date').val());
+        console.log($('#end_period_inv_date').val());
 
-
-        $("#createInvoiceDialog").modal();
+        $('#createInvoiceDialog').modal({backdrop: "static"});
+        $("#createInvoiceDialog").modal('show');
 
     }
 
     function saveInvoiceButton() {
 
         var issueDate = $("#issue_inv_date").val();
+        var startDate = $("#start_period_inv_date").val();
+        var endDate = $("#end_period_inv_date").val();
         var expireDate = $("#expire_inv_date").val();
         var contractID = $("#contract_inv_ID").val();
         var sum = $("#sum_inv").val();
@@ -502,6 +640,8 @@
         var data = {
             issueDate: issueDate,
             dueDate: expireDate,
+            startDate: startDate,
+            endDate: endDate,
             contractId: contractID,
             status: status,
             sum: sum
@@ -524,26 +664,20 @@
                 if (response.status === 'FAIL') {
                     console.log('FAILED !!!');
                     var allErrors = response.errorMessageList;
-                    for (var i= 0; i < allErrors.length; i++) {
+                    for (var i = 0; i < allErrors.length; i++) {
                         var currFieldName = allErrors[i].fieldName;
                         var currErrorMessage = allErrors[i].message;
                         $('#' + currFieldName).parent().addClass('has-error');
                         $('#' + currFieldName + 'Error').text(currErrorMessage);
                         $('#' + currFieldName + 'Error').show();
                     }
+                    $("#end_period_inv_dateError").parent().parent().show();
                 } else {
                     $('#createInvoiceDialog').modal('hide');
-                    $('#alertMessage').text('New invoice was added successful');
+                    showAlert('New invoice was added successful', '');
                     location.reload();
-                    $('#modalAlert').modal('show');
                 }
 
-
-                // $("#dueDate" + data.id).text(moment(data.dueDate, 'YYYY-MM-DD').format('DD-MM-YYYY'));
-                // $("#sum" + data.id).text(data.sum);
-                // $("#createInvoiceDialog").modal('hide')
-                // $('#alertMessage').text('New invoice was added successful');
-                // $('#modalAlert').modal('show');
             },
             error: function (errMsg, a, b) {
                 alert("Please call admins")
@@ -556,13 +690,12 @@
         });
     }
 
-
     function loadAllCustomers() {
         $('#new_customerSelect').find('option').each(function () {
-            if ($(this).text() != '--select--') {
+            if ($(this).text() !== '--select--') {
                 $(this).remove();
             }
-        })
+        });
         $.ajax(
             {
                 url: "/customerRest/getAllFullNames",
@@ -578,10 +711,10 @@
 
     function loadProducts(companyId) {
         $('#new_productSelect').find('option').each(function () {
-            if ($(this).text() != '--select--') {
+            if ($(this).text() !== '--select--') {
                 $(this).remove();
             }
-        })
+        });
         $.ajax(
             {
                 url: "/productRest/getAllByCompanyId",
@@ -621,8 +754,7 @@
                 }
             }
         )
-    })
-
+    });
 
     function createNewContract(btn) {
         clearErrors();
@@ -638,14 +770,13 @@
         loadCompanyName(companyId);
         loadAllCustomers();
         loadProducts(companyId);
-    };
+        $("#btn_save_contract").attr("disabled", false);
+    }
 
     $("#btn_save_contract").click(function (event) {
-
         event.preventDefault();
-
+        $("#btn_save_contract").attr("disabled", true);
         $('#alertMessage').text('');
-
         var newContractData = {
             "issueDate": $("#new_issueDate").val(),
             "expireDate": $("#new_expireDate").val(),
@@ -654,7 +785,7 @@
             "companyId": $("#new_companyId").val(),
             "customerId": $("#new_customerSelect").val(),
             "productId": $("#new_productSelect").val()
-        }
+        };
 
         $.ajax(
             {
@@ -675,9 +806,8 @@
                         }
                     } else {
                         $('#modalContract').modal('hide');
-                        $('#alertMessage').text('New contract was added successful');
+                        showAlert('New contract was created successful', '');
                         location.reload();
-                        $('#modalAlert').modal('show');
                     }
                 },
 
@@ -687,30 +817,35 @@
                 }
             }
         )
-    })
+    });
 
     function clearErrors() {
         $('#new_issueDate').focus(function () {
             $('#new_issueDate').parent().removeClass('has-error');
             $('#new_issueDateError').hide();
+            $("#btn_save_contract").attr("disabled", false);
         });
         $('#new_expireDate').focus(function () {
             $('#new_expireDateError').hide();
             $('#new_expireDate').parent().removeClass('has-error');
+            $("#btn_save_contract").attr("disabled", false);
         });
         $('#new_customerSelect').focus(function () {
             $('#new_customerSelectError').hide();
             $('#new_customerSelect').parent().removeClass('has-error');
             $('#new_contractError').hide();
+            $("#btn_save_contract").attr("disabled", false);
         });
         $('#new_productSelect').focus(function () {
             $('#new_productSelectError').hide();
             $('#new_productSelect').parent().removeClass('has-error');
             $('#new_contractError').hide();
+            $("#btn_save_contract").attr("disabled", false);
         });
         $('#new_sum').focus(function () {
             $('#new_sumError').hide();
             $('#new_sum').parent().removeClass('has-error');
+            $("#btn_save_contract").attr("disabled", false);
         });
         $('#new_expireDateError').hide();
         $('#new_expireDate').parent().removeClass('has-error');
@@ -727,23 +862,21 @@
 
     function clearErrorsSecond() {
 
-            $('#issue_inv_date').focus(function () {
-                $('#issue_inv_date').parent().removeClass('has-error');
-                $('#issue_inv_dateError').hide();
-            })
-
-            $('#expire_inv_date').focus(function () {
-                $('#expire_inv_date').parent().removeClass('has-error');
-                $('#expire_inv_dateError').hide();
-            })
-
-            $('#issue_inv_dateError').hide();
-            $('#expire_inv_dateError').hide();
+        $('#issue_inv_date').focus(function () {
             $('#issue_inv_date').parent().removeClass('has-error');
-            $('#expire_inv_date').parent().removeClass('has-error');
+            $('#issue_inv_dateError').hide();
+        })
+        $('#end_period_inv_date').parent().removeClass('has-error');
+        $('#end_period_inv_dateError').hide();
+        $('#end_period_inv_dateError').parent().parent().hide();
+        //})
+
+        $('#issue_inv_dateError').hide();
+        $('#issue_inv_date').parent().removeClass('has-error');
+        $('#expire_inv_dateError').hide();
+        $('#end_period_inv_date').parent().removeClass('has-error');
 
     }
-
 
     function askForSignContract(btn) {
         var rowId = btn.id.substring(9);
@@ -760,10 +893,15 @@
             $('#btn_sign_contract').hide();
         }
         $('#modalSignConfirm').find('.modal-title').text(title);
+        $('#modalSignConfirm').modal({backdrop: "static"});
         $('#modalSignConfirm').modal('show');
+        $("#btn_sign_contract").attr("disabled", false);
+        $("#btn_unsign_contract").attr("disabled", false);
     }
 
     function signContract() {
+        $("#btn_sign_contract").attr("disabled", true);
+        $("#btn_unsign_contract").attr("disabled", true);
         $.ajax(
             {
                 url: "/contractRest/signContract",
@@ -778,8 +916,93 @@
             })
     }
 
-    $('#btn_sign_contract').click(signContract());
+    $('#btn_sign_contract').click(function(){
+        signContract();
+    })
+
+    function selectActiveContractkBoxes() {
+        var selectedRows = $('table.table tbody input[type=checkbox]');
+
+        if ($("#check_all").prop("checked")) {
+            $("#bulk_create_invoices").css("display", "block");
+            for (var i = 0; i < selectedRows.length; i++) {
+
+                if ($("#row" + selectedRows[i].id).find("#status").text().toLowerCase() == 'active') {
+                    selectedRows[i].checked = true;
+                }
+            }
+        }
+        else {
+            $("#bulk_create_invoices").css("display", "none");
+            for (var i = 0; i < selectedRows.length; i++) {
+                selectedRows[i].checked = false;
+            }
+        }
+    }
+
+    $(".contracts_active_check").change(function () {
+        var status = false;
+
+        $.each($(".contracts_active_check"), function () {
+            if ($(this).prop("checked") == true) {
+                status = true;
+            }
+        })
+        if (status === true){
+            $("#bulk_create_invoices").css("display", "block");
+        } else {
+            $("#bulk_create_invoices").css("display", "none");
+        }
+    });
+
+    function createBulkInvoices() {
+
+        var selectedRows = $('table.table tbody input[type=checkbox]:checked');
+
+        if (selectedRows.length == 0) {
+            $("#modalBulkInvoiceWarning").modal();
+        } else {
+            var ids = [];
+            for (var i = 0; i < selectedRows.length; i++) {
+                ids.push(selectedRows[i].id);
+            }
+
+            $.ajax(
+                {
+                    url: "/restinvoice/createBulkInvoice",
+                    type: "POST",
+                    data: {invoiceIds: ids},
+                    success: function (length) {
+                        console.log(length);
+                        if(length == 0){
+                            $("#modalInvoiceSavedNr").find('.modal-title').text('NO one invoice could be created !');
+                        }else if(length ==1){
+                            $("#modalInvoiceSavedNr").find('.modal-title').text(length + '  invoice has been created !');
+                        }else {
+                            $("#modalInvoiceSavedNr").find('.modal-title').text(length + '  invoices has been created !');
+                        }
+
+                        $("#bulk_create_invoices").css("display", "none");
+                        $("#modalInvoiceSavedNr").modal('show');
+                        var selectedRows = $('table.table tbody input[type=checkbox]');
+                        for (var i = 0; i < selectedRows.length; i++) {
+                            selectedRows[i].checked = false;
+                        }
+                        $("#check_all").prop("checked", false);
+                    },
+                    error: function (errMsg, a, b) {
+                        alert("Some tech problems have appeared !")
+                        console.log("fail")
+                        console.log(errMsg)
+                        console.log(a)
+                        console.log(b)
+                    }
+                }
+            )
+        }
+    }
+
 
 </script>
-
+<script>$(".i_contracts").addClass("active_menu_link");</script>
 </html>

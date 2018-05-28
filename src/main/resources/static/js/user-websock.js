@@ -1,21 +1,33 @@
 var stompClient = null;
 $(document).ready(function () {
-    connect();
+    getToken();
 });
-
-function connect() {
+function connect(response) {
     var socket = new SockJS('/user-sock');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
-        stompClient.subscribe('/user/'+$("#user").text()+'/queue/messages', function () {
+        stompClient.subscribe('/user/'+response+'/queue/messages', function () {
+
             setTimeout(function () {
+                $("#show_not_link_down").addClass("cues");
+            }, 1040);
+            setTimeout(function () {
+                $("#show_not_link_down").removeClass("cues");
+            }, 1010);
+            setTimeout(function(){
                 loadNotifications();
-                $("#not_icon").addClass("cue");
-                setTimeout(function () {
-                    $("#not_icon").removeClass("cue");
-                }, 1010);
-            }, 1000);
+            } , 1010);
         });
     });
 }
 
+function getToken() {
+    $.ajax(
+        {
+            url: "/getToken",
+            success: function (response) {
+                connect(response);
+            }
+        }
+    );
+}

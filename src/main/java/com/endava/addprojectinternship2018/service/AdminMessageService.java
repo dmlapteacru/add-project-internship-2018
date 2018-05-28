@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -26,9 +27,11 @@ public class AdminMessageService {
     public void save(AdminMessage adminMessage){
         if (adminMessage != null){
             Date date = new Date();
-            adminMessage.setDate(date);
+            adminMessage.setDate(LocalDateTime.now());
             adminMessageDao.save(adminMessage);
-            webSocketDistributeService.sendNewAdminMessageNotification(adminMessage.getUserEmail(), getFirstAdminMessageByEmailOrderByDate(adminMessage.getUserEmail()).getId());
+            webSocketDistributeService.sendNewAdminMessageNotification(adminMessage.getUserEmail(),
+                            getFirstAdminMessageByEmailOrderByDate(adminMessage.getUserEmail()).getId(),
+                            getFirstAdminMessageByEmailOrderByDate(adminMessage.getUserEmail()).getUserEmail());
         }
     }
     public void deleteById(int id){

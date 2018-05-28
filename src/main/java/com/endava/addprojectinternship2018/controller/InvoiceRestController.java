@@ -1,31 +1,26 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.dao.InvoiceTransactionDao;
 import com.endava.addprojectinternship2018.model.Contract;
 import com.endava.addprojectinternship2018.model.Invoice;
-import com.endava.addprojectinternship2018.model.dto.ContractDto;
-import com.endava.addprojectinternship2018.model.dto.ContractDtoTest;
 import com.endava.addprojectinternship2018.model.dto.InvoiceEditDto;
 import com.endava.addprojectinternship2018.model.dto.InvoiceSaveNewDto;
-import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.service.ContractService;
 import com.endava.addprojectinternship2018.service.InvoiceService;
 import com.endava.addprojectinternship2018.validation.ErrorMessage;
 import com.endava.addprojectinternship2018.validation.ValidationResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -71,11 +66,6 @@ public class InvoiceRestController {
 
         List<Invoice> list = invoiceService.getInvoiceInPeriodService(dto.getContractId(), dto.getIssueDate());
 
-        for (Invoice inv : list
-                ) {
-            System.out.println(inv);
-        }
-
         Invoice invoice = new Invoice();
 
         if (result.hasErrors()) {
@@ -108,12 +98,12 @@ public class InvoiceRestController {
         Contract currentContract = contractService.getById(dto.getContractId());
         if (currentContract == null) {
             response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("issue_inv_date", "Contract with id " + dto.getContractId() + " not found"));
+            errorMessageList.add(new ErrorMessage("end_period_inv_date", "Contract with id " + dto.getContractId() + " not found"));
         }
 
         if (!list.isEmpty()) {
             response.setStatus("FAIL");
-            errorMessageList.add(new ErrorMessage("issue_inv_date", "Contract for active period already exists !"));
+            errorMessageList.add(new ErrorMessage("end_period_inv_date", "Invoice for active period already exists !"));
         }
 
         if (dto.getDueDate() == null) {
@@ -124,6 +114,8 @@ public class InvoiceRestController {
         if (response.getStatus().equals("SUCCESS")) {
             invoice.setIssueDate(dto.getIssueDate());
             invoice.setDueDate(dto.getDueDate());
+            invoice.setServiceStartDate(dto.getStartDate());
+            invoice.setServiceEndDate(dto.getEndDate());
             invoice.setStatus(dto.getStatus());
             invoice.setSum(dto.getSum());
             invoice.setContract(currentContract);
@@ -142,6 +134,17 @@ public class InvoiceRestController {
         invoiceService.changeInvoiceStatusToSent(invoiceId);
         return "Ok";
     }
+
+    @PostMapping(value = "/createBulkInvoice")
+    public ResponseEntity sendBulkInvoiceToCustomer(@RequestParam("invoiceIds[]") List<Integer> bulkContractIds) {
+
+        List<Invoice> invoiceList = invoiceService.getCheckedInvoices(bulkContractIds);
+        System.out.println("invoices size:"+invoiceList);
+        invoiceService.save(invoiceList);
+        return new ResponseEntity(invoiceList.size(),HttpStatus.OK);
+    }
+
+
 
     @PostMapping(value = "/sendBulkToCustomer")
     public String sendBulkInvoiceToCustomer(@RequestBody Map<String, Object> data) {
