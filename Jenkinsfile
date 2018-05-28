@@ -60,9 +60,20 @@ pipeline {
 
         stage('Build dockerfile') {
             steps {
-                sh 'ls -a .'
-                sh 'docker build -t java_team1 .'
-                 
+                sh 'docker build -t java_team1 .'  
+            }
+        }
+
+        stage('Push image on ECR') {
+            withCredentials([usernamePassword(credentialsId: '1829e512-98c0-4c98-9293-253d5a7a3704', passwordVariable: 'aws_secret_access_key', usernameVariable: 'aws_access_key_id')]) {
+                        sh "aws configure set aws_access_key_id $aws_access_key_id "
+                        sh "aws configure set aws_secret_access_key $aws_secret_access_key "
+                        sh "aws configure set default.region us-east-1"
+
+                        sh 'aws ecr get-login --no-include-email | bash'
+                        
+                        sh 'docker tag java_team1 543633097370.dkr.ecr.us-east-1.amazonaws.com/java_team1:v0.1'
+                        sh 'docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/java_team1:v0.1'
             }
         }
         
