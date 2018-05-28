@@ -45,20 +45,27 @@ pipeline {
             }
         }
 
-        stage('Upload artifact') {
-           steps {
-               nexusArtifactUploader artifacts: [[artifactId: 'add-project-internship-2018', classifier: '', file: 'target/add-project-internship-2018-' + version.trim() + '.war', type: 'war']], 
-               credentialsId: '9d977555-9613-4485-8c0c-a25b72a316e3', 
-               groupId: 'com.endava', 
-               nexusUrl: 'nexus.endava.net', 
-               nexusVersion: 'nexus3', 
-               protocol: 'https', 
-               repository: 'Intens_2018_firs', 
-               version: version2.trim()
-           }
+        // stage('Upload artifact') {
+        //    steps {
+        //        nexusArtifactUploader artifacts: [[artifactId: 'add-project-internship-2018', classifier: '', file: 'target/add-project-internship-2018-' + version.trim() + '.war', type: 'war']], 
+        //        credentialsId: '9d977555-9613-4485-8c0c-a25b72a316e3', 
+        //        groupId: 'com.endava', 
+        //        nexusUrl: 'nexus.endava.net', 
+        //        nexusVersion: 'nexus3', 
+        //        protocol: 'https', 
+        //        repository: 'Intens_2018_firs', 
+        //        version: version2.trim()
+        //    }
+        // }
+
+        stage('Build dockerfile') {
+            steps {
+                sh "cp 'target/add-project-internship-2018-' + version.trim() + '.war' . "
+                sh 'ls -a .'
+                //sh 'docker build -t java_team1 .'
+                 
+            }
         }
         
         }     
 }
-
-//c
