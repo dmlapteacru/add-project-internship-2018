@@ -5,7 +5,7 @@
 
     <groupId>com.endava</groupId>
     <artifactId>add-project-internship-2018</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <name>add-project-internship-2018</name>
