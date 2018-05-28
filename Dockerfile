@@ -2,6 +2,7 @@ FROM tomcat:9.0.8-jre8
 
 RUN apt-get update && apt-get install software-properties-common -y
 
+RUN pwd
 RUN cp target/add-project-internship-2018*.war ./ROOT.war
 ADD ROOT.war /usr/local/tomcat/webapps/
 #RUN /usr/local/tomcat/bin/startup.sh
