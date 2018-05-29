@@ -78,7 +78,7 @@ body {
     width: 18%;
     /*box-shadow: 0 5px 50px 1px black;*/
     border: 1px solid #2c909f;
-    border-radius: 4px;
+    border-radius: 2px;
 }
 .wrapper_left_ {
     display: flex;
@@ -116,7 +116,7 @@ body {
     height: 50px;
     width: 50px;
 }
-.index_header { border: 1px solid grey;
+.index_header {
     display: flex;
     width: 100%;
 }
@@ -182,7 +182,7 @@ body {
     font-size: 17pt;
 }
 .login_form_inpt {
-    padding: 0;
+    padding: 0 10px;
     height: 45px;
 }
 .control {

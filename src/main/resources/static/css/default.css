@@ -138,8 +138,9 @@ a{
 .control__indicator:after {
     position: absolute;
     display: none;
-    content: '\2713';
+    content: '\2022';
     color: #fff;
+    font-size: 30px;
     left: 50%;
     top: 50%;
     -webkit-transform: translate(-50%, -50%);
