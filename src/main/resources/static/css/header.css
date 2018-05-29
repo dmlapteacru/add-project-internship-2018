@@ -38,16 +38,14 @@ a:link {
     font-weight: 700;
     /*font-family: Roboto, sans-serif;*/
     display: flex;
-    padding: 0 20px;
+    padding: 0 80px;
     justify-content: space-between;
     background: linear-gradient(to right, #42cca2, #1a5e9d);
 }
 .menu_left {
     display: flex;
 }
-.menu_right {
-    padding: 0 50px 0 0;
-}
+
 .menu {
     display: flex;
     height: 100%;

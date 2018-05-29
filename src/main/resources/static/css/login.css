@@ -1,0 +1,205 @@
+@font-face {
+    font-family: 'Roboto';
+    src: url("../fonts/Roboto-Black.ttf");
+}
+@font-face {
+    font-family: 'Roboto-Condensed';
+    src: url("../fonts/Roboto-Condensed.ttf");
+}
+body {
+}
+
+.wrapper {
+}
+
+.main_wrapper {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid green;
+    /*background: linear-gradient(to right, #42cca2, #1a5e9d);*/
+    background: #f2f2f2;
+
+    z-index: 2;
+}
+.wrapper_top {
+    display: flex;
+    background-color: #fff;
+    width: 100%;
+    height: 25%;
+}
+.wrapper_bottom {
+    display: flex;
+    background-color: #fff;
+    width: 100%;
+    height: 25%;
+}
+.wrapper_middle {
+    display: flex;
+    background-color: #fff;
+    width: 100%;
+    height: 50%;
+}
+.wrapper_left {
+    width: 75%;
+    height: 100%;
+}
+.wrapper_right{
+    height:100%;
+    width: 25%;
+    background: linear-gradient(to bottom, #2c909f, #1f6d9d);
+}
+.wrapper_left_top {
+    padding: 50px 100px;
+    width: 75%;
+    height: 100%;
+}
+.wrapper_left_top > img {
+    width: 100px;
+    height: 80px;
+}
+.wrapper_left_top > span {
+    color: #2c909f;
+    font-family: Roboto, sans-serif;
+    font-size: 25pt;
+}
+.wrapper_right_top {
+    height:100%;
+    width: 25%;
+    background: linear-gradient(to bottom, #42cca2, #36aba0);
+}
+.wrapper_middle_{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    width: 18%;
+    /*box-shadow: 0 5px 50px 1px black;*/
+    border: 1px solid #2c909f;
+    border-radius: 4px;
+}
+.wrapper_left_ {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 62%;
+    height: 100%;
+}
+.login_page_title {
+    display: flex;
+    justify-content: center;
+}
+.login_page_title > span {
+    color: #2c909f;
+    font-family: Roboto, sans-serif;
+    font-size: 40pt;
+    margin: 0 20px;
+}
+.span_best {
+    border-bottom: 3px solid #2c909f;
+    border-top: 3px solid #2c909f;
+}
+.wrapper_right_ {
+    height:100%;
+    width: 20%;
+    background: linear-gradient(to bottom, #36aba0, #2c909f);
+}
+.control {
+    color: #222;
+}
+.modal_links > a{
+    color: #2c909f;
+}
+.index_header > img {
+    height: 50px;
+    width: 50px;
+}
+.index_header { border: 1px solid grey;
+    display: flex;
+    width: 100%;
+}
+.index_logo {
+    font-size: 25px;
+}
+.index_header > span {
+    font-size: 14pt;
+    font-family: Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 12px;
+    color: #fff;
+}
+
+.login_wrapper {
+    width: 100%;
+    height: 100%;
+    padding: 10px 25px ;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+}
+.reg_forms {
+    display: flex;
+    flex-direction: column;
+    font-size: 12pt;
+
+}
+.registration_form {
+    display: flex;
+    justify-content: space-around;
+    font-size: 10pt;
+}
+.registration_choice_btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.modal_links {
+    display: flex;
+    flex-direction: column;;
+    justify-content: center;
+    font-size: 15pt;
+}
+.modal_links > a {
+    display: flex;
+    justify-content: center;
+}
+.btn_login {
+    background-color: #2c909f;
+}
+.registration_choice_btn > button {
+    font-size: 13pt;
+    color: #fff;
+}
+.login_form {
+    font-size: 14pt;
+}
+.login_form > button {
+    font-size: 17pt;
+}
+.login_form_inpt {
+    padding: 0;
+    height: 45px;
+}
+.control {
+    font-size: 16pt;
+}
+.pass_wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 15pt;
+    height: 45px;
+}
+.pass_wrapper_ {
+    display: flex;
+    height: 100%;
+}
+.pass_wrapper_ > input {
+    height: 100%;
+    border: none;
+}
