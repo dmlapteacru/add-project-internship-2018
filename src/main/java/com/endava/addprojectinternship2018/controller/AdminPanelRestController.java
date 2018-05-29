@@ -19,10 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-import static org.springframework.web.bind.annotation.RequestMethod.PUT;
-
 @org.springframework.web.bind.annotation.RestController
 public class AdminPanelRestController {
 
@@ -46,30 +42,30 @@ public class AdminPanelRestController {
 
     private static final Logger LOGGER = Logger.getLogger(AdminPanelRestController.class);
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @GetMapping(value = "")
     public String adminMain(Model model){
         model.addAttribute("users", userService.getAllUsersWithProfile());
         return "admin/admin";
     }
 
-    @RequestMapping(value = "status", method = RequestMethod.GET)
+    @GetMapping(value = "status")
     public String approveNewUser(@RequestParam(name = "username")String username){
         userService.changeUserStatus(username);
         return "redirect:/admin";
     }
 
-    @RequestMapping(value = "/admin/services", method = GET)
+    @GetMapping(value = "/admin/services")
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
     }
 
 
-    @RequestMapping(value = "/admin/categories", method = GET)
+    @GetMapping(value = "/admin/categories")
     public List<Category> getAllCategory() {
         return categoryService.getAllCategory();
     }
 
-    @RequestMapping(value = "/admin/newCategory", method = PUT)
+    @PutMapping(value = "/admin/newCategory")
     public ResponseEntity<?> saveNewCategory(@RequestBody Category category, BindingResult error) {
         validator.validate(category, error);
         if (error.hasErrors()) {
@@ -80,7 +76,7 @@ public class AdminPanelRestController {
         return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/admin/deleteCategory/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/admin/deleteCategory/{id}")
     public String deleteCategory(@PathVariable Integer id) {
         LOGGER.info(String.format("admin is trying to delete category with id %s", id));
         String categoryName = categoryService.getCategoryById(id).getName();
@@ -89,85 +85,85 @@ public class AdminPanelRestController {
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/messages", method = GET)
+    @GetMapping(value = "/admin/messages")
     public List<AdminMessage> showMessages() {
         return adminMessageService.getAllMessages();
     }
 
-    @RequestMapping(value = "/admin/messages/unread", method = GET)
+    @GetMapping(value = "/admin/messages/unread")
     public List<AdminMessage> showMessagesByStatusUnread() {
         return adminMessageService.getAllMessagesByStatusUnread();
     }
 
-    @RequestMapping(value = "/admin/messages/read", method = GET)
+    @GetMapping(value = "/admin/messages/read")
     public List<AdminMessage> showMessagesByStatusRead() {
         return adminMessageService.getAllMessagesByStatusRead();
     }
 
-    @RequestMapping(value = "/message/send", method = POST)
+    @PostMapping(value = "/message/send")
     public String addNewMessage(@RequestBody AdminMessage adminMessage) {
         adminMessageService.save(adminMessage);
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/message/changeStatus/{id}", method = PUT)
+    @PutMapping(value = "/admin/message/changeStatus/{id}")
     public String changeMessageStatus(@PathVariable int id) {
         adminMessageService.changeMessageStatus(id);
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/message/changeStatus/read", method = PUT)
+    @PutMapping(value = "/admin/message/changeStatus/read")
     public String changeMessageStatusOnRead(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList) {
         adminMessageService.changeMessageStatusOnRead(changeMessageStatusDtoList);
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/message/changeStatus/unread", method = PUT)
+    @PutMapping(value = "/admin/message/changeStatus/unread")
     public String changeMessageStatusOnUnRead(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList) {
         adminMessageService.changeMessageStatusOnUnRead(changeMessageStatusDtoList);
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/message/delete/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/admin/message/delete/{id}")
     public String deleteMessage(@PathVariable int id) {
         adminMessageService.deleteById(id);
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/message/bulkDelete", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/admin/message/bulkDelete")
     public String deleteMessage(@RequestBody List<ChangeMessageStatusDto> changeMessageStatusDtoList) {
         adminMessageService.deleteMessages(changeMessageStatusDtoList);
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/changeUserStatus/active", method = POST)
+    @PostMapping(value = "/admin/changeUserStatus/active")
     public String changeUserStatusOnActive(@RequestBody List<ChangeUserStatusDto> changeUserStatusDto) {
         userService.changeUserStatusOnActive(changeUserStatusDto);
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/changeUserStatus/inactive", method = POST)
+    @PostMapping(value = "/admin/changeUserStatus/inactive")
     public String changeUserStatusOnInactive(@RequestBody List<ChangeUserStatusDto> changeUserStatusDto) {
         userService.changeUserStatusOnInactive(changeUserStatusDto);
         return "OK";
     }
 
-    @RequestMapping(value = "/admin/notifications/unread", method = GET)
+    @GetMapping(value = "/admin/notifications/unread")
     public List<Notification> getAllNotificationByStatusUnread(){
         return notificationService.getAllByStatusUnread("admin");
     }
 
-    @RequestMapping(value = "/notifications/unread", method = GET)
+    @GetMapping(value = "/notifications/unread")
     public List<Notification> getAllUsersNotificationByStatusUnread(){
         return notificationService.getAllByStatusUnread(SecurityContextHolder.getContext().getAuthentication().getName());
     }
 
-    @RequestMapping(value = "/admin/notifications/changeStatus", method = PUT)
+    @PutMapping(value = "/admin/notifications/changeStatus")
     public String changeNotificationStatus(@RequestParam("id") int id){
         notificationService.changeNotificationStatusOnRead(id);
         return "OK";
     }
-    @RequestMapping(value = "/notifications/changeStatus", method = PUT)
+    @PutMapping(value = "/notifications/changeStatus")
     public String changeCustomerNotificationStatus(@RequestParam("id") int id){
         notificationService.changeNotificationStatusOnRead(id);
         return "OK";

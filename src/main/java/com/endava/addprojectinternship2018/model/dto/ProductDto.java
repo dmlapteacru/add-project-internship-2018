@@ -1,12 +1,11 @@
 package com.endava.addprojectinternship2018.model.dto;
 
-import com.endava.addprojectinternship2018.model.Category;
-import com.endava.addprojectinternship2018.model.Company;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
@@ -15,18 +14,17 @@ public class ProductDto {
 
     private int productId;
 
-    @NotEmpty
+    @NotNull
     private String name;
 
-    @NotEmpty
-    private Category category;
-
-    @NotEmpty
+    @Min(0)
     private double price;
 
-    @NotEmpty
-    private Company company;
+    @NotNull
+    private int companyId;
+
+    @NotNull
+    private int categoryId;
 
     private String description;
-
 }

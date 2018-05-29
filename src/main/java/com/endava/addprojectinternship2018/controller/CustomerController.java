@@ -1,23 +1,29 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.model.*;
+import com.endava.addprojectinternship2018.model.Customer;
 import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
-import com.endava.addprojectinternship2018.model.dto.ContractDto;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
-import com.endava.addprojectinternship2018.service.*;
+import com.endava.addprojectinternship2018.service.UserService;
+import com.endava.addprojectinternship2018.service.CustomerService;
+import com.endava.addprojectinternship2018.service.ProductService;
+import com.endava.addprojectinternship2018.service.CategoryService;
+import com.endava.addprojectinternship2018.service.ContractService;
+import com.endava.addprojectinternship2018.service.InvoiceService;
 import com.endava.addprojectinternship2018.util.UserUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.validation.Valid;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -25,27 +31,29 @@ import java.util.Optional;
 public class CustomerController {
 
     @Autowired
-    private InvoiceService invoiceService;
-
-    @Autowired
     private UserUtil userUtil;
 
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private CustomerService customerService;
-
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private CategoryService categoryService;
-
-    @Autowired
-    private ContractService contractService;
+    private final CustomerService customerService;
+    private final ProductService productService;
+    private final CategoryService categoryService;
+    private final ContractService contractService;
+    private final InvoiceService invoiceService;
 
     private static final Logger LOGGER = Logger.getLogger(CustomerController.class);
+
+    @Autowired
+    public CustomerController(CustomerService customerService, ProductService productService,
+                              CategoryService categoryService, ContractService contractService,
+                              InvoiceService invoiceService) {
+        this.customerService = customerService;
+        this.productService = productService;
+        this.categoryService = categoryService;
+        this.contractService = contractService;
+        this.invoiceService = invoiceService;
+    }
 
     @GetMapping(value = "home")
     public String getHomePage(Model model) {
@@ -120,8 +128,6 @@ public class CustomerController {
         model.addAttribute("statusListForFilter", Arrays.asList(ContractStatus.values()));
         model.addAttribute("filter", new AdvancedFilter());
 
-        LOGGER.info(String.format("customer %s:%s accessed contracts page", currentCustomerId, userUtil.getCurrentCustomer().getFullName()));
-
         return "contract/contractListPage";
 
     }
@@ -167,24 +173,6 @@ public class CustomerController {
         return "product/productListPage";
     }
 
-    @Deprecated
-    @GetMapping(value = "services/newcontract")
-    public String getProductsPageSignContract(@RequestParam(name = "customerId") int customerId,
-                                              @RequestParam(name = "companyId") int companyId,
-                                              @RequestParam(name = "productId") int productId,
-                                              Model model) {
-        ContractDto contractDto = contractService.createNewContractDto(customerId, companyId, productId);
-        int currentCustomerId = userUtil.getCurrentCustomer().getId();
-        List<Product> productList = productService.getAllProducts();
-        List<Category> categoryList = categoryService.getAllCategory();
-        model.addAttribute("contractDto", contractDto);
-        model.addAttribute("categoryList", categoryList);
-        model.addAttribute("products", productList);
-        model.addAttribute("customerId", currentCustomerId);
-        model.addAttribute("update", false);
-        return "product/productListPage";
-    }
-
     @GetMapping(value = "invoices")
     public String getInvoicesPage(Model model) {
 
@@ -215,4 +203,8 @@ public class CustomerController {
         return "customer/bankPage";
     }
 
+    @GetMapping(value = "notifications")
+    public String showNotifications(){
+        return "customer/notifications";
+    }
 }

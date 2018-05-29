@@ -10,13 +10,20 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Component
 public class Validator implements org.springframework.validation.Validator {
+
+    private final CategoryService categoryService;
+
     @Autowired
-    private CategoryService categoryService;
+    public Validator(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
+
     @Override
     public boolean supports(Class<?> aClass) {
         return false;
@@ -27,35 +34,35 @@ public class Validator implements org.springframework.validation.Validator {
         Category category = (Category) o;
         Optional<Category> dbCategory = categoryService.getCategoryByName(category.getName());
 
-        if (category.getName().isEmpty() || category.getDescription().isEmpty()){
+        if (category.getName().isEmpty() || category.getDescription().isEmpty()) {
             errors.rejectValue("name", "Fields must not be empty.");
         }
-        if (dbCategory.isPresent() && dbCategory.get().getId()!=category.getId()){
+        if (dbCategory.isPresent() && dbCategory.get().getId() != category.getId()) {
             errors.rejectValue("name", "Category already exists.");
         }
     }
 
     public void validateStatementDates(StatementDateReqDto dateReqDto, Errors errors) {
-        if (dateReqDto.getDate().isEmpty() || dateReqDto.getDateTo().isEmpty()){
-            errors.rejectValue("date", "Dates can't be empty.");
+        if (dateReqDto.getDate().isEmpty() || dateReqDto.getDateTo().isEmpty()) {
+            errors.rejectValue("date", "Dates can not be empty.");
         }
     }
 
-    public void validateInvoicePayment(Double balance, PaymentDto paymentDto, Errors errors) {
-        if (paymentDto.getSum() > balance){
-            errors.rejectValue("sum", "Not enough money.");
+    public List<String> validateInvoicePayment(double balance, List<PaymentDto> paymentDtoList) {
+
+        List<String> errorList = new ArrayList<>();
+        if (paymentDtoList.stream().mapToDouble(PaymentDto::getS).sum() > balance) {
+            errorList.add("Not enough money");
         }
+        if (paymentDtoList.size() > 5) {
+            errorList.add("Impossible to process more than 5 invoices");
+        }
+        for (PaymentDto paymentDto : paymentDtoList) {
+            if (paymentDto.getC() == null) {
+                errorList.add(paymentDto.getD());
+            }
+        }
+        return errorList;
     }
 
-    public void validateBulkInvoicePayment(Double balance, List<PaymentDto> paymentDtoList, Errors errors) {
-        double sum = 0;
-        for (PaymentDto pdto:paymentDtoList
-             ) {
-            sum = sum + pdto.getSum();
-        }
-        if (balance < sum){
-//            errors.rejectValue("sum", "Not enough money.");
-            errors.reject("Not enough money.");
-        }
-    }
 }

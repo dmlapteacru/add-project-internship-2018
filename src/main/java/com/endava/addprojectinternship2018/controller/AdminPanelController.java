@@ -1,11 +1,12 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.service.*;
-import org.apache.log4j.Logger;
+import com.endava.addprojectinternship2018.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping(value = "admin")
@@ -13,8 +14,6 @@ public class AdminPanelController {
 
     @Autowired
     private UserService userService;
-
-    private static final Logger LOGGER = Logger.getLogger(AdminPanelController.class);
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public String adminMain(Model model){

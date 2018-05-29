@@ -33,6 +33,8 @@ public interface ContractDao extends JpaRepository<Contract, Integer> {
 
     long countByCustomerIdAndStatus(int customerId, ContractStatus status);
 
+    long countByProductId(int productId);
+
     List<Contract> findAllByCompanyIdAndSumBetweenAndIssueDateBetweenOrderByIssueDate
             (int id, double sumFrom, double sumTo, LocalDate dateFrom, LocalDate dateTo);
 

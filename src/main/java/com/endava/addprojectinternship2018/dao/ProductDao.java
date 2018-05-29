@@ -12,21 +12,11 @@ public interface ProductDao extends JpaRepository<Product, Integer> {
 
     List<Product> findAllByOrderByCompanyName();
 
-    List<Product> findAllByCategoryId(int id);
-
     List<Product> findAllByCompanyIdOrderByName(int id);
-
-    List<Product> findAllByCompanyIdAndCategoryId(int companyId, int categoryId);
 
     Optional<Product> findByNameAndCategoryIdAndCompanyId(String name, int categoryId, int companyId);
 
     Optional<Product> findById(int id);
-
-    Optional<Product> findByNameAndCompanyId(String name, int companyId);
-
-    void deleteById(int id);
-
-    Optional<Product> findByNameAndCategoryId(String name, int categoryId);
 
     List<Product> findAllByCompanyIdAndPriceBetween(int companyId, double priceFrom, double priceTo);
 

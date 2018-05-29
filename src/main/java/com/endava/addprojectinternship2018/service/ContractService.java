@@ -13,9 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.endava.addprojectinternship2018.model.enums.ContractStatus.SIGNED_BY_CUSTOMER;
 import static com.endava.addprojectinternship2018.model.enums.ContractStatus.UNSIGNED;
@@ -25,35 +23,31 @@ import static com.endava.addprojectinternship2018.model.enums.ContractStatus.ACT
 @Service
 public class ContractService {
 
-    @Autowired
     private UserUtil userUtil;
-
     private final ContractDao contractDao;
-
-    private final CustomerDao customerDao;
-
-    private final CompanyDao companyDao;
-
-    private final ProductDao productDao;
-
     private final InvoiceDao invoiceDao;
-
+    private final CompanyDao companyDao;
+    private final CustomerDao customerDao;
+    private final ProductDao productDao;
     private final WebSocketDistributeService webSocketDistributeService;
 
     private static final Logger LOGGER = Logger.getLogger(ContractService.class);
 
     @Autowired
-    public ContractService(ContractDao contractDao, CustomerDao customerDao, CompanyDao companyDao, ProductDao productDao, InvoiceDao invoiceDao, WebSocketDistributeService webSocketDistributeService) {
+    public ContractService(ContractDao contractDao, InvoiceDao invoiceDao,
+                           CompanyDao companyDao, CustomerDao customerDao, ProductDao productDao,
+                           WebSocketDistributeService webSocketDistributeService) {
         this.contractDao = contractDao;
+        this.invoiceDao = invoiceDao;
         this.customerDao = customerDao;
         this.companyDao = companyDao;
         this.productDao = productDao;
-        this.invoiceDao = invoiceDao;
         this.webSocketDistributeService = webSocketDistributeService;
     }
 
-    public List<Contract> getAllByCompanyName(String companyName) {
-        return contractDao.findAllByCompanyName(companyName);
+    @Autowired
+    public void setUserUtil(UserUtil userUtil) {
+        this.userUtil = userUtil;
     }
 
     public List<Contract> getAll() {
@@ -78,7 +72,7 @@ public class ContractService {
             LOGGER.error("Contract with id " + contractId + " not found");
             return null;
         }
-        return contractDao.findById(contractId).get();
+        return optionalContract.get();
     }
 
     public Optional<Contract> getByCustomerIdCompanyIdProductId(int customerId, int companyId, int productId) {
@@ -95,120 +89,70 @@ public class ContractService {
 
     @Transactional
     public void saveContract(ContractDto contractDto) {
-        contractDao.save(convertContractDtoToContract(contractDto));
+        Contract contract = convertDTOToContract(contractDto);
+        contractDao.save(contract);
         if (userUtil.getCurrentUser().getRole() == Role.CUSTOMER) {
-            webSocketDistributeService.sendNewContractNotification(contractDto.getSelectedCompany().getUser().getUsername());
+            webSocketDistributeService.sendNewContractNotification(contract.getCompany().getUser().getUsername(), contract.getCustomer().getFullName());
         } else {
-            webSocketDistributeService.sendNewContractNotification(contractDto.getSelectedCustomer().getUser().getUsername());
+            webSocketDistributeService.sendNewContractNotification(contract.getCustomer().getUser().getUsername(), contract.getCompany().getName());
         }
 
         LOGGER.info(String.format("%s: contract saved: %s - %s",
                 userUtil.getCurrentUser().getUsername(),
-                contractDto.getSelectedCompany().getName(),
-                contractDto.getSelectedCustomer().getFullName()
+                contract.getCompany().getName(),
+                contract.getCustomer().getFullName()
         ));
     }
 
     @Transactional
-    public String deleteContract(int contractId) {
-        Optional<Contract> contractOptional = contractDao.findById(contractId);
-        User currentUser = userUtil.getCurrentUser();
-        if (contractOptional.isPresent()) {
-            if (currentUser.getRole() == Role.CUSTOMER && contractOptional.get().getStatus() != SIGNED_BY_CUSTOMER) {
-                return contractOptional.get().getStatus() + " contract can not be deleted";
-            }
-            contractDao.delete(contractOptional.get());
-            return "OK";
+    public Set<String> deleteContract(int contractId) {
+
+        Set<String> result = new HashSet<>();
+        result.add("OK");
+
+        Contract currentContract = getById(contractId);
+        if (currentContract == null) {
+            result.add("Contract not found");
+            return result;
         }
-        return "Contract not found";
+
+        Role currentUserRole = userUtil.getCurrentUser().getRole();
+        ContractStatus currentContractStatus = currentContract.getStatus();
+        if (currentUserRole == Role.CUSTOMER) {
+            if (currentContractStatus == SIGNED_BY_COMPANY || currentContractStatus == ACTIVE) {
+                result.add("Contract is " + currentContractStatus.toString());
+                result.remove("OK");
+            }
+        } else if (currentUserRole == Role.COMPANY) {
+            if (currentContractStatus == SIGNED_BY_CUSTOMER) {
+                result.add("Contract is " + currentContractStatus.toString());
+                result.remove("OK");
+            }
+        }
+        if (haveInvoices(contractId)) {
+            result.add("Contract has active invoices");
+            result.remove("OK");
+        }
+        if (isOverdue(contractId)) {
+            result.add("OK");
+        }
+        if (result.contains("OK")) {
+            contractDao.delete(currentContract);
+        }
+
+        return result;
     }
 
-    public ContractDto convertContractToContractDto(Contract contract) {
-        ContractDto contractDto = new ContractDto();
-        contractDto.setSelectedCompany(contract.getCompany());
-        contractDto.setSelectedCustomer(contract.getCustomer());
-        contractDto.setSelectedProduct(contract.getProduct());
-        contractDto.setIssueDate(contract.getIssueDate());
-        contractDto.setStatus(contract.getStatus());
-        contractDto.setExpireDate(contract.getExpireDate());
-        contractDto.setSum(contract.getSum());
-        contractDto.setContractId(contract.getId());
-        return contractDto;
-    }
-
-    public Contract convertContractDtoToContract(ContractDto contractDto) {
-        Contract contract = contractDao.findById(contractDto.getContractId())
-                .orElseGet(Contract::new);
+    private Contract convertDTOToContract(ContractDto contractDto) {
+        Contract contract = new Contract();
         contract.setIssueDate(contractDto.getIssueDate());
         contract.setExpireDate(contractDto.getExpireDate());
         contract.setSum(contractDto.getSum());
-        contract.setCompany(contractDto.getSelectedCompany());
-        contract.setCustomer(contractDto.getSelectedCustomer());
-        contract.setProduct(contractDto.getSelectedProduct());
-        contract.setStatus(contractDto.getStatus());
+        contract.setCompany(companyDao.findById(contractDto.getCompanyId()).get());
+        contract.setCustomer(customerDao.findById(contractDto.getCustomerId()).get());
+        contract.setProduct(productDao.findById(contractDto.getProductId()).get());
+        contract.setStatus(ContractStatus.valueOf(contractDto.getStatus()));
         return contract;
-    }
-
-    public ContractDto createUpdateContractDto(int contractId) {
-        ContractDto contractDto = convertContractToContractDto(contractDao.findById(contractId).get());
-        List<Customer> customerList = new ArrayList<>();
-        customerList.add(contractDto.getSelectedCustomer());
-        contractDto.setCustomers(customerList);
-        List<Company> companyList = new ArrayList<>();
-        companyList.add(contractDto.getSelectedCompany());
-        contractDto.setCompanies(companyList);
-        List<Product> productList = new ArrayList<>();
-        productList.add(contractDto.getSelectedProduct());
-        contractDto.setProducts(productList);
-        return contractDto;
-    }
-
-    public ContractDto createNewContractDto(int customerId, int companyId, int productId) {
-
-        ContractDto contractDto = new ContractDto();
-
-        List<Customer> customerList = new ArrayList<>();
-        List<Company> companyList = new ArrayList<>();
-        List<Product> productList = new ArrayList<>();
-        if (customerId != 0) {
-            customerDao.findById(customerId).ifPresent(customer -> {
-                customerList.add(customer);
-                contractDto.setSelectedCustomer(customer);
-            });
-        }
-        if (customerList.isEmpty()) {
-            customerList.addAll(customerDao.findAll());
-        }
-        if (companyId != 0) {
-            companyDao.findById(companyId).ifPresent(company -> {
-                companyList.add(company);
-                contractDto.setSelectedCompany(company);
-            });
-        }
-        if (companyList.isEmpty()) {
-            companyList.addAll(companyDao.findAll());
-        }
-        if (productId != 0) {
-            productDao.findById(productId).ifPresent(product -> {
-                productList.add(product);
-                contractDto.setSelectedProduct(product);
-                contractDto.setSum(product.getPrice());
-            });
-        }
-        if (productList.isEmpty()) {
-            productList.addAll(productDao.findAllByCompanyIdOrderByName(companyId));
-        }
-        if (productList.isEmpty()) {
-            productList.addAll(productDao.findAll());
-        }
-
-        contractDto.setProducts(productList);
-        contractDto.setCompanies(companyList);
-        contractDto.setCustomers(customerList);
-        contractDto.setIssueDate(LocalDate.now());
-        contractDto.setStatus(ContractStatus.UNSIGNED);
-
-        return contractDto;
     }
 
     @Transactional
@@ -228,7 +172,8 @@ public class ContractService {
                 } else {
                     newStatus = UNSIGNED;
                 }
-                webSocketDistributeService.sendSignContractNotification(currentContract.getCompany().getUser().getUsername(), contractId);
+                webSocketDistributeService.sendSignContractNotification(currentContract.getCompany().getUser().getUsername(), contractId,
+                                                currentContract.getCustomer().getFullName());
                 break;
             case COMPANY:
                 if (currentStatus == UNSIGNED) {
@@ -238,13 +183,15 @@ public class ContractService {
                 } else {
                     newStatus = UNSIGNED;
                 }
-                webSocketDistributeService.sendSignContractNotification(currentContract.getCustomer().getUser().getUsername(), contractId);
+                webSocketDistributeService.sendSignContractNotification(currentContract.getCustomer().getUser().getUsername(), contractId,
+                                                currentContract.getCompany().getName());
                 break;
         }
 
         if (newStatus != currentStatus) {
             currentContract.setStatus(newStatus);
             contractDao.save(currentContract);
+            LOGGER.info(String.format("%s changed contract %s to new status %s", userUtil.getCurrentUser().getUsername(), contractId, newStatus));
         }
 
         return newStatus.toString();
@@ -285,9 +232,8 @@ public class ContractService {
         return contractDao.findFirstByOrderByIdDesc().get(0);
     }
 
-    public boolean isNotOverdue(int contractId) {
-        Contract currentContract = getById(contractId);
-        return currentContract != null && currentContract.getExpireDate().isAfter(LocalDate.now());
+    public boolean isOverdue(int contractId) {
+        return getById(contractId).getExpireDate().isBefore(LocalDate.now());
     }
 
     public boolean haveInvoices(int contractId) {

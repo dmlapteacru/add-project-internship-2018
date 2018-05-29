@@ -2,8 +2,10 @@ package com.endava.addprojectinternship2018.service;
 
 import com.endava.addprojectinternship2018.dao.CustomerDao;
 import com.endava.addprojectinternship2018.model.Customer;
+import com.endava.addprojectinternship2018.model.User;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -13,11 +15,18 @@ import java.util.Optional;
 @Service
 public class CustomerService {
 
-    @Autowired
-    private CustomerDao customerDao;
+    private final CustomerDao customerDao;
+    private final UserService userService;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final WebSocketDistributeService webSocketDistributeService;
 
     @Autowired
-    private UserService userService;
+    public CustomerService(CustomerDao customerDao, UserService userService, BCryptPasswordEncoder passwordEncoder, WebSocketDistributeService webSocketDistributeService) {
+        this.customerDao = customerDao;
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+        this.webSocketDistributeService = webSocketDistributeService;
+    }
 
     public List<Customer> getAllCustomers() {
         return customerDao.findAll();
@@ -42,8 +51,12 @@ public class CustomerService {
     @Transactional
     public void saveCustomer(CustomerDto customerDto) {
         customerDao.save(convertCustomerDtoToCustomer(customerDto));
+        User user = userService.getUserByUsername(customerDto.getUserDto().getUsername()).get();
+        user.setSocketToken(passwordEncoder.encode(webSocketDistributeService.generateSocketToken()).replace('/','a'));
+        userService.save(user);
     }
 
+    @Transactional
     public void save(Customer customer){
         customerDao.save(customer);
     }
@@ -55,7 +68,7 @@ public class CustomerService {
         customerDto.setCustomerId(customer.getId());
         customerDto.setEmail(customer.getEmail());
         customerDto.setCountNumber(customer.getCountNumber());
-        customerDto.setAccessKey(customer.getAccessKey());
+        customerDto.setBankKey(customer.getBankKey());
         customerDto.setUserDto(userService.convertUserToUserDto(customer.getUser()));
         return customerDto;
     }
@@ -67,7 +80,7 @@ public class CustomerService {
         customer.setLastName(customerDto.getLastName());
         customer.setEmail(customerDto.getEmail());
         customer.setCountNumber(customerDto.getCountNumber());
-        customer.setAccessKey(customerDto.getAccessKey());
+        customer.setBankKey(customerDto.getBankKey());
         customer.setUser(userService.convertUserDtoToUser(customerDto.getUserDto()));
         return customer;
     }

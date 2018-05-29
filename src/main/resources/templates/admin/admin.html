@@ -19,7 +19,7 @@
         <img id="load" src="/img/load_icon.gif"/>
     </div>
     <div class="logout_form">
-        <img src="/img/endava-logo.png"/>
+        <img src="/img/endava-logo.ico"/>
         <div class="logout_btn_wrap">
             <a th:href="@{/logout}" class="btn btn-danger" type="submit" value="Logout">Logout</a>
             <div class="time-date">
@@ -27,11 +27,8 @@
             </div>
             <div class="notification_wrapper">
                 <div class="notification">
-                    <div id="not_icon" class="notification_icon">
-                        <span id="not_count" value="0"></span>
-                    </div>
                     <div class="notification_link">
-                        <a id="show_not_link_down">Messages <i class="fas fa-angle-down"></i>
+                        <a id="show_not_link_down" class="notification_icon_chat" value="0">
                         </a>
                         <div class="notification_body">
                             <div id="notification_">
@@ -69,7 +66,7 @@
                             </th>
                             <th>
                                 <select class="sel_roles" disabled>
-                                    <option selected value="Roles">Roles</option>
+                                    <option selected value="Roles">User type</option>
                                     <option>COMPANY</option>
                                     <option>CUSTOMER</option>
                                     <option>ADMIN</option>
@@ -96,7 +93,7 @@
 
                         </thead>
                         <tbody class="filter_body">
-                        <tr th:each="user : ${users}">
+                        <tr th:each="user : ${users}" th:if="${user.username}!='admin'">
                             <td><input type="checkbox" th:value="${user.username}" class="checkbox_users_element"/></td>
                             <td class="filter_role" th:text="${user.role}" valign="center"></td>
                             <td th:text="${user.name}" valign="center"></td>
