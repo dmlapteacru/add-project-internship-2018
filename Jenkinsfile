@@ -58,7 +58,7 @@ pipeline {
     stage('Update service'){
         steps {
            sh 'aws ecs register-task-definition --requires-compatibilities FARGATE --network-mode awsvpc --cpu 2048 --memory 4096 --execution-role-arn ecsTaskExecutionRole --cli-input-json file://final-1-task-definition.json'
-           sh 'aws ecs update-service --cluster internship2018march --service java1new-service --task-definition java1new:6 '
+           sh 'aws ecs update-service --cluster internship2018march --service java1new-service --task-definition java1new:10 '
             }
     }
         
