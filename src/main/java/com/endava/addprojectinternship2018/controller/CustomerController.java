@@ -1,18 +1,26 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.model.*;
+import com.endava.addprojectinternship2018.model.Customer;
 import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
 import com.endava.addprojectinternship2018.model.dto.CustomerDto;
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;
 import com.endava.addprojectinternship2018.model.enums.InvoiceStatus;
-import com.endava.addprojectinternship2018.service.*;
+import com.endava.addprojectinternship2018.service.UserService;
+import com.endava.addprojectinternship2018.service.CustomerService;
+import com.endava.addprojectinternship2018.service.ProductService;
+import com.endava.addprojectinternship2018.service.CategoryService;
+import com.endava.addprojectinternship2018.service.ContractService;
+import com.endava.addprojectinternship2018.service.InvoiceService;
 import com.endava.addprojectinternship2018.util.UserUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.validation.Valid;
 import java.util.Arrays;

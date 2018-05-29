@@ -23,15 +23,12 @@ import static com.endava.addprojectinternship2018.model.enums.ContractStatus.ACT
 @Service
 public class ContractService {
 
-    @Autowired
     private UserUtil userUtil;
-
     private final ContractDao contractDao;
     private final InvoiceDao invoiceDao;
     private final CompanyDao companyDao;
     private final CustomerDao customerDao;
     private final ProductDao productDao;
-
     private final WebSocketDistributeService webSocketDistributeService;
 
     private static final Logger LOGGER = Logger.getLogger(ContractService.class);
@@ -48,8 +45,9 @@ public class ContractService {
         this.webSocketDistributeService = webSocketDistributeService;
     }
 
-    public List<Contract> getAllByCompanyName(String companyName) {
-        return contractDao.findAllByCompanyName(companyName);
+    @Autowired
+    public void setUserUtil(UserUtil userUtil) {
+        this.userUtil = userUtil;
     }
 
     public List<Contract> getAll() {

@@ -83,7 +83,4 @@ public class CompanyService {
         return company;
     }
 
-    public Company getCompanyByInvoiceId(int id){
-      return companyDao.findByInvoiceId(id);
-    }
 }

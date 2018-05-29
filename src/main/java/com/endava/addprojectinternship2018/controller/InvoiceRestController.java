@@ -35,11 +35,6 @@ public class InvoiceRestController {
 
     @PostMapping(value = "/editInvoice")
     public ResponseEntity editNewInvoiceFrom(@RequestBody @Valid InvoiceEditDto dto, BindingResult result) {
-        //TODO check if this invoice is of that company
-        //TODO get invoice by id ,change data that comes from modal dialog
-
-
-
         if (result.hasErrors()) {
             new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
@@ -53,9 +48,6 @@ public class InvoiceRestController {
 
     @PostMapping(value = "/createInvoice")
     public ResponseEntity createNewInvoiceFrom(@RequestBody @Valid InvoiceSaveNewDto dto, BindingResult result) {
-        //TODO check if this invoice is of that company
-        //TODO get invoice by id ,change data that comes from modal dialog
-        //TODO persist this entity
 
         boolean success = true;
 
@@ -63,8 +55,6 @@ public class InvoiceRestController {
         if (contract == null) {
             success = false;
         }
-
-        List<Invoice> list = invoiceService.getInvoiceInPeriodService(dto.getContractId(), dto.getIssueDate());
 
         Invoice invoice = new Invoice();
 
@@ -129,8 +119,6 @@ public class InvoiceRestController {
 
     @PostMapping(value = "/sendToCustomer")
     public String sendInvoiceToCustomer(@RequestParam int invoiceId) {
-        System.out.println("invoice_d:   " + invoiceId);
-        System.out.println("In sentToCustomer kkk");
         invoiceService.changeInvoiceStatusToSent(invoiceId);
         return "Ok";
     }
@@ -144,18 +132,12 @@ public class InvoiceRestController {
         return new ResponseEntity(invoiceList.size(),HttpStatus.OK);
     }
 
-
-
     @PostMapping(value = "/sendBulkToCustomer")
     public String sendBulkInvoiceToCustomer(@RequestBody Map<String, Object> data) {
 
         List<String> list = (List<String>) data.get("invoiceIDS");
-        list.forEach(s -> System.out.println(s));
         List<Integer> invoiceBulkIds = list.stream().map(Integer::parseInt).collect(Collectors.toList());
-        System.out.println("Size of the list:  " + invoiceBulkIds.size());
-        invoiceBulkIds.forEach(integer -> System.out.println(integer));
-        for (int id : invoiceBulkIds
-                ) {
+        for (int id : invoiceBulkIds) {
             invoiceService.changeInvoiceStatusToSent(id);
         }
         return "Ok";

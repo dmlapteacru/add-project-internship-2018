@@ -5,19 +5,19 @@ import com.endava.addprojectinternship2018.model.Notification;
 import com.endava.addprojectinternship2018.model.dto.CompanyDtoLight;
 import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.NotificationService;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "companyRest")
 public class CompanyRestController {
-
-    private static final Logger LOGGER = Logger.getLogger(CompanyRestController.class);
 
     private final CompanyService companyService;
     private final NotificationService notificationService;

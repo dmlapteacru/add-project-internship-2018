@@ -16,37 +16,16 @@ public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
 
     Optional<Invoice> findById(int id);
 
-    Optional<Invoice> findByContractId(int id);
-
     List<Invoice> findAllByContractId(int id);
 
     List<Invoice> findAll();
 
-    List<Invoice> findByContractIdOrderByIssueDate(int id);
-
-    List<Invoice> findAllByStatusOrderByIssueDate(InvoiceStatus invoiceStatus);
-
-    List<Invoice> findAllByIssueDate(LocalDate localDate);
-
-    List<Invoice> findAllByDueDate(LocalDate localDate);
-
-    List<Invoice> findAllByContractCustomerIdOrderByIssueDate(int id);
-
     List<Invoice> findAllByContractCustomerIdAndStatusIsInOrderByIssueDate(int customerId, List<InvoiceStatus> statuses);
-
-    List<Invoice> findAllByContract_Company_Name(String name);
 
     List<Invoice> findAllByContract_Company_IdOrderById(int id);
 
     @Query("select inv from Invoice inv join inv.contract contr where inv.serviceEndDate >=:date AND contr.id =:contract_id")
     List<Invoice> findInvoiceInPeriod(@Param("contract_id")int contract_id, @Param(  "date")LocalDate date);
-
-    @Query(value = "SELECT com.name as companyName, pr.name as productName FROM invoice i\n" +
-            "LEFT JOIN contract co on i.contract_id=co.id\n" +
-            "LEFT JOIN company com on com.id=co.company_id\n" +
-            "LEFT JOIN product pr on co.product_id=pr.id\n" +
-            "WHERE i.id=:id",nativeQuery = true)
-    List<Object[]> setInvoiceDescriptionPayment(@Param("id") int id);
 
     long countAllByContractCustomerIdAndStatus(int customerId, InvoiceStatus status);
 

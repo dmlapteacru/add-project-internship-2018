@@ -28,7 +28,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping(value = "productRest")
 public class ProductRestController {
 
-    @Autowired
     private UserUtil userUtil;
 
     private final ProductService productService;
@@ -38,6 +37,11 @@ public class ProductRestController {
     @Autowired
     public ProductRestController(ProductService productService) {
         this.productService = productService;
+    }
+
+    @Autowired
+    public void setUserUtil(UserUtil userUtil) {
+        this.userUtil = userUtil;
     }
 
     @RequestMapping(value = "/pdfExport", method = RequestMethod.GET,

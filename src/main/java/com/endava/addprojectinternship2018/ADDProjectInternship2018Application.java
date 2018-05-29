@@ -28,8 +28,15 @@ public class ADDProjectInternship2018Application extends SpringBootServletInitia
     @Value("${bank.connection.endpoint}")
     private String bankEndpoint;
 
-    @Autowired
+    @Value("${websocket.token.generate.chars}")
+    private String chars;
+
     private ObjectMapper objectMapper;
+
+    @Autowired
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(ADDProjectInternship2018Application.class, args);
@@ -69,6 +76,12 @@ public class ADDProjectInternship2018Application extends SpringBootServletInitia
     @Qualifier("bank_ip")
     public String bankIP() {
         return bankEndpoint;
+    }
+
+    @Bean
+    @Qualifier("token_chars")
+    public String tokenChars() {
+        return chars;
     }
 
     @Bean

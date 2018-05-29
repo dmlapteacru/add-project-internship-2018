@@ -12,9 +12,14 @@ import com.endava.addprojectinternship2018.validation.Validator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -32,9 +37,7 @@ import static org.springframework.http.HttpStatus.*;
 @RestController
 public class BankRestController {
 
-    @Autowired
     private UserUtil userUtil;
-
     private final String bankIP;
     private final RestTemplate restTemplate;
     private final UserBankAccountService userBankAccountService;
@@ -56,6 +59,11 @@ public class BankRestController {
         this.invoiceService = invoiceService;
         this.validator = validator;
         this.encryptionUtils = encryptionUtils;
+    }
+
+    @Autowired
+    public void setUserUtil(UserUtil userUtil) {
+        this.userUtil = userUtil;
     }
 
     @PostMapping(value = "/bankAccount/create")
@@ -125,7 +133,7 @@ public class BankRestController {
     }
 
     @PostMapping(value = "/bankAccount/payinvoice")
-    public ResponseEntity<?> payInvoice(@RequestBody int invoiceId) throws NoBankAccountException {
+    public ResponseEntity<?> payInvoice(@RequestBody int invoiceId) {
 
         String currentCustomerName = userUtil.getCurrentCustomer().getFullName();
 
@@ -229,7 +237,7 @@ public class BankRestController {
         }
 
         validator.validateStatementDates(dateReqDto, error);
-        if (error.hasErrors()) {
+        if (error != null && error.hasErrors()) {
             LOGGER.error(error.getFieldError().getDefaultMessage());
             return new ResponseEntity<>(error.getFieldError().getCode(), PRECONDITION_FAILED);
         }

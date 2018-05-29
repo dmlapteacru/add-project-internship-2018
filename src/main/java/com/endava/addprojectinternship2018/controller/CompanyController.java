@@ -1,6 +1,8 @@
 package com.endava.addprojectinternship2018.controller;
 
-import com.endava.addprojectinternship2018.model.*;
+import com.endava.addprojectinternship2018.model.Company;
+import com.endava.addprojectinternship2018.model.Contract;
+import com.endava.addprojectinternship2018.model.Invoice;
 import com.endava.addprojectinternship2018.model.dto.AdvancedFilter;
 import com.endava.addprojectinternship2018.model.dto.CompanyDto;
 import com.endava.addprojectinternship2018.model.enums.ContractStatus;

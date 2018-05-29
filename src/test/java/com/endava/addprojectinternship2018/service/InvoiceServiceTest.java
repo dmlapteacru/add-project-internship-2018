@@ -29,7 +29,7 @@ public class InvoiceServiceTest {
     public void init(){
         invoiceDao = Mockito.mock(InvoiceDao.class);
         webSocketDistributeService = Mockito.mock(WebSocketDistributeService.class);
-        invoiceService=new InvoiceService(invoiceDao,null,webSocketDistributeService,null);
+        invoiceService=new InvoiceService(invoiceDao,webSocketDistributeService,null);
     }
 
 

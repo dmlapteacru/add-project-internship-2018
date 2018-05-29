@@ -2,10 +2,7 @@ package com.endava.addprojectinternship2018.controller;
 
 import com.endava.addprojectinternship2018.model.Contract;
 import com.endava.addprojectinternship2018.model.dto.ContractDto;
-import com.endava.addprojectinternship2018.service.CompanyService;
 import com.endava.addprojectinternship2018.service.ContractService;
-import com.endava.addprojectinternship2018.service.CustomerService;
-import com.endava.addprojectinternship2018.service.ProductService;
 import com.endava.addprojectinternship2018.util.UserUtil;
 import com.endava.addprojectinternship2018.validation.ErrorMessage;
 import com.endava.addprojectinternship2018.validation.ValidationResponse;
@@ -14,8 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -23,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 @RequestMapping(value = "contractRest")
@@ -120,7 +119,7 @@ public class ContractRestController {
         return response;
     }
 
-    @RequestMapping(value = "/deleteContract", method = POST)
+    @PostMapping(value = "/deleteContract")
     public ResponseEntity<?> deleteContract(@RequestParam(name = "contractId") int contractId) {
         LOGGER.info(String.format("%s: attempt to delete contract: %s", userUtil.getCurrentUser().getUsername(), contractId));
         Set<String> deleteResult = contractService.deleteContract(contractId);

@@ -1,11 +1,10 @@
 package com.endava.addprojectinternship2018.service;
 
-import com.endava.addprojectinternship2018.controller.ContractRestController;
 import com.endava.addprojectinternship2018.model.Notification;
 import com.endava.addprojectinternship2018.model.enums.NotificationCase;
-import com.endava.addprojectinternship2018.model.enums.NotificationStatus;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +24,10 @@ public class WebSocketDistributeService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    @Qualifier("token_chars")
+    private String CHARS;
 
     private static final Logger LOGGER = Logger.getLogger(WebSocketDistributeService.class);
 
@@ -52,14 +55,12 @@ public class WebSocketDistributeService {
         messagingTemplate.convertAndSendToUser(userService.getUserByUsername("admin").get().getSocketToken(), "/queue/messages", "NOTIFICATION");
     }
     public String generateSocketToken(){
-        String CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
         StringBuilder uniqueID = new StringBuilder();
         Random random = new Random();
         while (uniqueID.length() < 18) {
             int index = (int) (random.nextFloat() * CHARS.length());
             uniqueID.append(CHARS.charAt(index));
         }
-        String token = uniqueID.toString();
-        return token;
+        return uniqueID.toString();
     }
 }
