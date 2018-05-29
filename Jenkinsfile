@@ -8,6 +8,10 @@ pipeline {
     stages {
         stage('Install') {
              steps {
+                 script {
+                    version = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.version | grep -e "^[^[]" | sed "s/-SNAPSHOT//g"')
+                    version = version.trim()
+                 }
                 sh 'mvn clean install -DskipTests'
             }
         }
@@ -18,13 +22,13 @@ pipeline {
         //     }
         // }
 
-        // stage('Sonar scan') {
-        //     steps {
-        //         withSonarQubeEnv('New Sonar Endava') {
-        //             sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar'
-        //         }
-        //     }
-        // }
+        stage('Sonar scan') {
+            steps {
+                withSonarQubeEnv('New Sonar Endava') {
+                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.2:sonar'
+                }
+            }
+        }
 
         stage('Build dockerfile') {
             steps {
@@ -41,8 +45,8 @@ pipeline {
 
                         sh 'aws ecr get-login --no-include-email | bash'
                         
-                        sh 'docker tag internship_java_team1_spring_2018 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:v0.1.0'
-                        sh 'docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:v0.1.0'
+                        sh "docker tag internship_java_team1_spring_2018 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:$version"
+                        sh "docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:$version"
 
                         
             }
