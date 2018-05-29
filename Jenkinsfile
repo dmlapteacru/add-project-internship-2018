@@ -12,7 +12,13 @@ pipeline {
                     version = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.version | grep -e "^[^[]" | sed "s/-SNAPSHOT//g"')
                     version = version.trim()
                  }
+                sh "mvn versions:set -DnewVersion=$version-$env.BUILD_NUMBER"
                 sh 'mvn clean install -DskipTests'
+
+                script {
+                    version2 = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.version | grep -e "^[^[]" | sed "s/-SNAPSHOT//g"')
+                    version2 = version2.trim()
+                 }
             }
         }
 
@@ -48,8 +54,8 @@ pipeline {
                         
                        // sh "docker tag internship_java_team1_spring_2018 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:$version"
                        // sh "docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:$version"
-                          sh "docker tag final-1:latest 543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:$version"
-                          sh "docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:$version"
+                          sh "docker tag final-1:latest 543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:$version2"
+                          sh "docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:$version2"
                         
             }
         }
@@ -58,7 +64,7 @@ pipeline {
     stage('Update service'){
         steps {
            sh 'aws ecs register-task-definition --requires-compatibilities FARGATE --network-mode awsvpc --cpu 2048 --memory 4096 --execution-role-arn ecsTaskExecutionRole --cli-input-json file://final-1-task-definition.json'
-           sh 'aws ecs update-service --cluster internship2018march --service java1new-service --task-definition java1new:10 '
+           sh 'aws ecs update-service --cluster internship2018march --service java1new-service --task-definition java1new:11 '
             }
     }
         

@@ -4,7 +4,7 @@
       "environment": [],
       "name": "java1new-container",
       "mountPoints": [],
-      "image": "543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:v0.1.0",
+      "image": "543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:v0.1.0-85",
       "cpu": 0,
       "portMappings": [
         {
