@@ -17,9 +17,9 @@
 <body>
 <div class="header_wrapper" th:fragment="header">
         <div class="menu_left">
-            <!--<div class="logo_wrapper">-->
-                <!--<a class="logo" href="#"><img src="/img/endava-logo.ico"/></a>-->
-            <!--</div>-->
+            <div class="logo_wrapper">
+                <a class="logo" href="#"><img src="/img/logo-white.png"/></a>
+            </div>
             <ul class="menu" sec:authorize="hasAuthority('CUSTOMER')">
                 <li><a th:href="@{/customer/home}" class="menu_item i_home"><div class="menu_icon"><i class="fas fa-home"></i></div> <span>HOME</span> </a></li>
                 <li><a th:href="@{/customer/services}" class="menu_item i_services"><div class="menu_icon"><i class="fas fa-tag"></i></div><span>SERVICES</span> </a></li>
