@@ -28,7 +28,7 @@ pipeline {
 
         stage('Build dockerfile') {
             steps {
-                sh 'docker build -t final-1 .'  
+                sh 'docker build -t internship_java_team1_spring_2018 .'  
             }
         }
 
@@ -41,16 +41,19 @@ pipeline {
 
                         sh 'aws ecr get-login --no-include-email | bash'
                         
-                        sh 'docker tag internship_java_team1_spring_2018:latest 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:latest'
-                        sh 'docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:latest'
-
                         sh 'docker tag internship_java_team1_spring_2018 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:v0.1.0'
                         sh 'docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:v0.1.0'
 
-                        //sh 'docker tag final-1:latest 543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:latest'
-                        //sh 'docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:latest'
+                        
             }
         }
+    }
+
+    stage('Update service'){
+        steps {
+           sh 'aws ecs register-task-definition --requires-compatibilities FARGATE --network-mode awsvpc --cpu 2048 --memory 4096 --execution-role-arn ecsTaskExecutionRole --cli-input-json file://final-1-task-definition.json'
+           sh 'aws ecs update-service --cluster internship2018march --service java1new-service --task-definition final-1-task-definition:10'
+            }
     }
         
     }     
