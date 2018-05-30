@@ -10,10 +10,11 @@ pipeline {
              steps {
                 script {
                     url = 'http://othervpcdotnet-1019633969.us-east-1.elb.amazonaws.com:5001'
-                    link_net = readFile 'src/main/resources/application.properties'
-                    link_net = link_net.replaceFirst("/(bank.connection.endpoint=).+api\$/", "\$1${url}/api")
-                    echo link_net
-                    writeFile file: 'src/main/resources/application.properties', text: "$link_net"
+                    // link_net = readFile 'src/main/resources/application.properties'
+                    // link_net = link_net.replaceFirst("/(bank.connection.endpoint=).+api\$/", "\$1${url}/api")
+                    // echo link_net
+                    // writeFile file: 'src/main/resources/application.properties', text: "$link_net"
+                    sh "sed -i 's/\bank.connection.endpoint=s\b&$url/'"
                     sh 'cat src/main/resources/application.properties'
                 }
                 script {
