@@ -12,5 +12,4 @@ import java.time.LocalDate;
 public class StatementDateReqDto {
     private String date;
     private String dateTo;
-    private int pages;
 }

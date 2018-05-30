@@ -3,8 +3,6 @@ package com.endava.addprojectinternship2018.service;
 import com.endava.addprojectinternship2018.dao.PasswordTokenDao;
 import com.endava.addprojectinternship2018.model.PasswordToken;
 import com.endava.addprojectinternship2018.model.dto.UserEmailDto;
-import com.endava.addprojectinternship2018.model.dto.UserWithProfileDto;
-import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

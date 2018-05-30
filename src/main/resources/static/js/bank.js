@@ -78,7 +78,6 @@ $("#btn_statement_req").click(function () {
 
 function loadStatement(data) {
     $(".table_statement tbody").html("");
-    //$("#curr_balance").append("<br><span style='color: orange'>" + data.startBalance + " MDL</span>");
     addRowToTable("a" , "", "", "start balance", "", data.startBalance.toFixed(2));
     var endBalance = data.startBalance;
     $.each(data.listOfTransactions, function (id, object) {
@@ -90,7 +89,8 @@ function loadStatement(data) {
 
 function addRowToTable(id, date, name, description, sum, balance) {
     $(".table_statement tbody").append("<tr id='" + id + "'></tr>");
-    $(".table_statement tbody tr[id='" + id + "']").append("<td>" + date + "</td>" +
+    var dateFormat = (date !== '' ? moment(date).format('DD.MM.YYYY HH:mm:ss') : date);
+    $(".table_statement tbody tr[id='" + id + "']").append("<td>" + dateFormat + "</td>" +
                                                            "<td>" + name + "</td>" +
                                                            "<td>" + description + "</td>");
     if (sum > 0) {

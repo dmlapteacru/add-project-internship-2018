@@ -32,9 +32,7 @@ import javax.validation.Valid;
 @RequestMapping(value = "registration")
 public class UserRegistrationController {
 
-    @Autowired
     private UserService userService;
-
     private final CustomerService customerService;
     private final CompanyService companyService;
     private final LoginAuthenticationSuccessHandler loginAuthenticationSuccessHandler;
@@ -51,6 +49,11 @@ public class UserRegistrationController {
         this.loginAuthenticationSuccessHandler = loginAuthenticationSuccessHandler;
         this.messagingTemplate = messagingTemplate;
         this.notificationService = notificationService;
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping(value = "")
@@ -103,7 +106,6 @@ public class UserRegistrationController {
         return "registration/company";
     }
 
-
     @PostMapping(value = "company")
     public String registerCompany(@ModelAttribute("companyDto") @Valid CompanyDto companyDto,
                                   BindingResult result, Model model) {
@@ -111,17 +113,14 @@ public class UserRegistrationController {
         if (result.hasErrors()) {
             return "registration/company";
         }
-
         if (companyDto.getName().matches(PATTERN)) {
             result.rejectValue("name", "name.error", "Name contains illegal characters");
             return "registration/company";
         }
-
         if (userService.getUserByUsername(companyDto.getUserDto().getUsername()).isPresent()) {
             result.rejectValue("username", "username.error", "Username is not unique");
             return "registration/company";
         }
-
         if (companyService.getCompanyByEmail(companyDto.getEmail()).isPresent()) {
             result.rejectValue("email", "email.error", "Email is not unique");
             return "registration/company";
@@ -142,22 +141,18 @@ public class UserRegistrationController {
         if (result.hasErrors()) {
             return "registration/customer";
         }
-
         if (customerDto.getFirstName().matches(PATTERN)) {
             result.rejectValue("firstName", "firstName.error", "First name contains illegal characters");
             return "registration/customer";
         }
-
         if (customerDto.getLastName().matches(PATTERN)) {
             result.rejectValue("lastName", "lastName.error", "Last name contains illegal characters");
             return "registration/customer";
         }
-
         if (customerService.getCustomerByEmail(customerDto.getEmail()).isPresent()) {
             result.rejectValue("email", "email.error", "Email is not unique");
             return "registration/customer";
         }
-
         if (userService.getUserByUsername(customerDto.getUserDto().getUsername()).isPresent()) {
             result.rejectValue("userDto.username", "username.error", "Username is not unique");
             return "registration/customer";

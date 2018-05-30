@@ -8,8 +8,6 @@ import com.endava.addprojectinternship2018.service.ContractService;
 import com.endava.addprojectinternship2018.service.InvoiceService;
 import com.endava.addprojectinternship2018.validation.ErrorMessage;
 import com.endava.addprojectinternship2018.validation.ValidationResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

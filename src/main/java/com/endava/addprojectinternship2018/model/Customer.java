@@ -1,6 +1,5 @@
 package com.endava.addprojectinternship2018.model;
 
-import com.endava.addprojectinternship2018.model.dto.UserBankAccountDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,6 +25,9 @@ public class Customer {
 
     @Column
     private String email;
+
+    @Column
+    private Long accessKey;
 
     @Column
     private Long countNumber = null;

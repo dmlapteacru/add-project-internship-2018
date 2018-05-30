@@ -1,10 +1,8 @@
 package com.endava.addprojectinternship2018.dao;
 
 import com.endava.addprojectinternship2018.model.User;
-import com.endava.addprojectinternship2018.model.dto.UserBankAccountDto;
 import com.endava.addprojectinternship2018.model.dto.UserWithProfileDto;
 import com.endava.addprojectinternship2018.model.dto.UserEmailDto;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
