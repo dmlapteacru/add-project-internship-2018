@@ -41,7 +41,7 @@ $(".btn").click(function () {
                 contentType: "application/json",
                 data: JSON.stringify(object),
                 success: function () {
-                    location.href = "http://localhost:8080/login";
+                    location.href = "/login";
                 }
             }
         )

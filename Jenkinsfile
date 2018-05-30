@@ -33,8 +33,8 @@ pipeline {
 
         stage('Build dockerfile') {
             steps {
-                //sh 'docker build -t internship_java_team1_spring_2018 .'  
-                sh 'docker build -t final-1 .'
+                sh 'docker build -t internship_java_team1 .'  
+               // sh 'docker build -t final-1 .'
             }
         }
 
@@ -47,10 +47,10 @@ pipeline {
 
                         sh 'aws ecr get-login --no-include-email | bash'
                         
-                       // sh "docker tag internship_java_team1_spring_2018 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:$version"
-                       // sh "docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:$version"
-                        sh "docker tag final-1:latest 543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:$version2"
-                        sh "docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:$version2"
+                         sh "docker tag internship_java_team1 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:$version2"
+                         sh "docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:$version2"
+                        //sh "docker tag final-1:latest 543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:$version2"
+                        //sh "docker push 543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:$version2"
                         
             }
         }
@@ -63,16 +63,14 @@ pipeline {
             //  task_def = task_def.replace("/(543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:)*\"/", "\$1$version2")
             //  writeFile file: 'final-1-task-definition.json', text: "$task_def"
             //  echo task_def
-                task_def = sh(returnStdout: true, script: "sed -e \"s/0.2.0-*/$version2/\" final-1-task-definition.json")
-                echo task_def
-                writeFile file: 'final-1-task-definition.json', text: "$task_def"
           }
+           sh "sed -ie 's/0.2.0-.*/$version2\",/' final-1-task-definition.json"
            sh 'aws ecs register-task-definition --requires-compatibilities FARGATE --network-mode awsvpc --cpu 2048 --memory 4096 --execution-role-arn ecsTaskExecutionRole --cli-input-json file://final-1-task-definition.json'
            sh 'aws ecs describe-task-definition --task-definition java1new > taskdef.json'
            script {
-                rev_ver = sh(returnStdout: true, script:'aws ecs describe-task-definition --task-definition java1new | grep "revision" | cut -d: -f2 | cut -d, -f1 | tr -d " " ')
+                rev_ver = sh(returnStdout: true, script:'aws ecs describe-task-definition --task-definition internship-java-team1-taskdef | grep "revision" | cut -d: -f2 | cut -d, -f1 | tr -d " " ')
            }
-           sh "aws ecs update-service --cluster internship2018march --service java1new-service --task-definition java1new:$rev_ver "
+           sh "aws ecs update-service --cluster internship-spring-2018 --service internship-java-team1-service --task-definition internship-java-team1-taskdef:$rev_ver "
         }
     }
         

@@ -2,9 +2,9 @@
   "containerDefinitions": [
     {
       "environment": [],
-      "name": "java1new-container",
+      "name": "internship-java-team1-container",
       "mountPoints": [],
-      "image": "543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:0.2.0-91",
+      "image": "543633097370.dkr.ecr.us-east-1.amazonaws.com/internship_java_team1_spring_2018:0.2.0-91",
       "cpu": 2048,  
       "portMappings": [
         {
@@ -18,5 +18,5 @@
       "volumesFrom": []
     }
   ],
-  "family": "java1new"
+  "family": "internship-java-team1-taskdef"
 }
