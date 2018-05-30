@@ -124,20 +124,20 @@ public class UserService {
 
     public UserBankAccountDto getUserBankAccount() throws NoBankAccountException {
         long countNumber;
-        BankKey bankKey;
+        long accessKey;
         if (userUtil.getCurrentUser().getRole() == Role.COMPANY) {
             Company currentCompany = userUtil.getCurrentCompany();
             countNumber = currentCompany.getCountNumber();
-            bankKey = currentCompany.getBankKey();
+            accessKey = currentCompany.getAccessKey();
         } else {
             Customer currentCustomer = userUtil.getCurrentCustomer();
             countNumber = currentCustomer.getCountNumber();
-            bankKey = currentCustomer.getBankKey();
+            accessKey = currentCustomer.getAccessKey();
         }
         if (countNumber == 0) {
             throw new NoBankAccountException();
         }
-        return new UserBankAccountDto(countNumber, bankKey.getModulus(), bankKey.getPrivateKey());
+        return new UserBankAccountDto(countNumber, accessKey);
     }
 
     public void setSocketToken() {

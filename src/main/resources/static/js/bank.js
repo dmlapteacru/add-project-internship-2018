@@ -16,7 +16,9 @@ $("#create_account").click(function () {
             success: function () {
                 $("#load_icon_wrapper").modal("hide");
                 showAlert('Success', 'Bank account was created');
-                location.reload();
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
             },
             error: function () {
                 $("#load_icon_wrapper").modal("hide");
@@ -38,7 +40,9 @@ $(".add_money").submit(function (e) {
                 $(".btn_add_money_toggle").click();
                 $("#money_sum").val("0.0");
                 loadBalance();
-                location.reload();
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
             },
             error: function (response) {
                 $("#load_icon_wrapper").modal("hide");
@@ -76,29 +80,50 @@ $("#btn_statement_req").click(function () {
     }
 });
 
-function loadStatement(data) {
-    $(".table_statement tbody").html("");
-    //$("#curr_balance").append("<br><span style='color: orange'>" + data.startBalance + " MDL</span>");
-    addRowToTable("a" , "", "", "start balance", "", data.startBalance.toFixed(2));
-    var endBalance = data.startBalance;
-    $.each(data.listOfTransactions, function (id, object) {
-        addRowToTable(id, object.date, object.partnerName, object.description, object.sum.toFixed(2), object.currentBalance.toFixed(2));
-        endBalance = object.currentBalance;
-    });
-    addRowToTable("z", "", "", "end balance", "", endBalance.toFixed(2));
-}
+// function loadStatement(data) {
+//     $(".table_statement tbody").html("");
+//     //$("#curr_balance").append("<br><span style='color: orange'>" + data.startBalance + " MDL</span>");
+//     addRowToTable("a" , "", "", "start balance", "", data.startBalance.toFixed(2));
+//     var endBalance = data.startBalance;
+//     $.each(data.listOfTransactions, function (id, object) {
+//         addRowToTable(id, object.date, object.partnerName, object.description, object.sum.toFixed(2), object.currentBalance.toFixed(2));
+//         endBalance = object.currentBalance;
+//     });
+//     addRowToTable("z", "", "", "end balance", "", endBalance.toFixed(2));
+// }
+//
+// function addRowToTable(id, date, name, description, sum, balance) {
+//     $(".table_statement tbody").append("<tr id='" + id + "'></tr>");
+//     $(".table_statement tbody tr[id='" + id + "']").append("<td>" + date + "</td>" +
+//                                                            "<td>" + name + "</td>" +
+//                                                            "<td>" + description + "</td>");
+//     if (sum > 0) {
+//         $(".table_statement tbody tr[id='" + id + "']").append("<td class='income'>" + sum + "</td>");
+//     } else {
+//         $(".table_statement tbody tr[id='" + id + "']").append("<td class='loss'>" + sum + "</td>");
+//     }
+//     $(".table_statement tbody tr[id='" + id + "']").append("<td style='color: orange; font-weight: bold;'>" + balance + "</td>");
+// }
 
-function addRowToTable(id, date, name, description, sum, balance) {
-    $(".table_statement tbody").append("<tr id='" + id + "'></tr>");
-    $(".table_statement tbody tr[id='" + id + "']").append("<td>" + date + "</td>" +
-                                                           "<td>" + name + "</td>" +
-                                                           "<td>" + description + "</td>");
-    if (sum > 0) {
-        $(".table_statement tbody tr[id='" + id + "']").append("<td class='income'>" + sum + "</td>");
-    } else {
-        $(".table_statement tbody tr[id='" + id + "']").append("<td class='loss'>" + sum + "</td>");
-    }
-    $(".table_statement tbody tr[id='" + id + "']").append("<td style='color: orange; font-weight: bold;'>" + balance + "</td>");
+function loadStatement(data) {
+    $("#bal-change").html("+/-");
+    $(".table_statement tbody").html("");
+    $("#bal-change").append("<br><span style='color: orange'>" + data.balanceBefore+ " MDL</span>");
+    var sumFinal = data.balanceBefore;
+    $.each(data.listOfTransactions, function (id, object) {
+        $(".table_statement tbody").append("<tr id='"+id+"'></tr>");
+        $(".table_statement tbody tr[id='"+id+"']").append("<td>"+ dateParse(object.date)+"</td><td>"+object.description+"</td>");
+        if (object.correspondentCount === 1){
+            $(".table_statement tbody tr[id='"+id+"']").append("<td class='income'>"+ object.sum+"</td>");
+        } else {
+            $(".table_statement tbody tr[id='"+id+"']").append("<td class='loss'>"+ object.sum+"</td>");
+        }
+        sumFinal+=object.sum;
+    });
+    $(".table_statement tbody").append("<tr" +
+        "><td></td><td style='color: orange; font-weight: bold;'>Current SUM :</td>" +
+        "<td style='color: orange; font-weight: bold;'><span>"+sumFinal+" MDL</span></td>" +
+        "</tr>");
 }
 
 function dateParse(date) {

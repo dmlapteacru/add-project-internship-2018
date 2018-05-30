@@ -109,10 +109,10 @@ body {
     display: flex;
     justify-content:center;
     padding: 5px 8px;
-    background-color: rgba(82, 184, 213,0.7);
-    border: 1px solid rgba(82, 184, 213,0.7);
+    background-color: rgba(68, 176, 210, 1);
+    border: 1px solid rgba(68, 176, 210, 1);
     border-radius: 20px;
-    color: #f2f2f2;
+    color: #fff;
     font-family: Roboto, sans-serif;
     font-size: 12px;
     font-weight: normal;

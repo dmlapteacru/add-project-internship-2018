@@ -179,12 +179,12 @@ public class InvoiceService {
         Contract currentContract = currentInvoice.getContract();
         Long companyCount = currentContract.getCompany().getCountNumber();
         PaymentDto paymentDto = new PaymentDto();
-        paymentDto.setC(companyCount);
-        paymentDto.setS(currentInvoice.getSum());
+        paymentDto.setCorrespondentCount(companyCount);
+        paymentDto.setSum(currentInvoice.getSum());
         if (companyCount == null) {
-            paymentDto.setD("Company " + currentContract.getCompany().getName() + " has not bank account!");
+            paymentDto.setDescription("Company " + currentContract.getCompany().getName() + " has not bank account!");
         } else {
-            paymentDto.setD("invoiceId=" + invoiceId);
+            paymentDto.setDescription("invoiceId=" + invoiceId);
         }
         return paymentDto;
     }

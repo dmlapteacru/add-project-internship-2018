@@ -67,7 +67,7 @@ public class CompanyService {
         companyDto.setCompanyId(company.getId());
         companyDto.setEmail(company.getEmail());
         companyDto.setCountNumber(company.getCountNumber());
-        companyDto.setBankKey(company.getBankKey());
+//        companyDto.setBankKey(company.getBankKey());
         companyDto.setUserDto(userService.convertUserToUserDto(company.getUser()));
         return companyDto;
     }
@@ -77,7 +77,7 @@ public class CompanyService {
                 .orElseGet(Company::new);
         company.setName(companyDto.getName());
         company.setEmail(companyDto.getEmail());
-        company.setBankKey(companyDto.getBankKey());
+//        company.setBankKey(companyDto.getBankKey());
         company.setCountNumber(companyDto.getCountNumber());
         company.setUser(userService.convertUserDtoToUser(companyDto.getUserDto()));
         return company;

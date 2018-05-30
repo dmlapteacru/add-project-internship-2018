@@ -12,10 +12,7 @@ import com.endava.addprojectinternship2018.validation.Validator;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -68,29 +65,11 @@ public class BankRestController {
 
     @PostMapping(value = "/bankAccount/create")
     public ResponseEntity<UserBankAccountDto> newAccount() {
-
-        KeyPair keyPair = encryptionUtils.generateKeyPair();
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        String modulus = encryptionUtils.getModulus(publicKey);
-        UserBankAccountDto dto = new UserBankAccountDto();
-        try {
-            encryptionUtils.init(null, keyPair.getPrivate().getEncoded());
-        } catch (InvalidKeySpecException e) {
-            LOGGER.error(e.getMessage());
-            return new ResponseEntity<>(dto, BAD_REQUEST);
-        }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        HttpEntity request = new HttpEntity<>(modulus, headers);
-        ResponseEntity<Object> response = restTemplate.postForEntity(bankIP + "/bankaccount/create", request, Object.class);
-        try {
-            dto = (UserBankAccountDto) encryptionUtils.decryptData(response.getBody().toString(), UserBankAccountDto.class);
-            userBankAccountService.save(dto, keyPair);
-        } catch (BadPaddingException | IllegalBlockSizeException | IOException | InvalidKeyException e) {
-            LOGGER.error(e.getMessage());
-            return new ResponseEntity<>(dto, BAD_REQUEST);
-        }
-
+        HttpEntity request = new HttpEntity<>("param", headers);
+        UserBankAccountDto response = restTemplate.postForObject(bankIP + "/bankaccount/create", request, UserBankAccountDto.class);
+        userBankAccountService.save(response);
         return new ResponseEntity<>(OK);
     }
 
@@ -112,7 +91,7 @@ public class BankRestController {
         }
         HttpHeaders headers;
         try {
-            headers = initEncriptedHeaders();
+            headers = initHeaders();
         } catch (NoBankAccountException | NoBankConnectionException ex) {
             LOGGER.error(ex.getMessage());
             return new ResponseEntity<>(ex.getMessage(), BAD_REQUEST);
@@ -120,8 +99,7 @@ public class BankRestController {
         Map<String, Double> body = new HashMap<>();
         body.put("sum", sum);
         try {
-            String encryptedData = encryptionUtils.encryptData(body);
-            HttpEntity<String> request = new HttpEntity<>(encryptedData, headers);
+            HttpEntity<Map> request = new HttpEntity<>(body, headers);
             restTemplate.postForObject(bankIP + "/bankaccount/addmoney", request, String.class);
         } catch (Exception ex) {
             LOGGER.error("add money error: " + ex.getMessage());
@@ -142,7 +120,7 @@ public class BankRestController {
         double balance;
         try {
             balance = getBalance();
-            headers = initEncriptedHeaders();
+            headers = initHeaders();
         } catch (NoBankAccountException | NoBankConnectionException ex) {
             return new ResponseEntity<>(ex.getMessage(), PRECONDITION_FAILED);
         }
@@ -156,8 +134,7 @@ public class BankRestController {
 
         ResponseEntity<Object> response;
         try {
-            String encrypted = encryptionUtils.encryptData(paymentDto);
-            HttpEntity<String> request = new HttpEntity<>(encrypted, headers);
+            HttpEntity<PaymentDto> request = new HttpEntity<>(paymentDto, headers);
             response = restTemplate.postForEntity(bankIP + "/sendmoney/sendmoney", request, Object.class);
         } catch (Exception ex) {
             LOGGER.error(currentCustomerName + ": " + ex.getMessage());
@@ -194,7 +171,7 @@ public class BankRestController {
         double balance;
         try {
             balance = getBalance();
-            headers = initEncriptedHeaders();
+            headers = initHeaders();
         } catch (NoBankAccountException | NoBankConnectionException ex) {
             return new ResponseEntity<>(ex.getMessage(), PRECONDITION_FAILED);
         }
@@ -210,8 +187,7 @@ public class BankRestController {
 
         ResponseEntity<Object> response;
         try {
-            String encrypted = encryptionUtils.encryptData(paymentDtoList);
-            HttpEntity<String> request = new HttpEntity<>(encrypted, headers);
+            HttpEntity<List<PaymentDto>> request = new HttpEntity<>(paymentDtoList, headers);
             response = restTemplate.postForEntity(bankIP + "/sendmoney/bulkpayment", request, Object.class);
         } catch (Exception ex) {
             LOGGER.error(currentCustomerName + " bulk payment: " + ex.getMessage());
@@ -230,7 +206,7 @@ public class BankRestController {
 
         HttpHeaders headers;
         try {
-            headers = initEncriptedHeaders();
+            headers = initHeaders();
         } catch (NoBankAccountException | NoBankConnectionException ex) {
             LOGGER.error(ex.getMessage());
             return new ResponseEntity<>(ex.getMessage(), PRECONDITION_FAILED);
@@ -242,39 +218,26 @@ public class BankRestController {
             return new ResponseEntity<>(error.getFieldError().getCode(), PRECONDITION_FAILED);
         }
 
-        List<TransactionRequestDto> allTransactions = new LinkedList<>();
-        int totalPages = 1;
-        double balanceBefore = 0;
-        for (int i = 1; i <= totalPages; i++) {
-            dateReqDto.setPages(i);
-            try {
-                String encrypted = encryptionUtils.encryptData(dateReqDto);
-                HttpEntity<String> request = new HttpEntity<>(encrypted, headers);
-                String encoded = restTemplate.postForObject(bankIP + "/statement/statement", request, Object.class).toString();
-                StatementRequestDto statementRequestDto = (StatementRequestDto) encryptionUtils.decryptData(encoded, StatementRequestDto.class);
-                totalPages = statementRequestDto.getP();
-                balanceBefore = statementRequestDto.getBf();
-                allTransactions.addAll(statementRequestDto.getListOfTransactions());
-            } catch (Exception ex) {
-                LOGGER.error(ex.getMessage());
-                return new ResponseEntity<>("No connection with bank.", BAD_REQUEST);
-            }
+
+
+        HttpEntity<StatementDateReqDto> request = new HttpEntity<>(dateReqDto, headers);
+        ResponseEntity<Object> response;
+        try {
+            response = restTemplate.exchange(bankIP + "/statement/statement", HttpMethod.POST, request, Object.class);
+        } catch (Exception ex){
+            return new ResponseEntity<>("No connection with bank.", HttpStatus.BAD_REQUEST);
         }
-
-        StatementDto statementDto = userBankAccountService.createStatementDto(balanceBefore, allTransactions);
-
-        return new ResponseEntity<>(statementDto, OK);
+        return new ResponseEntity<>(response.getBody(), HttpStatus.OK);
     }
 
-    private HttpHeaders initEncriptedHeaders() throws NoBankAccountException, NoBankConnectionException {
+    private HttpHeaders initHeaders() throws NoBankAccountException, NoBankConnectionException {
         HttpHeaders headers = new HttpHeaders();
         try {
             UserBankAccountDto dto = userService.getUserBankAccount();
-            encryptionUtils.init(dto.getModulus(), dto.getPrivateKey());
             headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
             headers.add("countNumber", String.valueOf(dto.getCountNumber()));
-        } catch (InvalidKeySpecException
-                | NullPointerException e) {
+            headers.add("accessKey", String.valueOf(dto.getAccessKey()));
+        } catch (NullPointerException e) {
             LOGGER.error(e.getMessage());
             throw new NoBankConnectionException();
         }
@@ -282,11 +245,10 @@ public class BankRestController {
     }
 
     private double getBalance() throws NoBankAccountException, NoBankConnectionException {
-        HttpEntity request = new HttpEntity<>(initEncriptedHeaders());
+        HttpEntity request = new HttpEntity<>(initHeaders());
         BalanceDto balanceDto;
         try {
-            String encoded = restTemplate.postForObject(bankIP + "/bankaccount/balance", request, Object.class).toString();
-            balanceDto = (BalanceDto) encryptionUtils.decryptData(encoded, BalanceDto.class);
+            balanceDto = restTemplate.postForObject(bankIP + "/bankaccount/balance", request, BalanceDto.class);
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
             throw new NoBankConnectionException();

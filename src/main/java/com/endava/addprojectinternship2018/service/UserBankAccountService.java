@@ -37,25 +37,20 @@ public class UserBankAccountService {
     }
 
     @Transactional
-    public void save(UserBankAccountDto userBankAccountDto, KeyPair keyPair) {
-
-        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-
-        byte[] bankModulus = Base64.getDecoder().decode(userBankAccountDto.getBankPublicKeyModulus());
-        BankKey bankKey = new BankKey(bankModulus, privateKey.getEncoded());
+    public void save(UserBankAccountDto userBankAccountDto) {
 
         if (userUtil.getCurrentUser().getRole() == Role.COMPANY) {
             Company currentCompany = userUtil.getCurrentCompany();
-            if (currentCompany.getCountNumber() == null && currentCompany.getBankKey() == null) {
+            if (currentCompany.getCountNumber() == null && currentCompany.getAccessKey() == null) {
                 currentCompany.setCountNumber(userBankAccountDto.getCountNumber());
-                currentCompany.setBankKey(bankKey);
+                currentCompany.setAccessKey(userBankAccountDto.getAccessKey());
                 companyDao.save(currentCompany);
             }
         } else {
             Customer currentCustomer = userUtil.getCurrentCustomer();
-            if (currentCustomer.getCountNumber() == null && currentCustomer.getBankKey() == null) {
+            if (currentCustomer.getCountNumber() == null && currentCustomer.getAccessKey() == null) {
                 currentCustomer.setCountNumber(userBankAccountDto.getCountNumber());
-                currentCustomer.setBankKey(bankKey);
+                currentCustomer.setAccessKey(userBankAccountDto.getAccessKey());
                 customerDao.save(currentCustomer);
             }
         }
@@ -70,23 +65,23 @@ public class UserBankAccountService {
         for (TransactionRequestDto dto : transactionRequestDtoList) {
             TransactionDto transactionDto = new TransactionDto();
             if (isCompany) {
-                Optional<Customer> optionalCustomer = customerDao.findByCountNumber(dto.getC());
+                Optional<Customer> optionalCustomer = customerDao.findByCountNumber(dto.getCorrespondentCount());
                 if (optionalCustomer.isPresent()) {
                     transactionDto.setPartnerName(optionalCustomer.get().getFullName());
                 } else {
-                    transactionDto.setPartnerName(companyDao.findByCountNumber(dto.getM()).get().getName());
+                    transactionDto.setPartnerName(companyDao.findByCountNumber(dto.getMainCount()).get().getName());
                 }
             } else {
-                Optional<Company> optionalCompany = companyDao.findByCountNumber(dto.getC());
+                Optional<Company> optionalCompany = companyDao.findByCountNumber(dto.getCorrespondentCount());
                 if (optionalCompany.isPresent()) {
                     transactionDto.setPartnerName(optionalCompany.get().getName());
                 } else {
-                    transactionDto.setPartnerName(customerDao.findByCountNumber(dto.getM()).get().getFullName());
+                    transactionDto.setPartnerName(customerDao.findByCountNumber(dto.getMainCount()).get().getFullName());
                 }
             }
             String fullDescription;
             try {
-                String[] str = dto.getDr().split("=");
+                String[] str = dto.getDescription().split("=");
                 int invoiceId = Integer.valueOf(str[1]);
                 Invoice currentInvoice = invoiceDao.findById(invoiceId).get();
                 StringBuilder sb = new StringBuilder();
@@ -99,12 +94,12 @@ public class UserBankAccountService {
                 sb.append(currentInvoice.getContract().getProduct().getName());
                 fullDescription = sb.toString();
             } catch (Exception ex) {
-                fullDescription = dto.getDr();
+                fullDescription = dto.getDescription();
             }
-            balanceAfter += dto.getS();
-            transactionDto.setDate(dto.getD());
+            balanceAfter += dto.getSum();
+            transactionDto.setDate(dto.getDate());
             transactionDto.setDescription(fullDescription);
-            transactionDto.setSum(dto.getS());
+            transactionDto.setSum(dto.getSum());
             transactionDto.setCurrentBalance(balanceAfter);
             transactionDtoList.add(transactionDto);
         }

@@ -30,9 +30,8 @@ public class Customer {
     @Column
     private Long countNumber = null;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "bank_key_id")
-    private BankKey bankKey;
+    @Column
+    private Long accessKey = null;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")

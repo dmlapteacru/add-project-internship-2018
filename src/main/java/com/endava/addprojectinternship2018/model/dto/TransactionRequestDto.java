@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TransactionRequestDto {
     // short names because of encription needs
-    private String d; // date in format ('yyyy-MM-dd')
-    private long m; // main account
-    private long c; // correspondent account
-    private double s; // sum
-    private String dr; // description
+    private String date; // date in format ('yyyy-MM-dd')
+    private long mainCount; // main account
+    private long correspondentCount; // correspondent account
+    private double sum; // sum
+    private String description; // description
 }
