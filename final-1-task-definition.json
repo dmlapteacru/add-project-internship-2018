@@ -4,8 +4,8 @@
       "environment": [],
       "name": "java1new-container",
       "mountPoints": [],
-      "image": "543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:v0.1.0-85",
-      "cpu": 0,
+      "image": "543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:0.2.0-91",
+      "cpu": 2048,  
       "portMappings": [
         {
             "hostPort": 8080,
@@ -13,7 +13,7 @@
             "containerPort": 8080
           }
       ],
-      "memory": 10,
+      "memory": 4096,
       "essential": true,
       "volumesFrom": []
     }
