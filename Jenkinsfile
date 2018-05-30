@@ -8,15 +8,7 @@ pipeline {
     stages {
         stage('Install') {
              steps {
-                script {
-                    url = 'http://othervpcdotnet-1019633969.us-east-1.elb.amazonaws.com:5001'
-                    // link_net = readFile 'src/main/resources/application.properties'
-                    // link_net = link_net.replaceFirst("/(bank.connection.endpoint=).+api\$/", "\$1${url}/api")
-                    // echo link_net
-                    // writeFile file: 'src/main/resources/application.properties', text: "$link_net"
-                    sh "sed -i 's@\bbank.connection.endpoint=\b@&$url@' src/main/resources/application.properties"
-                    sh 'cat src/main/resources/application.properties'
-                }
+              
                 script {
                     version = sh(returnStdout: true, script: 'mvn help:evaluate -Dexpression=project.version | grep -e "^[^[]" | sed "s/-SNAPSHOT//g"')
                     version = version.trim()
@@ -30,12 +22,6 @@ pipeline {
                  }
             }
         }
-
-        // stage('Jacoco Code Coverage') {
-        //     steps {
-        //         jacoco execPattern: '**/target/**.exec'
-        //     }
-        // }
 
         stage('Sonar scan') {
             steps {
@@ -75,6 +61,8 @@ pipeline {
           script {
              task_def = readFile 'final-1-task-definition.json'
              task_def = task_def.replace("/(543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:)*\"/", "\$1$version2")
+             echo $version2
+             echo $task_def
              writeFile file: 'final-1-task-definition.json', text: "$task_def"
           }
            sh 'aws ecs register-task-definition --requires-compatibilities FARGATE --network-mode awsvpc --cpu 2048 --memory 4096 --execution-role-arn ecsTaskExecutionRole --cli-input-json file://final-1-task-definition.json'
