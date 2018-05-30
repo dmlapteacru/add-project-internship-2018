@@ -40,7 +40,7 @@ public class PasswordTokenService {
                 passwordToken.setToken(passwordEncoder.encode(passwordToken.getToken()));
                 passwordTokenDao.save(passwordToken);
                 UserEmailDto userEmailDto = userService.getUserEmailByUsername(passwordToken.getUsername());
-                String RESET_PASS_LINK = "http://localhost:8080/reset/password?username=" + passwordToken.getUsername() + "&token=" + passwordToken.getToken();
+                String RESET_PASS_LINK = "http://java1new-load-balancer-1084119527.us-east-1.elb.amazonaws.com:8080/reset/password?username=" + passwordToken.getUsername() + "&token=" + passwordToken.getToken();
                 emailService.sendSimpleMessage(userEmailDto.getEmail(), "Endava reset password!", RESET_PASS_LINK);
             }
         }

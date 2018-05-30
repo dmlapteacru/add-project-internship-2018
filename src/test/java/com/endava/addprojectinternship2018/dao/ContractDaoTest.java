@@ -40,10 +40,6 @@ public class ContractDaoTest {
 
     @Test
     public void testSave() {
-//        Contract contract = new Contract(LocalDate.now(), LocalDate.now(), 4000);
-//        Contract savedContract = entityManager.persist(contract);
-//        Contract findContract = contractDao.getOne(savedContract.getId());
-//        assertEquals(findContract, savedContract);
     }
 
     @Test
