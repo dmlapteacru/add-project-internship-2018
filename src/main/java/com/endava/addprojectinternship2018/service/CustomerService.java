@@ -32,14 +32,6 @@ public class CustomerService {
         return customerDao.findAll();
     }
 
-    public Optional<Customer> getCustomerById(int id) {
-        return customerDao.findById(id);
-    }
-
-    public Optional<Customer> getCustomerByFullName(String firstName, String lastName) {
-        return customerDao.findByFirstNameAndLastName(firstName, lastName);
-    }
-
     public Optional<Customer> getCustomerByEmail(String email) {
         return customerDao.findByEmail(email);
     }

@@ -10,7 +10,7 @@ body {
 .page_title {
     display: flex;
     flex-direction:column;
-    padding: 15px 100px;
+    padding: 13px 100px 20px 100px;
     background-color: #fff;
     font-family: Helvetica, sans-serif;
     color: #777;
@@ -111,8 +111,8 @@ body {
     display: flex;
     justify-content:center;
     padding: 5px 8px;
-    background-color: rgba(82, 184, 213,0.7);
-    border: 1px solid rgba(82, 184, 213,0.7);
+    background-color: rgb(68, 166, 194);
+    border: 1px solid rgb(68, 166, 194);
     border-radius: 20px;
     color: #f2f2f2;
     font-family: Roboto, sans-serif;
@@ -123,8 +123,8 @@ body {
 }
 .btn_create_contract:hover {
     color: #285a68;
-    background-color: rgba(82, 184, 213,1);
-    border: 1px solid rgba(82, 184, 213,1);
+    background-color: rgb(68, 166, 194);
+    border: 1px solid rgb(68, 166, 194);
     text-decoration: none;
 }
 .btn_apply {
@@ -132,8 +132,8 @@ body {
     justify-content:center;
     font-size: 10pt;
     padding: 5px 25px;
-    background-color: rgba(77, 196, 138, 0.5);
-    border: 1px solid rgba(77, 196, 138, 0.5);
+    background-color: rgba(77, 196, 138, 0.8);
+    border: 1px solid rgba(77, 196, 138, 0.8);
     border-radius: 25px;
     color: #555;
 }
@@ -144,8 +144,8 @@ body {
     margin-right: 3px;
 }
 .btn_apply:hover {
-    background-color: rgba(77, 196, 138, 0.8);
-    border: 1px solid rgba(77, 196, 138, 0.8);
+    background-color: rgba(77, 196, 138, 1);
+    border: 1px solid rgba(77, 196, 138, 1);
 }
 
 .btn_pay {
@@ -202,7 +202,7 @@ body {
     padding: 15px 40px;
     vertical-align: middle;
     font-family: Helvetica, sans-serif;
-    font-size: 10.2pt;
+    font-size: 12pt;
     font-weight: bold;
     color: #666;
 }
@@ -212,12 +212,12 @@ tbody > tr:hover {
 }
 th > select{
     font-family: Roboto, sans-serif;
-    font-size: 10.2pt;
+    font-size: 11pt;
     color: #888;
 }
 th > input::placeholder {
     font-family: Roboto, sans-serif;
-    font-size: 10.2pt;
+    font-size: 12pt;
     color: #888;
 }
 .filters select[disabled]{
@@ -275,7 +275,7 @@ thead tr, tbody tr {
 .dropdown_action > li > a {
     font-family: Helvetica, sans-serif;
     font-weight: 600;
-    font-size: 9pt;
+    font-size: 11pt;
     color: #888;
 }
 .pdf_error_checked {
@@ -340,5 +340,5 @@ thead tr, tbody tr {
 
 }
 .filter_status_contract {
-    font-size: 9pt;
+    font-size: 10pt;
 }

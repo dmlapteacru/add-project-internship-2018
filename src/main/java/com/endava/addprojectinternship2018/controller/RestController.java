@@ -3,13 +3,12 @@ package com.endava.addprojectinternship2018.controller;
 import com.endava.addprojectinternship2018.model.*;
 import com.endava.addprojectinternship2018.service.*;
 import com.endava.addprojectinternship2018.util.UserUtil;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -19,10 +18,7 @@ public class RestController {
     private final CompanyService companyService;
     private final CategoryService categoryService;
 
-    @Autowired
     private UserUtil userUtil;
-
-    private static final Logger LOGGER = Logger.getLogger(RestController.class);
 
     @Autowired
     public RestController(CompanyService companyService, CategoryService categoryService) {
@@ -30,7 +26,11 @@ public class RestController {
         this.categoryService = categoryService;
     }
 
-    //  -----   REST Company
+    @Autowired
+    public void setUserUtil(UserUtil userUtil) {
+        this.userUtil = userUtil;
+    }
+
     @GetMapping("/rest/getCompanyByEmail/{name}")
     public Company getCompanyByEmail(@PathVariable String name) {
         return companyService.getCompanyByEmail(name).get();

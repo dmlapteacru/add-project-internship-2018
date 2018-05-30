@@ -133,6 +133,12 @@ public class ProductService {
         Document document = new Document();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
+        Font titleFont = FontFactory.getFont(FontFactory.HELVETICA);
+        titleFont.setSize(26);
+
+        Phrase title = new Phrase("Service price-list");
+        title.setFont(titleFont);
+
         try {
 
             PdfPTable table = new PdfPTable(4);
@@ -188,6 +194,9 @@ public class ProductService {
 
             PdfWriter.getInstance(document, out);
             document.open();
+
+            document.add(title);
+
             document.add(table);
 
             document.close();
