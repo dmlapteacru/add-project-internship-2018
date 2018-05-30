@@ -98,7 +98,8 @@
             <div class="panel-heading">
                 <!--<h3 class="panel-title">Contracts</h3>-->
                 <div class="contracts_btn_wrapper">
-                    <button sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalContract" data-backdrop="static"
+                    <button sec:authorize="hasAuthority('COMPANY')" data-toggle="modal" data-target="#modalContract"
+                            data-backdrop="static"
                             class="btn_create_service" role="button" th:id="${companyId}"
                             onclick="createNewContract(this)">
                         <div>
@@ -106,7 +107,8 @@
                             <span>NEW CONTRACT</span>
                         </div>
                     </button>
-                    <button id="bulk_create_invoices" sec:authorize="hasAuthority('COMPANY')" type="button" class="btn_create_service"
+                    <button id="bulk_create_invoices" sec:authorize="hasAuthority('COMPANY')" type="button"
+                            class="btn_create_service"
                             onclick="createBulkInvoices()">
                         <div>
                             <span class="btn_icon_left"><i class="fas fa-plus-circle"></i></span>
@@ -148,12 +150,13 @@
                     <th></th>
                 </tr>
 
-        </thead>
-        <tbody class="filter_body">
-        <tr th:each="contract : ${contractList}" th:id="${'row'+contract.getId()}">
+                </thead>
+                <tbody class="filter_body">
+                <tr th:each="contract : ${contractList}" th:id="${'row'+contract.getId()}">
                     <td sec:authorize="hasAuthority('COMPANY')" width="3%">
                         <label class="control control--radio" th:if="${contract.getStatus().name() == 'ACTIVE'}">
-                            <input class="contracts_active_check" type="checkbox" th:id="${contract.getId()}" name="sel"/>
+                            <input class="contracts_active_check" type="checkbox" th:id="${contract.getId()}"
+                                   name="sel"/>
                             <div class="control__indicator"></div>
                         </label>
                     </td>
@@ -164,23 +167,29 @@
                         th:text="${contract.getCustomer().getFullName()}">customer
                         name
                     </td>
-                    <td th:id="issueDate" th:text="${#temporals.format(contract.getIssueDate(),'dd.MM.yyyy')}">issue date</td>
-                    <td th:id="expireDate" th:text="${#temporals.format(contract.getExpireDate(),'dd.MM.yyyy')}">expire date
+                    <td th:id="issueDate" th:text="${#temporals.format(contract.getIssueDate(),'dd.MM.yyyy')}">issue
+                        date
+                    </td>
+                    <td th:id="expireDate" th:text="${#temporals.format(contract.getExpireDate(),'dd.MM.yyyy')}">expire
+                        date
                     </td>
                     <td th:id="productName" th:text="${contract.getProduct().getName()}">service name</td>
                     <td th:id="sum" th:text="${#numbers.formatDecimal(contract.getSum(),1,2)+' MDL'}"
                         th:value="${contract.getSum()}">sum
                     </td>
                     <td width="20%"
-                        th:value="${contract.getStatus().name()}"><span th:id="status" class="filter_status_contract" th:text="${contract.getStatus()}"></span>
+                        th:value="${contract.getStatus().name()}"><span th:id="status" class="filter_status_contract"
+                                                                        th:text="${contract.getStatus()}"></span>
                     </td>
 
                     <td align="center">
                         <div class="dropdown">
-                            <a class="dropdown-toggle" type="button" id="menu1" data-toggle="dropdown" title="Actions..">
+                            <a class="dropdown-toggle" type="button" id="menu1" data-toggle="dropdown"
+                               title="Actions..">
                                 <span><i class="fas fa-ellipsis-h"></i></span>
-                                </a>
-                            <ul class="dropdown-menu dropdown-menu-right dropdown_action" role="menu" aria-labelledby="menu1">
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-right dropdown_action" role="menu"
+                                aria-labelledby="menu1">
                                 <li role="presentation" th:if="not ${contract.getStatus().name()=='ACTIVE'}">
                                     <a role="menuitem" tabindex="-1"
                                        th:id="'btn_sign_'+${contract.getId()}"
@@ -291,7 +300,7 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Sum</label>
                         <div class="col-sm-6">
-                            <input type="number" class="form-control" id="sum_inv"/>
+                            <input type="text" class="form-control" id="sum_inv"/>
                         </div>
                     </div>
 
@@ -308,7 +317,9 @@
                             <button id="save_btn" onclick="saveInvoiceButton()" type="button" class="btn btn-success">
                                 Save
                             </button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="uncheckAllCheckBoxes()">Close</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal"
+                                    onclick="uncheckAllCheckBoxes()">Close
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -342,11 +353,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">No one checkbox was selected !</h4>
+                <h4 class="modal-title"></h4>
             </div>
             <div class="modal-footer modal_btn">
-                <!--<button id="btn_delete_contract" type="button" class="btn btn-danger">Delete</button>-->                <!--<input id="deleteContractI" type="text" hidden="hidden"/>-->
-
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -501,7 +510,11 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" id="nrInvSaved"></h4>
+
+                <h4 class="modal-title">Successfully !</h4>
+            </div>
+            <div class="modal-body">
+                <h4 class="modal-body" id="nrInvSaved"></h4>
             </div>
             <div class="modal-footer modal_btn">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -516,17 +529,17 @@
 <script src="/js/invoice-create-send.js"></script>
 </body>
 <script>
-$(document).ready(function () {
-    $.each($(".filter_status_contract"),function () {
-        if ($(this).text() === "Unsigned"){
-            $(this).addClass("contract_unsigned");
-        } else if ($(this).text() === "Active"){
-            $(this).addClass("contract_active");
-        }else {
-            $(this).addClass("contract_pending");
-        }
-    });
-})
+    $(document).ready(function () {
+        $.each($(".filter_status_contract"), function () {
+            if ($(this).text() === "Unsigned") {
+                $(this).addClass("contract_unsigned");
+            } else if ($(this).text() === "Active") {
+                $(this).addClass("contract_active");
+            } else {
+                $(this).addClass("contract_pending");
+            }
+        });
+    })
     $(document).ready(function () {
         $('#createInvoiceDialog').on('hidden.bs.modal', function () {
             clearErrorsSecond();
@@ -570,6 +583,19 @@ $(document).ready(function () {
         alertWindow.modal('show');
     }
 
+    function showAlertInvoiceCreate(title, message) {
+        var alertWindow = $('#modalAlert');
+        $('#alertTitle').text(title);
+        var alertBody = alertWindow.find('.modal-body');
+        alertBody.find('p').empty();
+        var strings = message.split('\n');
+        for (i = 0; i < strings.length; i++) {
+            alertBody.append('<p>' + strings[i] + '</p>');
+        }
+        alertWindow.modal({backdrop: "static"});
+        alertWindow.modal('show');
+    }
+
     $('#btn_delete_contract').click(function () {
         $("#btn_delete_contract").attr("disabled", true);
         $.ajax(
@@ -599,7 +625,7 @@ $(document).ready(function () {
         var lastDay = new Date(y, m + 1, 0);
         expireDate.setDate(lastDay.getDate() + 15);
 
-        $('#issue_inv_date').val(moment(issueDate).format('YYYY-MM-DD'));
+        $('#contract_inv_ID').val(rowId);
         $('#issue_inv_date').val(moment(currentDate).format('YYYY-MM-DD'));
         $('#expire_inv_date').val(moment(expireDate).format('YYYY-MM-DD'));
         $('#start_period_inv_date').val(moment(firstDay).format('YYYY-MM-DD'));
@@ -608,18 +634,8 @@ $(document).ready(function () {
         $('#status_inv_out').val($('#status_inv_in').val());
         $('#customer_inv_name').val(row.find("#customer").text());
         $('#product_inv').val(row.find("#productName").text());
-        $('#sum_inv').val(row.find("#sum").attr('value'));
-        $('#contract_inv_ID').val(rowId);
-
-        console.log('Contract ID: ' + $("#contract_inv_ID").val());
-        console.log($('#customer_inv_name').val());
-        console.log($('#product_inv').val());
-        console.log($('#sum_inv').val());
-        console.log($('#status_inv_out').val());
-        console.log($('#issue_inv_date').val());
-        console.log($('#expire_inv_date').val());
-        console.log($('#start_period_inv_date').val());
-        console.log($('#end_period_inv_date').val());
+        var sum_fixed = (parseFloat(row.find("#sum").attr('value'))).toFixed(2) ;
+        $('#sum_inv').val(sum_fixed + ' MDL');
 
         $('#createInvoiceDialog').modal({backdrop: "static"});
         $("#createInvoiceDialog").modal('show');
@@ -633,8 +649,8 @@ $(document).ready(function () {
         var endDate = $("#end_period_inv_date").val();
         var expireDate = $("#expire_inv_date").val();
         var contractID = $("#contract_inv_ID").val();
-        var sum = $("#sum_inv").val();
-        // var sum = parseFloat(sum2);
+        var sum = parseFloat($("#sum_inv").val());
+
         var status = $("#status_inv_out").val();
 
         var data = {
@@ -657,12 +673,7 @@ $(document).ready(function () {
             data: JSON.stringify(data),
             contentType: "application/json; charset=utf-8",
             success: function (response) {
-                console.log(data);
-                console.log("success!!!");
-                console.log(response);
-
                 if (response.status === 'FAIL') {
-                    console.log('FAILED !!!');
                     var allErrors = response.errorMessageList;
                     for (var i = 0; i < allErrors.length; i++) {
                         var currFieldName = allErrors[i].fieldName;
@@ -680,12 +691,7 @@ $(document).ready(function () {
 
             },
             error: function (errMsg, a, b) {
-                alert("Please call admins")
-                console.log("fail")
-                console.log(errMsg)
-                console.log(a)
-                console.log(b)
-
+                alert("Some error occured")
             }
         });
     }
@@ -916,7 +922,7 @@ $(document).ready(function () {
             })
     }
 
-    $('#btn_sign_contract').click(function(){
+    $('#btn_sign_contract').click(function () {
         signContract();
     })
 
@@ -948,7 +954,7 @@ $(document).ready(function () {
                 status = true;
             }
         })
-        if (status === true){
+        if (status === true) {
             $("#bulk_create_invoices").css("display", "block");
         } else {
             $("#bulk_create_invoices").css("display", "none");
@@ -956,50 +962,46 @@ $(document).ready(function () {
     });
 
     function createBulkInvoices() {
+        $("#load_icon_wrapper").modal("show");
 
         var selectedRows = $('table.table tbody input[type=checkbox]:checked');
-
-        if (selectedRows.length == 0) {
-            $("#modalBulkInvoiceWarning").modal();
-        } else {
-            var ids = [];
-            for (var i = 0; i < selectedRows.length; i++) {
-                ids.push(selectedRows[i].id);
-            }
-
-            $.ajax(
-                {
-                    url: "/restinvoice/createBulkInvoice",
-                    type: "POST",
-                    data: {invoiceIds: ids},
-                    success: function (length) {
-                        console.log(length);
-                        if(length == 0){
-                            $("#modalInvoiceSavedNr").find('.modal-title').text('NO one invoice could be created !');
-                        }else if(length ==1){
-                            $("#modalInvoiceSavedNr").find('.modal-title').text(length + '  invoice has been created !');
-                        }else {
-                            $("#modalInvoiceSavedNr").find('.modal-title').text(length + '  invoices has been created !');
-                        }
-
-                        $("#bulk_create_invoices").css("display", "none");
-                        $("#modalInvoiceSavedNr").modal('show');
-                        var selectedRows = $('table.table tbody input[type=checkbox]');
-                        for (var i = 0; i < selectedRows.length; i++) {
-                            selectedRows[i].checked = false;
-                        }
-                        $("#check_all").prop("checked", false);
-                    },
-                    error: function (errMsg, a, b) {
-                        alert("Some tech problems have appeared !")
-                        console.log("fail")
-                        console.log(errMsg)
-                        console.log(a)
-                        console.log(b)
-                    }
-                }
-            )
+        var ids = [];
+        for (var i = 0; i < selectedRows.length; i++) {
+            ids.push(selectedRows[i].id);
         }
+
+        $.ajax(
+            {
+                url: "/restinvoice/createBulkInvoice",
+                type: "POST",
+                data: {invoiceIds: ids},
+                success: function (length) {
+                    if (length == 0) {
+                        $("#modalInvoiceSavedNr").find('.modal-title').text('Unsuccessfully !');
+                        $("#modalInvoiceSavedNr").find('.modal-body').text('NO one invoice could be created !');
+                    } else if (length == 1) {
+                        $("#modalInvoiceSavedNr").find('.modal-title').text('Successfully !');
+                        $("#modalInvoiceSavedNr").find('.modal-body').text(length + '  invoice has been created !');
+                    } else {
+                        $("#modalInvoiceSavedNr").find('.modal-title').text('Unsuccessfully !');
+                        $("#modalInvoiceSavedNr").find('.modal-title').text(length + '  invoices has been created !');
+                    }
+
+                    $("#bulk_create_invoices").css("display", "none");
+                    $("#modalInvoiceSavedNr").modal('show');
+                    var selectedRows = $('table.table tbody input[type=checkbox]');
+                    for (var i = 0; i < selectedRows.length; i++) {
+                        selectedRows[i].checked = false;
+                    }
+                    $("#check_all").prop("checked", false);
+                    $("#load_icon_wrapper").modal("hide");
+                },
+                error: function (errMsg, a, b) {
+                    alert("Some tech problems have appeared !")
+                }
+            }
+        )
+
     }
 
 

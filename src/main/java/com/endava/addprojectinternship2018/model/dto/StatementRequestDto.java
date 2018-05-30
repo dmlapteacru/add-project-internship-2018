@@ -10,10 +10,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StatementRequestDto {
-    // short names because of encription needs
-    private int p; // pages
-    private double bf; // balance before
-    private double ba; // balance after
-    private double bfc; // balance before current
+    private double balanceBefore;
     private List<TransactionRequestDto> listOfTransactions;
 }

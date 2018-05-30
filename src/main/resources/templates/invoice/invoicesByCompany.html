@@ -21,77 +21,27 @@
     <script src="/js/table-filter.js"></script>
     <script src="/js/invoice-create-send.js"></script>
     <script th:src="@{/js/moment.js}"></script>
-
-    <style>
-        .row_issued_color {
-            background: #c8f8ff;
-        }
-
-        .row_sent_color {
-            background: #fff0a8;
-        }
-
-        .row_paid_color {
-            background: #a4ffb0;
-        }
-
-        .row_overdue_color {
-            background: #ffacb3;
-        }
-
-        .text_issued_color {
-            font-weight: 800;
-            color: #283dff;
-
-        }
-
-        .text_sent_color {
-            font-weight: 800;
-            color: #ffa325;
-        }
-
-        .text_paid_color {
-            font-weight: 800;
-            color: #0d9d17;
-        }
-
-        .text_overdue_color {
-            font-weight: 800;
-            color: #fa100a;
-        }
-    </style>
-
     <script>
 
         $(document).ready(function () {
             $(".i_invoices").addClass("active_menu_link");
             setStatusColors();
-            console.log("document ready")
             $("table.table tbody input[type=checkbox]").change(function () {
                 calculateTotalSum();
             });
             $("#btn_delete_invoice").on("click", function () {
-                // console.log($('#delete_inv_hidd_id').val());
-                // console.log('delete_invoice_id:  ' + $('#delete_inv_hidd_id').val());
                 var id = $('#delete_inv_hidd_id').val();
-                // console.log(JSON.stringify(id));
-                // console.log(JSON.stringify({"id": parseFloat(id)}))
                 $.ajax(
                     {
                         url: "/restinvoice/deleteInvoice",
                         type: "POST",
                         data: {"invoiceId": id},
                         success: function () {
-                            // console.log("deleted successfully");
                             $("#row" + id).remove();
                             $("#modalDeleteConfirm").modal("hide");
                         },
                         error: function (errMsg, a, b) {
                             alert("Some tech problems have appeared !")
-                            console.log("fail")
-                            console.log(errMsg)
-                            console.log(a)
-                            console.log(b)
                         }
                     }
                 )
@@ -127,22 +77,6 @@
             }
         }
 
-        // $(".invoices_issued_check").change(function () {
-        //     var status = false;
-        //     console.log("A");
-        //     $.each($(".invoices_issued_check"), function () {
-        //         console.log("B");
-        //         if ($(this).prop("checked") == true) {
-        //             console.log("C");
-        //             status = true;
-        //         }
-        //     });
-        //     if (status === true){
-        //         console.log("A"); $(".bulk_btn_wrapper").css("display", "block");
-        //     } else {
-        //         $(".bulk_btn_wrapper").css("display", "none");
-        //     }
-        // });
         function showBulkSend() {
             var status = false;
             $.each($(".invoices_issued_check"), function () {
@@ -151,7 +85,7 @@
                 }
             });
             if (status === true){
-                console.log("A"); $(".bulk_btn_wrapper").css("display", "block");
+                $(".bulk_btn_wrapper").css("display", "block");
             } else {
                 $(".bulk_btn_wrapper").css("display", "none");
             }
@@ -176,18 +110,11 @@
         }
 
         function editInvoice(elementFromView) {
-            console.log(elementFromView);
             var id = elementFromView.id;
             var issueDate = $("#issueDate" + id).text();
             var dueDate = $("#dueDate" + id).text();
-            console.log(dueDate);
             var sum = $("#sum" + id).text();
-            console.log(sum);
             var fullName = $("#fullName" + id).text();
-            console.log(fullName);
-
-            console.log(moment(issueDate, 'DD-MM-YYYY').format('YYYY-MM-DD'));
-            console.log(moment(dueDate, 'DD-MM-YYYY').format('YYYY-MM-DD'));
             $("#input_invoice_id").text(id);
             $("#input_issue_date").val(moment(issueDate, 'DD-MM-YYYY').format('YYYY-MM-DD'));
             $("#input_due_date").val(moment(dueDate, 'DD-MM-YYYY').format('YYYY-MM-DD'));
@@ -210,10 +137,6 @@
                 },
                 error: function (errMsg, a, b) {
                     alert("Some tech problems have appeared !")
-                    console.log("fail")
-                    console.log(errMsg)
-                    console.log(a)
-                    console.log(b)
                 }
             });
         }
@@ -252,7 +175,6 @@
                     data: JSON.stringify(invIDS),
                     contentType: "application/json; charset=utf-8",
                     success: function () {
-                        console.log("Success !!!")
                         for (var i = 0; i < ids.length; i++) {
                             // $("#row"+ids[i]).remove();
                             $('#row' + ids[i] + " .btn_delete").remove();
@@ -267,10 +189,6 @@
                     },
                     error: function (errMsg, a, b) {
                         alert("Please call admins")
-                        console.log("fail")
-                        console.log(errMsg)
-                        console.log(a)
-                        console.log(b)
                     }
                 }
             )

@@ -95,41 +95,8 @@ a{
     justify-content: flex-start;
     font-size: 10pt;
 }
-.login_wrapper {
-    width: 60%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-direction: column;
-    margin-bottom: 80px;
-    border: #cccccc 1px solid;
-    border-radius: 4px;
-    padding: 10px;
 
-}
 
-.login_form {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-direction: column;
-}
-.registration_choice{
-    display: flex;
-    flex-direction: column;
-
-}
-.registration_form {
-    display: flex;
-    justify-content: space-between;
-}
-.registration_choice_btn {
-    display: flex;
-    flex-direction: column;
-    justify-content:center;
-    width: 50%;
-}
 .registration_approve_info {
     border: 1px solid;
     border-radius: 4px;
@@ -171,8 +138,9 @@ a{
 .control__indicator:after {
     position: absolute;
     display: none;
-    content: '\2713';
+    content: '\2022';
     color: #fff;
+    font-size: 30px;
     left: 50%;
     top: 50%;
     -webkit-transform: translate(-50%, -50%);
@@ -207,11 +175,7 @@ a{
     margin-bottom: 15px;
     color: rgba(255,255,255,0.4);
 }
-.reg_forms {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
+
 
 .modal_links {
     display: flex;

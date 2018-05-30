@@ -7,7 +7,6 @@ import com.endava.addprojectinternship2018.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 
 import java.util.ArrayList;
@@ -51,15 +50,15 @@ public class Validator implements org.springframework.validation.Validator {
     public List<String> validateInvoicePayment(double balance, List<PaymentDto> paymentDtoList) {
 
         List<String> errorList = new ArrayList<>();
-        if (paymentDtoList.stream().mapToDouble(PaymentDto::getS).sum() > balance) {
+        if (paymentDtoList.stream().mapToDouble(PaymentDto::getSum).sum() > balance) {
             errorList.add("Not enough money");
         }
         if (paymentDtoList.size() > 5) {
             errorList.add("Impossible to process more than 5 invoices");
         }
         for (PaymentDto paymentDto : paymentDtoList) {
-            if (paymentDto.getC() == null) {
-                errorList.add(paymentDto.getD());
+            if (paymentDto.getCorrespondentCount() == null) {
+                errorList.add(paymentDto.getDescription());
             }
         }
         return errorList;

@@ -16,8 +16,8 @@ function loadBalance() {
             url: "/bankAccount/balance",
             type: "POST",
             success: function (result) {
-                $(".balance").text(result);
-                $(".balance_info").text(result);
+                $(".balance").text(result.toFixed(2));
+                $(".balance_info").text(result.toFixed(2));
                 $(".balance_header").css("display","block");
             },
             error: function (result) {
@@ -40,7 +40,7 @@ function getUserName() {
 }
 function parseBalance(string) {
     var balance = string.split(":")[1].substring(0, string.split(":")[1].length-1);
-    $(".balance_info").text(balance);
+    $(".balance_info").text(balance.toFixed(2));
     return balance;
 }
 

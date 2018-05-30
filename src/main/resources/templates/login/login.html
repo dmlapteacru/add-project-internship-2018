@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
-
 <head>
-    <title>Login</title>
+    <title>Main</title>
     <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>-->
     <link rel="stylesheet" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
     <script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
@@ -11,73 +10,99 @@
     <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" type="text/javascript"></script>
     <link rel="stylesheet" type="text/css" href="/css/default.css"  />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+    <link rel="stylesheet" media="screen" th:href="@{/css/login.css}"  />
 </head>
 
 <body>
 <div class="main_wrapper">
+    <div id="approval_reg" class="alert alert-success alert-dismissible fade in" th:if="${#httpServletRequest.getParameter('error') == 'reg_approval'}">
+        <div class="approval_info">
+            <strong> Registration success! Wait for admin's approval.</strong>
+        </div>
+    </div>
+    <div id="alert_success" class="alert alert-success alert-dismissible fade in">
+        <div id="approval_info">
+            <strong id="confirm_alert_message"></strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
 
-    <div style="display: flex; flex-direction: column;" class="wrapper">
-        <div id="approval_reg" class="alert alert-success alert-dismissible fade in" th:if="${#httpServletRequest.getParameter('error') == 'reg_approval'}">
-            <div class="approval_info">
-                <strong> Registration success! Wait for admin's approval.</strong>
+    <div class="wrapper_top">
+        <div class="wrapper_left_top">
+            <img src="/public.images/logo.png" alt="">
+            <span>ADD SERVICE</span>
+        </div>
+        <div class="wrapper_right_top"></div>
+    </div>
+    <div class="wrapper_middle">
+        <div class="wrapper_left_">
+            <div class="login_page_title">
+                <span>WE</span>
+                <span>PROVIDE</span>
+                <span class="span_best">BEST</span>
+                <span>SERVICES</span>
             </div>
         </div>
-        <div id="alert_success" class="alert alert-success alert-dismissible fade in">
-            <div id="approval_info">
-                <strong id="confirm_alert_message"></strong>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        </div>
-        <div class="login_wrapper">
-            <form class="login_form" th:action="@{/login}" th:object="${loginForm_}" method="POST">
-                <h3 class="form-signin-heading heading"  th:text="Welcome"></h3>
-                <br/>
-                <input type="text" name="email" th:field="*{username}" th:placeholder="Username"
-                       class="form-control" />
-                <br/>
-                <div class="pass_wrapper">
-                    <input type="password" th:field="*{password}" th:placeholder="Password"
-                           name="password" class="form-control"/>
-                    <a class="show_pass_btn">SHOW</a>
-                </div>
-                <div class="error" th:if="${#httpServletRequest.getParameter('error') == 'inactive_user'}">
-                    <p style="font-size: 14px; color: #FF1C19;">Your status is INACTIVE</p>
-                </div>
-                <div class="error" th:if="${#httpServletRequest.getParameter('error') == 'no_user'}">
-                    <p style="font-size: 14px; color: #FF1C19;">Username is incorrect</p>
-                </div>
-                <div class="error" th:if="${#httpServletRequest.getParameter('error') == 'wrong_password'}">
-                    <p style="font-size: 14px; color: #FF1C19;">Password is incorrect</p>
-                </div>
-                <br/>
-                <button class="btn btn-lg btn-primary btn-block" name="Submit" value="Login" type="Submit" th:text="Login"></button>
-                <br/>
-            </form>
-            <div class="reg_forms">
-                <form class="registration_form" th:action="@{/registration}" method="POST">
-                    <div class="registration_choice_btn">
-                        <button type="submit" class="btn btn-warning">Registration as</button>
+        <div class="wrapper_middle_">
+            <div class="login_wrapper">
+                <form class="login_form" th:action="@{/login}" th:object="${loginForm_}" method="POST">
+                    <!--<h3 class="form-signin-heading heading"  th:text="Welcome"></h3>-->
+                    <br/>
+                    <input type="text" name="email" th:field="*{username}" th:placeholder="Username"
+                           class="form-control login_form_inpt" />
+                    <br/>
+                    <div class="pass_wrapper">
+                        <div class="pass_wrapper_">
+                            <input type="password" th:field="*{password}" th:placeholder="Password"
+                                   name="password" class="form-control"/>
+                            <a class="show_pass_btn">SHOW</a>
+                        </div>
                     </div>
-                    <div class="registration_choice">
-                        <label class="control control--radio">Customer
-                            <input type="radio" name="choice" th:value="CUSTOMER" checked/>
-                            <div class="control__indicator"></div>
-                        </label>
-                        <label class="control control--radio">Company
-                            <input type="radio" name="choice" th:value="COMPANY"/>
-                            <div class="control__indicator"></div>
-                        </label>
+                    <div class="error" th:if="${#httpServletRequest.getParameter('error') == 'inactive_user'}">
+                        <p style="font-size: 14px; color: #FF1C19;">Your status is INACTIVE</p>
                     </div>
+                    <div class="error" th:if="${#httpServletRequest.getParameter('error') == 'no_user'}">
+                        <p style="font-size: 14px; color: #FF1C19;">Username is incorrect</p>
+                    </div>
+                    <div class="error" th:if="${#httpServletRequest.getParameter('error') == 'wrong_password'}">
+                        <p style="font-size: 14px; color: #FF1C19;">Password is incorrect</p>
+                    </div>
+                    <br/>
+                    <button class="btn btn-lg btn-primary btn-block btn_login" name="Submit" value="Login" type="Submit" th:text="Login"></button>
+                    <br/>
                 </form>
-                <br/>
-                <div class="modal_links">
-                    <a class="btn_contact_admin" data-target="#modalMessage" data-toggle="modal">Contact admin <span class="glyphicon glyphicon-envelope"></span></a>
-                    <a class="btn_contact_admin" data-target="#modalResetPassword" data-toggle="modal">Forgot your password?</a>
+                <div class="reg_forms">
+                    <form class="registration_form" th:action="@{/registration}" method="POST">
+                        <div class="registration_choice_btn">
+                            <button type="submit" class="btn btn_login">Registration as</button>
+                        </div>
+                        <div class="registration_choice">
+                            <label class="control control--radio" style="font-size: 12pt">Customer
+                                <input type="radio" name="choice" th:value="CUSTOMER" checked />
+                                <div class="control__indicator"></div>
+                            </label>
+                            <label class="control control--radio" style="font-size: 12pt">Company
+                                <input type="radio" name="choice" th:value="COMPANY" />
+                                <div class="control__indicator"></div>
+                            </label>
+                        </div>
+                    </form>
+                    <br/>
+                    <div class="modal_links">
+                        <a class="btn_contact_admin" data-target="#modalMessage" data-toggle="modal"><span>Contact admin</span> <span style="margin-left: 5px;" class="glyphicon glyphicon-envelope"></span></a>
+                        <a class="btn_contact_admin" data-target="#modalResetPassword" data-toggle="modal"><span>Forgot your password?</span></a>
+                    </div>
                 </div>
             </div>
         </div>
+        <div class="wrapper_right_"></div>
+    </div>
+    <div class="wrapper_bottom">
+        <div class="wrapper_left"></div>
+        <div class="wrapper_right"></div>
     </div>
 </div>
 <!--MODALS-->
@@ -101,7 +126,7 @@
                 </div>
                 <div class="modal-footer modal_btn">
                     <button type="button" style="display: none;" class="btn"></button>
-                    <button id="save_btn_message" type="button" class="btn btn-success">Send</button>
+                    <button id="save_btn_message" type="button" class="btn btn-success btn_login">Send</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </form>
@@ -124,13 +149,14 @@
                 </div>
                 <div class="modal-footer modal_btn">
                     <button type="button" style="display: none;" class="btn"></button>
-                    <button id="reset_btn" type="submit" class="btn btn-success">Reset</button>
+                    <button id="reset_btn" type="submit" class="btn btn-success btn_login">Reset</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
 <script src="/js/show_pass.js" type="text/javascript"></script>
 <script type="text/javascript">
     $("#save_btn_message").click(function () {

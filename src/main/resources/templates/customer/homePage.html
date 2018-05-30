@@ -7,7 +7,6 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/css/header.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="/css/header.css"/>
@@ -15,7 +14,7 @@
     <script src="/webjars/sockjs-client/1.0.2/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js" integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe" crossorigin="anonymous"></script>
-
+    <link rel="stylesheet" type="text/css" href="/css/home-page.css"/>
 </head>
 
 <body>
@@ -23,78 +22,204 @@
 <div th:replace="fragments/header :: header">
 </div>
 
-<div class="container">
-
-    <h2 th:text="'Welcome '+${customerName}+','"></h2>
-    <h3>here is your current statistics:</h3>
-
-    <div class="panel panel-default">
-        <div class="panel-heading">Available services</div>
-        <div class="panel-body">
-            <a th:href="@{/customer/services}" class="btn btn-primary"> Total
-                <span class="badge" th:text="${totalServices}"></span>
-            </a>
+<div class="container_">
+    <div class="page_title">
+        <div class="title">
+            <span>Statistic overview</span>
+        </div>
+        <div class="description">
+            <!--<span>Here you can get an account number and manage it. Add money, take a look on your transactions.</span>-->
         </div>
     </div>
 
-    <div class="panel panel-default">
-        <div class="panel-heading">Contracts</div>
-        <div class="panel-body">
-            <form th:action="@{/customer/contracts/filtered}"
-                  th:object="${filterActiveContracts}" method="post" class="input-group pull-left">
-                <input type="hidden" th:field="*{contractStatus}">
-                <button type="submit" class="btn btn-primary"> Active
-                    <span class="badge" th:text="${activeContracts}"></span>
-                </button>
-            </form>
-            <form th:action="@{/customer/contracts/filtered}"
-                  th:object="${filterSignedContracts}" method="post" class="input-group pull-left">
-                <input type="hidden" th:field="*{contractStatus}">
-                <button type="submit" class="btn btn-info"> Signed only by you
-                    <span class="badge" th:text="${onePartSignedContracts}"></span>
-                </button>
-            </form>
-            <form th:action="@{/customer/contracts/filtered}"
-                  th:object="${filterSignedContracts}" method="post" class="input-group pull-left">
-                <input type="hidden" th:field="*{contractStatus}">
-                <button type="submit" class="btn btn-info"> Signed only your partner
-                    <span class="badge" th:text="${anotherPartSignedContracts}"></span>
-                </button>
-            </form>
-            <form th:action="@{/customer/contracts/filtered}"
-                  th:object="${filterUnsignedContracts}" method="post" class="input-group pull-left">
-                <input type="hidden" th:field="*{contractStatus}">
-                <button type="submit" class="btn"> Unsigned
-                    <span class="badge" th:text="${unsignedContracts}"></span>
-                </button>
-            </form>
+
+    <div class="dashboard_wrapper">
+        <div class="title">
+            <span>Services</span>
+        </div>
+        <div class="dashboard_wrapper_body services_color">
+            <div class="dashboard_item ">
+                <div class="dash_body">
+                    <div class="dash_stat">
+                        <div class="dash_logo"><i class="fas fa-tag"></i></div>
+                        <div class="dash_count">
+                            <span th:text="${totalServices}"></span>
+                        </div>
+                    </div>
+                    <div class="dash_desc">
+                        <span>Services Available</span>
+                    </div>
+                </div>
+                <div class="dash_footer">
+                    <a th:href="@{/customer/services}">
+                        <div class="dash_view"><span>View</span></div>
+                        <div class="dash_view_arrow"><i class="fas fa-arrow-circle-right"></i></div>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="panel panel-default">
-        <div class="panel-heading">Invoices</div>
-        <div class="panel-body">
-            <form th:action="@{/customer/invoices/filtered}"
-                  th:object="${filterSentInvoices}" method="post" class="input-group pull-left">
-                <input type="hidden" th:field="*{invoiceStatus}">
-                <button type="submit" class="btn btn-primary"> Sent
-                    <span class="badge" th:text="${sentInvoices}"></span>
-                </button>
-            </form>
-            <form th:action="@{/customer/invoices/filtered}"
-                  th:object="${filterPaidInvoices}" method="post" class="input-group pull-left">
-                <input type="hidden" th:field="*{invoiceStatus}">
-                <button type="submit" class="btn btn-info"> Paid
-                    <span class="badge" th:text="${paidInvoices}"></span>
-                </button>
-            </form>
-            <form th:action="@{/customer/invoices/filtered}"
-                  th:object="${filterOverdueInvoices}" method="post" class="input-group pull-left">
-                <input type="hidden" th:field="*{invoiceStatus}">
-                <button type="submit" class="btn"> Overdue
-                    <span class="badge" th:text="${overdueInvoices}"></span>
-                </button>
-            </form>
+    <div class="dashboard_wrapper">
+        <div class="title">
+            <span>Contracts</span>
+        </div>
+        <div class="dashboard_wrapper_body contracts_color">
+            <div class="dashboard_item">
+                <div class="dash_body">
+                    <div class="dash_stat">
+                        <div class="dash_logo"><i class="fas fa-handshake"></i></div>
+                        <div class="dash_count">
+                            <span th:text="${activeContracts}"></span>
+                        </div>
+                    </div>
+                    <div class="dash_desc">
+                        <span>Active Contracts</span>
+                    </div>
+                </div>
+                <form th:action="@{/customer/contracts/filtered}"
+                      th:object="${filterActiveContracts}" method="post" class="dash_footer">
+                    <input type="hidden" th:field="*{contractStatus}">
+                    <button type="submit" class="dash_footer">
+                        <div class="dash_view"><span>View</span></div>
+                        <div class="dash_view_arrow"><i class="fas fa-arrow-circle-right"></i></div>
+                    </button>
+                </form>
+            </div>
+            <div class="dashboard_item">
+                <div class="dash_body">
+                    <div class="dash_stat">
+                        <div class="dash_logo"><i class="fas fa-handshake"></i></div>
+                        <div class="dash_count">
+                            <span th:text="${onePartSignedContracts}"></span>
+                        </div>
+                    </div>
+                    <div class="dash_desc">
+                        <span>Contracts signed by you</span>
+                    </div>
+                </div>
+                <form th:action="@{/customer/contracts/filtered}"
+                      th:object="${filterSignedContracts}" method="post" class="dash_footer">
+                    <input type="hidden" th:field="*{contractStatus}">
+                    <button type="submit" class="dash_footer">
+                        <div class="dash_view"><span>View</span></div>
+                        <div class="dash_view_arrow"><i class="fas fa-arrow-circle-right"></i></div>
+                    </button>
+                </form>
+            </div>
+            <div class="dashboard_item">
+                <div class="dash_body">
+                    <div class="dash_stat">
+                        <div class="dash_logo"><i class="fas fa-handshake"></i></div>
+                        <div class="dash_count">
+                            <span th:text="${anotherPartSignedContracts}"></span>
+                        </div>
+                    </div>
+                    <div class="dash_desc">
+                        <span>Contracts signed by your partner</span>
+                    </div>
+                </div>
+                <form th:action="@{/customer/contracts/filtered}"
+                      th:object="${filterSignedContracts}" method="post" class="dash_footer">
+                    <input type="hidden" th:field="*{contractStatus}">
+                    <button type="submit" class="dash_footer">
+                        <div class="dash_view"><span>View</span></div>
+                        <div class="dash_view_arrow"><i class="fas fa-arrow-circle-right"></i></div>
+                    </button>
+                </form>
+            </div>
+            <div class="dashboard_item">
+                <div class="dash_body">
+                    <div class="dash_stat">
+                        <div class="dash_logo"><i class="fas fa-handshake"></i></div>
+                        <div class="dash_count">
+                            <span th:text="${unsignedContracts}"></span>
+                        </div>
+                    </div>
+                    <div class="dash_desc">
+                        <span>Unsigned contracts</span>
+                    </div>
+                </div>
+                <form th:action="@{/customer/contracts/filtered}"
+                      th:object="${filterUnsignedContracts}" method="post" class="dash_footer">
+                    <input type="hidden" th:field="*{contractStatus}">
+                    <button type="submit" class="dash_footer">
+                        <div class="dash_view"><span>View</span></div>
+                        <div class="dash_view_arrow"><i class="fas fa-arrow-circle-right"></i></div>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard_wrapper">
+        <div class="title">
+            <span>Invoices</span>
+        </div>
+        <div class="dashboard_wrapper_body invoices_color">
+            <div class="dashboard_item">
+                <div class="dash_body">
+                    <div class="dash_stat">
+                        <div class="dash_logo"><i class="fas fa-receipt"></i></div>
+                        <div class="dash_count">
+                            <span th:text="${sentInvoices}"></span>
+                        </div>
+                    </div>
+                    <div class="dash_desc">
+                        <span>Sent Invoices</span>
+                    </div>
+                </div>
+                <form th:action="@{/customer/invoices/filtered}"
+                      th:object="${filterSentInvoices}" method="post" class="dash_footer">
+                    <input type="hidden" th:field="*{invoiceStatus}">
+                    <button type="submit" class="dash_footer">
+                        <div class="dash_view"><span>View</span></div>
+                        <div class="dash_view_arrow"><i class="fas fa-arrow-circle-right"></i></div>
+                    </button>
+                </form>
+            </div>
+            <div class="dashboard_item">
+                <div class="dash_body">
+                    <div class="dash_stat">
+                        <div class="dash_logo"><i class="fas fa-receipt"></i></div>
+                        <div class="dash_count">
+                            <span th:text="${paidInvoices}"></span>
+                        </div>
+                    </div>
+                    <div class="dash_desc">
+                        <span>Paid Invoices</span>
+                    </div>
+                </div>
+                <form th:action="@{/customer/invoices/filtered}"
+                      th:object="${filterPaidInvoices}" method="post" class="dash_footer">
+                    <input type="hidden" th:field="*{invoiceStatus}">
+                    <button type="submit" class="dash_footer">
+                        <div class="dash_view"><span>View</span></div>
+                        <div class="dash_view_arrow"><i class="fas fa-arrow-circle-right"></i></div>
+                    </button>
+                </form>
+            </div>
+            <div class="dashboard_item">
+                <div class="dash_body">
+                    <div class="dash_stat">
+                        <div class="dash_logo"><i class="fas fa-receipt"></i></div>
+                        <div class="dash_count">
+                            <span th:text="${overdueInvoices}"></span>
+                        </div>
+                    </div>
+                    <div class="dash_desc">
+                        <span>Overdue Invoices</span>
+                    </div>
+                </div>
+                <form th:action="@{/customer/invoices/filtered}"
+                      th:object="${filterOverdueInvoices}" method="post" class="dash_footer">
+                    <input type="hidden" th:field="*{invoiceStatus}">
+                    <button type="submit" class="dash_footer">
+                        <div class="dash_view"><span>View</span></div>
+                        <div class="dash_view_arrow"><i class="fas fa-arrow-circle-right"></i></div>
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

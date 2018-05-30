@@ -8,8 +8,4 @@ public class NoBankAccountException extends Exception {
         super(MESSAGE);
     }
 
-    public NoBankAccountException(String message){
-        super(message);
-    }
-
 }
