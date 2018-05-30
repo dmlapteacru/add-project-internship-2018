@@ -77,6 +77,7 @@ $("#btn_statement_req").click(function () {
 });
 
 function loadStatement(data) {
+    $(".table_statement").css("display", "block");
     $(".table_statement tbody").html("");
     addRowToTable("a" , "", "", "start balance", "", data.startBalance.toFixed(2));
     var endBalance = data.startBalance;
