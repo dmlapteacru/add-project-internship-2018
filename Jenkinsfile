@@ -14,7 +14,7 @@ pipeline {
                     // link_net = link_net.replaceFirst("/(bank.connection.endpoint=).+api\$/", "\$1${url}/api")
                     // echo link_net
                     // writeFile file: 'src/main/resources/application.properties', text: "$link_net"
-                    sh "sed -i 's@\bbank.connection.endpoint=\b@&$url@' "
+                    sh "sed -i 's@\bbank.connection.endpoint=\b@&$url@' src/main/resources/application.properties"
                     sh 'cat src/main/resources/application.properties'
                 }
                 script {
