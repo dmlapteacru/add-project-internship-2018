@@ -59,10 +59,13 @@ pipeline {
     stage('Update service'){
         steps {
           script {
-             task_def = readFile 'final-1-task-definition.json'
-             task_def = task_def.replace("/(543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:)*\"/", "\$1$version2")
-             writeFile file: 'final-1-task-definition.json', text: "$task_def"
-             echo task_def
+            //  task_def = readFile 'final-1-task-definition.json'
+            //  task_def = task_def.replace("/(543633097370.dkr.ecr.us-east-1.amazonaws.com/final-1:)*\"/", "\$1$version2")
+            //  writeFile file: 'final-1-task-definition.json', text: "$task_def"
+            //  echo task_def
+                task_def = sh(returnStdout: true, script: "sed -e \"s/0.2.0-*/$version2/\" final-1-task-definition.json")
+                echo task_def
+                writeFile file: 'final-1-task-definition.json', text: "$task_def"
           }
            sh 'aws ecs register-task-definition --requires-compatibilities FARGATE --network-mode awsvpc --cpu 2048 --memory 4096 --execution-role-arn ecsTaskExecutionRole --cli-input-json file://final-1-task-definition.json'
            sh 'aws ecs describe-task-definition --task-definition java1new > taskdef.json'
