@@ -149,7 +149,7 @@
                     <td><span th:text="${invoice.getContract().getProduct().getName()}"></span><br><span class="sub_label">SERVICE NAME</span></td>
                     <td>
                         <button th:if="${invoice.getStatus()}!=${invoice.status.PAID}" th:id="${invoice.getId()}"
-                                class="btn_pay" onclick="payInvoice(this)">PAY INVOICE
+                                class="btn_pay" onclick="payInvoice(this)">PAY
                         </button>
                     </td>
                 </tr>

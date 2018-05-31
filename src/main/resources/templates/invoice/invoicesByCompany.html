@@ -374,7 +374,7 @@
                         <span th:text="${invoice.getContract().getProduct().getName()}"></span><br>
                         <span class="sub_label">SERVICE NAME</span>
                     </td>
-                    <td style="display: flex; flex-direction: row-reverse;">
+                    <td>
                         <a th:if="${invoice.getStatus().name() == 'ISSUED'}" th:id="${invoice.id}"
                            onclick="deleteInvoice(this)" class="btn_delete">DELETE</a>
                     </td>
