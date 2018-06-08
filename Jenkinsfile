@@ -34,6 +34,7 @@ pipeline {
                repository: 'Intens_2018_firs', 
                version: version2.trim()
            }
+        }
 
         // stage('Sonar scan') {
         //     steps {
