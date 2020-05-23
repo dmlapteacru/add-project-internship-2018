@@ -1,6 +1,7 @@
 package com.endava.addprojectinternship2018.dao;
 
 import com.endava.addprojectinternship2018.model.Company;
+import com.endava.addprojectinternship2018.model.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -21,5 +22,7 @@ public interface CompanyDao extends JpaRepository<Company, Integer> {
     Optional<Company> findByUserId(int id);
 
     Optional<Company> findByCountNumber(long count);
+
+    Optional<Company> findByBankAccountAccountNumber(String accountNumber);
 
 }

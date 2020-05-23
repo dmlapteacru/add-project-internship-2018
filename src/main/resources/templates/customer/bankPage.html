@@ -42,10 +42,10 @@
                     <div class="account_number_wr">
                         <div class="account_number_wr_info">
                             <span class="additional_info">Account number: </span>
-                            <span class="main_info" th:if="${customer.countNumber != null}" th:text="${customer.countNumber}"></span>
-                            <span class="main_info" th:if="${customer.countNumber == null}">NO ACCOUNT</span>
+                            <span class="main_info" th:if="${customer.bankAccount != null}" th:text="${customer.bankAccount.accountNumber}"></span>
+                            <span class="main_info" th:if="${customer.bankAccount == null}">NO ACCOUNT</span>
                         </div>
-                        <button id="create_account" th:if="${customer.countNumber == null}" class="btn btn-warning" type="submit">CREATE ACCOUNT</button>
+                        <button id="create_account" th:if="${customer.bankAccount == null}" class="btn btn-warning" type="submit">CREATE ACCOUNT</button>
                     </div>
                 </div>
                 <div class="account_info_balance">
@@ -54,7 +54,7 @@
                         <span class="currency">MDL</span>
                     </div>
                     <span class="additional_info">Available balance</span>
-                    <form th:if="${customer.countNumber != null}" class="add_money">
+                    <form th:if="${customer.bankAccount != null}" class="add_money">
                         <div>
                             <input id="money_sum" pattern="[0-9].{1,}" title="Must be numbers" type="number" value="0.0"/>
                             <br/>

@@ -178,7 +178,7 @@ public class InvoiceService {
     public PaymentDto createPaymentDto(int invoiceId) {
         Invoice currentInvoice = getInvoiceById(invoiceId);
         Contract currentContract = currentInvoice.getContract();
-        Long companyCount = currentContract.getCompany().getCountNumber();
+        String companyCount = currentContract.getCompany().getBankAccount().getAccountNumber();
         PaymentDto paymentDto = new PaymentDto();
         paymentDto.setCorrespondentCount(companyCount);
         paymentDto.setSum(currentInvoice.getSum());

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentDto {
-    private Long correspondentCount;
+    private String correspondentCount;
     private double sum;
     private String description;
 }

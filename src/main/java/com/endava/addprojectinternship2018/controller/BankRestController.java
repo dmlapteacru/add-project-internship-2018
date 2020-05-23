@@ -22,11 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.sql.SQLException;
+import java.util.*;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
@@ -64,13 +61,8 @@ public class BankRestController {
 
     @PostMapping(value = "/bankAccount/create")
     public ResponseEntity<UserBankAccountDto> newAccount() {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        HttpEntity request = new HttpEntity<>("param", headers);
         try {
-            UserBankAccountDto dto = restTemplate.postForObject(bankIP + "/bankaccount/create", request, UserBankAccountDto.class);
-            userBankAccountService.save(dto);
+            userBankAccountService.createAccount();
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             return new ResponseEntity<>(BAD_REQUEST);
@@ -81,11 +73,7 @@ public class BankRestController {
 
     @PostMapping(value = "/bankAccount/balance")
     public ResponseEntity<?> getBalanceResponseEntity() {
-        try {
-            return new ResponseEntity<>(getBalance(), OK);
-        } catch (NoBankAccountException | NoBankConnectionException ex) {
-            return new ResponseEntity<>(ex.getMessage(), BAD_REQUEST);
-        }
+        return new ResponseEntity<>(userBankAccountService.getBalance(), OK);
     }
 
     @PostMapping(value = "/bankAccount/addmoney")
@@ -95,23 +83,13 @@ public class BankRestController {
             LOGGER.warn("add money validation error");
             return new ResponseEntity<>("Sum must be greater than 0.01 MDL.", PRECONDITION_FAILED);
         }
-        HttpHeaders headers;
+
         try {
-            headers = initHeaders();
-        } catch (NoBankAccountException | NoBankConnectionException ex) {
-            LOGGER.error(ex.getMessage());
-            return new ResponseEntity<>(ex.getMessage(), PRECONDITION_FAILED);
-        }
-        Map<String, Double> body = new HashMap<>();
-        body.put("sum", sum);
-        try {
-            HttpEntity<Map> request = new HttpEntity<>(body, headers);
-            restTemplate.postForObject(bankIP + "/bankaccount/addmoney", request, String.class);
-        } catch (Exception ex) {
-            LOGGER.error("add money error: " + ex.getMessage());
+            userBankAccountService.addMoney(sum);
+        } catch (Exception e) {
+            LOGGER.error("add money error: " + e.getMessage());
             return new ResponseEntity<>("No connection with bank", PRECONDITION_FAILED);
         }
-
         LOGGER.info(userUtil.getCurrentUser().getUsername() + " added money successful");
         return new ResponseEntity<>("Money was added", OK);
     }
@@ -121,36 +99,22 @@ public class BankRestController {
 
         String currentCustomerName = userUtil.getCurrentCustomer().getFullName();
 
-        HttpHeaders headers;
-
-        double balance;
-        try {
-            balance = getBalance();
-            headers = initHeaders();
-        } catch (NoBankAccountException | NoBankConnectionException ex) {
-            return new ResponseEntity<>(ex.getMessage(), PRECONDITION_FAILED);
-        }
+        double balance = userBankAccountService.getBalance();
 
         PaymentDto paymentDto = invoiceService.createPaymentDto(invoiceId);
-        List<PaymentDto> paymentDtoList = new ArrayList<>();
-        paymentDtoList.add(paymentDto);
-        List<String> errors = validator.validateInvoicePayment(balance, paymentDtoList);
+        List<String> errors = validator.validateInvoicePayment(balance, Collections.singletonList(paymentDto));
         ResponseEntity<?> errorsResponse = checkErrors(currentCustomerName, errors);
         if (errorsResponse != null) return errorsResponse;
 
-        ResponseEntity<Object> response;
         try {
-            HttpEntity<PaymentDto> request = new HttpEntity<>(paymentDto, headers);
-            response = restTemplate.postForEntity(bankIP + "/sendmoney/sendmoney", request, Object.class);
-        } catch (Exception ex) {
-            LOGGER.error(currentCustomerName + ": " + ex.getMessage());
+            userBankAccountService.sendMoney(paymentDto);
+        } catch (Exception e) {
+            LOGGER.error(currentCustomerName + ": " + e.getMessage());
             return new ResponseEntity<>("No connection with bank", BAD_REQUEST);
         }
 
-        if (response.getStatusCode() == OK) {
-            LOGGER.info(currentCustomerName + " paid invoice: " + paymentDto);
-            invoiceService.setInvoiceAsPaid(invoiceId);
-        }
+        LOGGER.info(currentCustomerName + " paid invoice: " + paymentDto);
+        invoiceService.setInvoiceAsPaid(invoiceId);
 
         return new ResponseEntity<>(OK);
     }
@@ -172,15 +136,7 @@ public class BankRestController {
 
         String currentCustomerName = userUtil.getCurrentCustomer().getFullName();
 
-        HttpHeaders headers;
-
-        double balance;
-        try {
-            balance = getBalance();
-            headers = initHeaders();
-        } catch (NoBankAccountException | NoBankConnectionException ex) {
-            return new ResponseEntity<>(ex.getMessage(), PRECONDITION_FAILED);
-        }
+        double balance = userBankAccountService.getBalance();
 
         List<PaymentDto> paymentDtoList = new ArrayList<>();
         for (Integer invoiceId : invoiceIdList) {
@@ -191,18 +147,15 @@ public class BankRestController {
         ResponseEntity<?> errorsResponse = checkErrors(currentCustomerName, errors);
         if (errorsResponse != null) return errorsResponse;
 
-        ResponseEntity<Object> response;
         try {
-            HttpEntity<List<PaymentDto>> request = new HttpEntity<>(paymentDtoList, headers);
-            response = restTemplate.postForEntity(bankIP + "/sendmoney/bulkpayment", request, Object.class);
-        } catch (Exception ex) {
-            LOGGER.error(currentCustomerName + " bulk payment: " + ex.getMessage());
-            return new ResponseEntity<>("No connection with bank", PRECONDITION_FAILED);
+            userBankAccountService.sendMoney(paymentDtoList);
+        } catch (Exception e) {
+            LOGGER.error(currentCustomerName + ": " + e.getMessage());
+            return new ResponseEntity<>("No connection with bank", BAD_REQUEST);
         }
-        if (response.getStatusCode().equals(OK)) {
-            LOGGER.info(currentCustomerName + " success bulk payment, invoices id: " + invoiceIdList);
-            invoiceService.setInvoiceBulkAsPaid(invoiceIdList);
-        }
+
+        LOGGER.info(currentCustomerName + " success bulk payment, invoices id: " + invoiceIdList);
+        invoiceService.setInvoiceBulkAsPaid(invoiceIdList);
 
         return new ResponseEntity<>(OK);
     }
@@ -210,33 +163,13 @@ public class BankRestController {
     @PostMapping(value = "/bankAccount/statement")
     public ResponseEntity<?> getStatement(@RequestBody StatementDateReqDto dateReqDto, BindingResult error) {
 
-        HttpHeaders headers;
-        try {
-            headers = initHeaders();
-        } catch (NoBankAccountException | NoBankConnectionException ex) {
-            LOGGER.error(ex.getMessage());
-            return new ResponseEntity<>(ex.getMessage(), PRECONDITION_FAILED);
-        }
-
         validator.validateStatementDates(dateReqDto, error);
         if (error != null && error.hasErrors()) {
             LOGGER.error(error.getFieldError().getDefaultMessage());
             return new ResponseEntity<>(error.getFieldError().getCode(), PRECONDITION_FAILED);
         }
 
-        List<TransactionRequestDto> allTransactions = new LinkedList<>();
-        double balanceBefore = 0;
-        try {
-            HttpEntity<StatementDateReqDto> request = new HttpEntity<>(dateReqDto, headers);
-            StatementRequestDto statementRequestDto = restTemplate.postForObject(bankIP + "/statement/statement", request, StatementRequestDto.class);
-            balanceBefore = statementRequestDto.getBalanceBefore();
-            allTransactions.addAll(statementRequestDto.getListOfTransactions());
-        } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
-            return new ResponseEntity<>("No connection with bank.", BAD_REQUEST);
-        }
-
-        StatementDto statementDto = userBankAccountService.createStatementDto(balanceBefore, allTransactions);
+        StatementDto statementDto = userBankAccountService.getStatement(dateReqDto);
 
         return new ResponseEntity<>(statementDto, OK);
     }

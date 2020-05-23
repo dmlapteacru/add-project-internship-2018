@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TransactionRequestDto {
     private String Date;
-    private long MainCount;
-    private long CorrespondentCount;
+    private String MainCount;
+    private String CorrespondentCount;
     private double Sum;
     private String Description;
 }

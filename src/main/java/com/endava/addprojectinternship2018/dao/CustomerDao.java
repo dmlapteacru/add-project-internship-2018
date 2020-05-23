@@ -22,4 +22,6 @@ public interface CustomerDao extends JpaRepository <Customer, Integer> {
 
     Optional<Customer> findByCountNumber(long count);
 
+    Optional<Customer> findByBankAccountAccountNumber(String accountNumber);
+
 }
